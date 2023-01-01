@@ -1,0 +1,14 @@
+{
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "Shimakaze API.",
+        "title": "Shimakaze API",
+        "contact": {}
+    },
+    "basePath": "/",
+    "paths": {}
+}

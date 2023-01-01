@@ -1,0 +1,10 @@
+version: "2.4"
+
+services:
+  shimakaze-api:
+    container_name: shimakaze-api
+    image: rl404/shimakaze:latest
+    command: ./shimakaze server
+    restart: always
+    env_file: ./../.env
+    network_mode: host

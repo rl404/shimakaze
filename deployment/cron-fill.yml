@@ -1,0 +1,9 @@
+version: "2.4"
+
+services:
+  shimakaze-cron-fill:
+    container_name: shimakaze-cron-fill
+    image: rl404/shimakaze:latest
+    command: ./shimakaze cron fill
+    env_file: ./../.env
+    network_mode: host

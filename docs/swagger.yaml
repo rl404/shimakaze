@@ -1,0 +1,10 @@
+basePath: /
+info:
+  contact: {}
+  description: Shimakaze API.
+  title: Shimakaze API
+paths: {}
+schemes:
+- http
+- https
+swagger: "2.0"

@@ -1,0 +1,9 @@
+version: "2.4"
+
+services:
+  shimakaze-migrate:
+    container_name: shimakaze-migrate
+    image: rl404/shimakaze:latest
+    command: ./shimakaze migrate
+    env_file: ./../.env
+    network_mode: host
