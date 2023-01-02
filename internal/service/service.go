@@ -15,8 +15,10 @@ import (
 type Service interface {
 	ConsumeMessage(ctx context.Context, msg entity.Message) error
 
-	QueueMissingVtuber(ctx context.Context, limit int) (int, int, error)
 	QueueMissingAgency(ctx context.Context) (int, int, error)
+	QueueMissingVtuber(ctx context.Context, limit int) (int, int, error)
+	QueueOldAgency(ctx context.Context) (int, int, error)
+	QueueOldVtuber(ctx context.Context, limit int) (int, int, error)
 }
 
 type service struct {

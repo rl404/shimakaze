@@ -8,7 +8,7 @@ import (
 	"github.com/rl404/shimakaze/internal/utils"
 )
 
-// Fill to fill missing vtuber.
+// Fill to fill missing data.
 func (c *Cron) Fill(nrApp *newrelic.Application, limit int) error {
 	ctx := errors.Init(context.Background())
 	defer c.log(ctx)

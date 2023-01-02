@@ -107,3 +107,26 @@ func (m *Mongo) UpdateByID(ctx context.Context, id int64, data entity.Agency) (i
 
 	return http.StatusOK, nil
 }
+
+// GetOldIDs to get old ids.
+func (m *Mongo) GetOldIDs(ctx context.Context) ([]int64, int, error) {
+	cursor, err := m.db.Find(ctx, bson.M{
+		"updated_at": bson.M{"$lte": primitive.NewDateTimeFromTime(time.Now().Add(-m.oldAge))},
+	}, options.Find().SetProjection(bson.M{"id": 1}))
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+	defer cursor.Close(ctx)
+
+	var ids []int64
+	for cursor.Next(ctx) {
+		var agency agency
+		if err := cursor.Decode(&agency); err != nil {
+			return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		}
+
+		ids = append(ids, agency.ID)
+	}
+
+	return ids, http.StatusOK, nil
+}

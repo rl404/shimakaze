@@ -34,8 +34,8 @@ type vtuber struct {
 	BloodType           string     `bson:"blood_type"`
 	ZodiacSign          string     `bson:"zodiac_sign"`
 	Emoji               string     `bson:"emoji"`
-	CreatedAt           time.Time
-	UpdatedAt           time.Time
+	CreatedAt           time.Time  `bson:"created_at"`
+	UpdatedAt           time.Time  `bson:"updated_at"`
 }
 
 // MarshalBSON to override marshal function.

@@ -101,3 +101,40 @@ func (s *service) QueueMissingAgency(ctx context.Context) (int, int, error) {
 		}
 	}
 }
+
+// QueueOldAgency to queue old agency.
+func (s *service) QueueOldAgency(ctx context.Context) (int, int, error) {
+	var cnt int
+
+	ids, code, err := s.agency.GetOldIDs(ctx)
+	if err != nil {
+		return cnt, code, errors.Wrap(ctx, err)
+	}
+
+	for _, id := range ids {
+		if err := s.publisher.PublishParseAgency(ctx, entity.ParseAgencyRequest{ID: id}); err != nil {
+			return cnt, http.StatusInternalServerError, errors.Wrap(ctx, err, errors.ErrInternalServer)
+		}
+		cnt++
+	}
+
+	return cnt, http.StatusOK, nil
+}
+
+// QueueOldVtuber to queue old vtuber.
+func (s *service) QueueOldVtuber(ctx context.Context, limit int) (int, int, error) {
+	var cnt int
+
+	ids, code, err := s.vtuber.GetOldIDs(ctx)
+	if err != nil {
+		return cnt, code, errors.Wrap(ctx, err)
+	}
+
+	for i := 0; i < len(ids) && cnt < limit; i, cnt = i+1, cnt+1 {
+		if err := s.publisher.PublishParseVtuber(ctx, entity.ParseVtuberRequest{ID: ids[i]}); err != nil {
+			return cnt, http.StatusInternalServerError, errors.Wrap(ctx, err)
+		}
+	}
+
+	return cnt, http.StatusOK, nil
+}

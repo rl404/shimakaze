@@ -87,3 +87,26 @@ func (m *Mongo) IsOld(ctx context.Context, id int64) (bool, int, error) {
 
 	return false, http.StatusOK, nil
 }
+
+// GetOldIDs to get old ids.
+func (m *Mongo) GetOldIDs(ctx context.Context) ([]int64, int, error) {
+	cursor, err := m.db.Find(ctx, bson.M{
+		"updated_at": bson.M{"$lte": primitive.NewDateTimeFromTime(time.Now().Add(-m.oldAge))},
+	}, options.Find().SetProjection(bson.M{"id": 1}))
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+	defer cursor.Close(ctx)
+
+	var ids []int64
+	for cursor.Next(ctx) {
+		var vtuber vtuber
+		if err := cursor.Decode(&vtuber); err != nil {
+			return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		}
+
+		ids = append(ids, vtuber.ID)
+	}
+
+	return ids, http.StatusOK, nil
+}
