@@ -103,7 +103,7 @@ func cronFill() error {
 
 	// Run cron.
 	utils.Info("filling missing data...")
-	if err := cron.New(service).Fill(nrApp, cfg.Cron.FillLimit); err != nil {
+	if err := cron.New(service).Fill(nrApp); err != nil {
 		return err
 	}
 

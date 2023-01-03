@@ -9,7 +9,7 @@ import (
 )
 
 // Update to old data.
-func (c *Cron) Update(nrApp *newrelic.Application, limit int) error {
+func (c *Cron) Update(nrApp *newrelic.Application) error {
 	ctx := errors.Init(context.Background())
 	defer c.log(ctx)
 
@@ -23,7 +23,7 @@ func (c *Cron) Update(nrApp *newrelic.Application, limit int) error {
 		return errors.Wrap(ctx, err)
 	}
 
-	if err := c.queueOldVtuber(ctx, nrApp, limit); err != nil {
+	if err := c.queueOldVtuber(ctx, nrApp); err != nil {
 		tx.NoticeError(err)
 		return errors.Wrap(ctx, err)
 	}
@@ -45,10 +45,10 @@ func (c *Cron) queueOldAgency(ctx context.Context, nrApp *newrelic.Application) 
 	return nil
 }
 
-func (c *Cron) queueOldVtuber(ctx context.Context, nrApp *newrelic.Application, limit int) error {
+func (c *Cron) queueOldVtuber(ctx context.Context, nrApp *newrelic.Application) error {
 	defer newrelic.FromContext(ctx).StartSegment("queueOldVtuber").End()
 
-	cnt, _, err := c.service.QueueOldVtuber(ctx, limit)
+	cnt, _, err := c.service.QueueOldVtuber(ctx)
 	if err != nil {
 		return errors.Wrap(ctx, err)
 	}

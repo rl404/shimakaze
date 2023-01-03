@@ -60,9 +60,7 @@ type pubsubConfig struct {
 }
 
 type cronConfig struct {
-	FillLimit   int `envconfig:"FILL_LIMIT" validate:"required,gte=0" mod:"default=30"`
-	UpdateLimit int `envconfig:"UPDATE_LIMIT" validate:"required,gte=0" mod:"default=10"`
-	UpdateAge   int `envconfig:"UPDATE_AGE" validate:"required,gte=0" mod:"default=7"`
+	UpdateAge int `envconfig:"UPDATE_AGE" validate:"required,gte=0" mod:"default=7"`
 }
 
 type logConfig struct {

@@ -9,7 +9,7 @@ import (
 )
 
 // Fill to fill missing data.
-func (c *Cron) Fill(nrApp *newrelic.Application, limit int) error {
+func (c *Cron) Fill(nrApp *newrelic.Application) error {
 	ctx := errors.Init(context.Background())
 	defer c.log(ctx)
 
@@ -23,7 +23,7 @@ func (c *Cron) Fill(nrApp *newrelic.Application, limit int) error {
 		return errors.Wrap(ctx, err)
 	}
 
-	if err := c.queueMissingVtuber(ctx, nrApp, limit); err != nil {
+	if err := c.queueMissingVtuber(ctx, nrApp); err != nil {
 		tx.NoticeError(err)
 		return errors.Wrap(ctx, err)
 	}
@@ -45,10 +45,10 @@ func (c *Cron) queueMissingAgency(ctx context.Context, nrApp *newrelic.Applicati
 	return nil
 }
 
-func (c *Cron) queueMissingVtuber(ctx context.Context, nrApp *newrelic.Application, limit int) error {
+func (c *Cron) queueMissingVtuber(ctx context.Context, nrApp *newrelic.Application) error {
 	defer newrelic.FromContext(ctx).StartSegment("queueMissingVtuber").End()
 
-	cnt, _, err := c.service.QueueMissingVtuber(ctx, limit)
+	cnt, _, err := c.service.QueueMissingVtuber(ctx)
 	if err != nil {
 		return errors.Wrap(ctx, err)
 	}
