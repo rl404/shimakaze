@@ -153,7 +153,7 @@ github.com/mattn/go-isatty
 # github.com/montanaflynn/stats v0.6.6
 ## explicit; go 1.13
 github.com/montanaflynn/stats
-# github.com/newrelic/go-agent/v3 v3.20.1
+# github.com/newrelic/go-agent/v3 v3.20.2
 ## explicit; go 1.17
 github.com/newrelic/go-agent/v3/internal
 github.com/newrelic/go-agent/v3/internal/cat
@@ -235,7 +235,7 @@ github.com/swaggo/files
 # github.com/swaggo/http-swagger v1.3.3
 ## explicit; go 1.17
 github.com/swaggo/http-swagger
-# github.com/swaggo/swag v1.8.8
+# github.com/swaggo/swag v1.8.9
 ## explicit; go 1.18
 github.com/swaggo/swag
 # github.com/tmdvs/Go-Emoji-Utils v1.1.0

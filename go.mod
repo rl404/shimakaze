@@ -7,12 +7,12 @@ require (
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/joho/godotenv v1.4.0
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/newrelic/go-agent/v3 v3.20.1
+	github.com/newrelic/go-agent/v3 v3.20.2
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.3
 	github.com/rl404/fairy v0.21.0
 	github.com/spf13/cobra v1.6.1
 	github.com/swaggo/http-swagger v1.3.3
-	github.com/swaggo/swag v1.8.8
+	github.com/swaggo/swag v1.8.9
 	github.com/tmdvs/Go-Emoji-Utils v1.1.0
 	go.mongodb.org/mongo-driver v1.11.1
 	golang.org/x/text v0.5.0
