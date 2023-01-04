@@ -15,7 +15,7 @@ require (
 	github.com/swaggo/swag v1.8.9
 	github.com/tmdvs/Go-Emoji-Utils v1.1.0
 	go.mongodb.org/mongo-driver v1.11.1
-	golang.org/x/text v0.5.0
+	golang.org/x/text v0.6.0
 )
 
 require (
