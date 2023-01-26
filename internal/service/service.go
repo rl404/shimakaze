@@ -13,6 +13,12 @@ import (
 
 // Service contains functions for service.
 type Service interface {
+	GetVtuberByID(ctx context.Context, id int64) (*vtuber, int, error)
+	GetVtuberImages(ctx context.Context) ([]vtuberImage, int, error)
+	GetVtuberFamilyTrees(ctx context.Context) (*vtuberFamilyTree, int, error)
+
+	GetWikiaImage(ctx context.Context, path string) ([]byte, int, error)
+
 	ConsumeMessage(ctx context.Context, msg entity.Message) error
 
 	QueueMissingAgency(ctx context.Context) (int, int, error)

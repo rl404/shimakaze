@@ -45,6 +45,21 @@ func ResponseWithJSON(w http.ResponseWriter, code int, data interface{}, err err
 	_, _ = w.Write(rJSON)
 }
 
+// ResponseWithPNG to write response with PNG.
+func ResponseWithPNG(w http.ResponseWriter, code int, data []byte, err error) {
+	if err != nil {
+		ResponseWithJSON(w, code, nil, err)
+		return
+	}
+
+	// Set response header.
+	w.Header().Set("Content-Type", "image/png")
+	w.Header().Set("Content-Length", strconv.Itoa(len(data)))
+	w.WriteHeader(code)
+
+	_, _ = w.Write(data)
+}
+
 // Recoverer is custom recoverer middleware.
 // Will return 500.
 func Recoverer(next http.Handler) http.Handler {

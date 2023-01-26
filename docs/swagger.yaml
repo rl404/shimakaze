@@ -1,9 +1,238 @@
 basePath: /
+definitions:
+  service.vtuber:
+    properties:
+      affiliations:
+        items:
+          type: string
+        type: array
+      age:
+        type: number
+      agencies:
+        items:
+          type: string
+        type: array
+      birthday:
+        type: string
+      blood_type:
+        type: string
+      caption:
+        type: string
+      channels:
+        items:
+          $ref: '#/definitions/service.vtuberChannel'
+        type: array
+      character_2d_modelers:
+        items:
+          type: string
+        type: array
+      character_3d_modelers:
+        items:
+          type: string
+        type: array
+      character_designers:
+        items:
+          type: string
+        type: array
+      debut_date:
+        type: string
+      emoji:
+        type: string
+      gender:
+        type: string
+      has_2d:
+        type: boolean
+      has_3d:
+        type: boolean
+      height:
+        type: number
+      id:
+        type: integer
+      image:
+        type: string
+      name:
+        type: string
+      nicknames:
+        items:
+          type: string
+        type: array
+      official_websites:
+        items:
+          type: string
+        type: array
+      original_names:
+        items:
+          type: string
+        type: array
+      retirement_date:
+        type: string
+      social_medias:
+        items:
+          type: string
+        type: array
+      weight:
+        type: number
+      zodiac_sign:
+        type: string
+    type: object
+  service.vtuberChannel:
+    properties:
+      type:
+        type: string
+      url:
+        type: string
+    type: object
+  service.vtuberFamilyTree:
+    properties:
+      links:
+        items:
+          $ref: '#/definitions/service.vtuberFamilyTreeLink'
+        type: array
+      nodes:
+        items:
+          $ref: '#/definitions/service.vtuberFamilyTreeNode'
+        type: array
+    type: object
+  service.vtuberFamilyTreeLink:
+    properties:
+      id1:
+        type: integer
+      id2:
+        type: integer
+      role:
+        type: string
+    type: object
+  service.vtuberFamilyTreeNode:
+    properties:
+      has_retired:
+        type: boolean
+      id:
+        type: integer
+      image:
+        type: string
+      name:
+        type: string
+    type: object
+  service.vtuberImage:
+    properties:
+      id:
+        type: integer
+      image:
+        type: string
+      name:
+        type: string
+    type: object
+  utils.Response:
+    properties:
+      data:
+        type: object
+      message:
+        type: string
+      meta:
+        type: object
+      status:
+        type: integer
+    type: object
 info:
   contact: {}
   description: Shimakaze API.
   title: Shimakaze API
-paths: {}
+paths:
+  /vtuber/{id}:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/service.vtuber'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get vtuber data.
+      tags:
+      - Vtuber
+  /vtuber/family-trees:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/service.vtuberFamilyTree'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get vtuber family trees.
+      tags:
+      - Vtuber
+  /vtuber/images:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/service.vtuberImage'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get all vtuber images.
+      tags:
+      - Vtuber
+  /wikia/image/{path}:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: PNG image
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get wikia image.
+      tags:
+      - Wikia
 schemes:
 - http
 - https

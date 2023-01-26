@@ -5,9 +5,7 @@ import (
 	"time"
 
 	"github.com/newrelic/go-agent/v3/newrelic"
-	"github.com/rl404/fairy/cache"
 	_nr "github.com/rl404/fairy/log/newrelic"
-	nrCache "github.com/rl404/fairy/monitoring/newrelic/cache"
 	nrPS "github.com/rl404/fairy/monitoring/newrelic/pubsub"
 	"github.com/rl404/fairy/pubsub"
 	"github.com/rl404/shimakaze/internal/delivery/cron"
@@ -48,15 +46,6 @@ func cronUpdate() error {
 		utils.Info("newrelic initialized")
 	}
 
-	// Init cache.
-	c, err := cache.New(cacheType[cfg.Cache.Dialect], cfg.Cache.Address, cfg.Cache.Password, cfg.Cache.Time)
-	if err != nil {
-		return err
-	}
-	c = nrCache.New(cfg.Cache.Dialect, cfg.Cache.Address, c)
-	utils.Info("cache initialized")
-	defer c.Close()
-
 	// Init db.
 	db, err := newDB(cfg.DB)
 	if err != nil {
@@ -79,18 +68,15 @@ func cronUpdate() error {
 	utils.Info("repository wikia initialized")
 
 	// Init vtuber.
-	var vtuber vtuberRepository.Repository
-	vtuber = vtuberMongo.New(db, cfg.Cron.UpdateAge)
+	var vtuber vtuberRepository.Repository = vtuberMongo.New(db, cfg.Cron.UpdateAge)
 	utils.Info("repository vtuber initialized")
 
 	// Init non-vtuber.
-	var nonVtuber nonVtuberRepository.Repository
-	nonVtuber = nonVtuberMongo.New(db)
+	var nonVtuber nonVtuberRepository.Repository = nonVtuberMongo.New(db)
 	utils.Info("repository non-vtuber initialized")
 
 	// Init agency.
-	var agency agencyRepository.Repository
-	agency = agencyMongo.New(db, cfg.Cron.UpdateAge)
+	var agency agencyRepository.Repository = agencyMongo.New(db, cfg.Cron.UpdateAge)
 	utils.Info("repository agency initialized")
 
 	// Init publisher.

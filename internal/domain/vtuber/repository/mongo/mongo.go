@@ -28,6 +28,18 @@ func New(db *mongo.Database, oldAge int) *Mongo {
 	}
 }
 
+// GetByID to get by id.
+func (m *Mongo) GetByID(ctx context.Context, id int64) (*entity.Vtuber, int, error) {
+	var vtuber vtuber
+	if err := m.db.FindOne(ctx, bson.M{"id": id}).Decode(&vtuber); err != nil {
+		if _errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, http.StatusNotFound, errors.Wrap(ctx, errors.ErrVtuberNotFound, err)
+		}
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+	return vtuber.toEntity(), http.StatusOK, nil
+}
+
 // GetAllIDs to get all ids.
 func (m *Mongo) GetAllIDs(ctx context.Context) ([]int64, int, error) {
 	cursor, err := m.db.Find(ctx, bson.M{}, options.Find().SetProjection(bson.M{"id": 1}))
@@ -109,4 +121,64 @@ func (m *Mongo) GetOldIDs(ctx context.Context) ([]int64, int, error) {
 	}
 
 	return ids, http.StatusOK, nil
+}
+
+// GetAllImages to get all images.
+func (m *Mongo) GetAllImages(ctx context.Context) ([]entity.Vtuber, int, error) {
+	cursor, err := m.db.Find(ctx, bson.M{"image": bson.M{"$ne": ""}}, options.Find().SetProjection(bson.M{"id": 1, "name": 1, "image": 1}))
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	var res []entity.Vtuber
+	for cursor.Next(ctx) {
+		var vtuber vtuber
+		if err := cursor.Decode(&vtuber); err != nil {
+			return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		}
+
+		res = append(res, entity.Vtuber{
+			ID:    vtuber.ID,
+			Name:  vtuber.Name,
+			Image: vtuber.Image,
+		})
+	}
+
+	return res, http.StatusOK, nil
+}
+
+// GetAllForTree to get all data for tree.
+func (m *Mongo) GetAllForTree(ctx context.Context) ([]entity.Vtuber, int, error) {
+	cursor, err := m.db.Find(ctx, bson.M{}, options.Find().SetProjection(bson.M{
+		"id":                    1,
+		"name":                  1,
+		"image":                 1,
+		"retirement_date":       1,
+		"character_designers":   1,
+		"character_2d_modelers": 1,
+		"character_3d_modelers": 1,
+	}))
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	var res []entity.Vtuber
+	for cursor.Next(ctx) {
+		var vtuber vtuber
+		if err := cursor.Decode(&vtuber); err != nil {
+			return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		}
+
+		res = append(res, entity.Vtuber{
+			ID:                  vtuber.ID,
+			Name:                vtuber.Name,
+			Image:               vtuber.Image,
+			RetirementDate:      vtuber.RetirementDate,
+			CharacterDesigners:  vtuber.CharacterDesigners,
+			Character2DModelers: vtuber.Character2DModelers,
+			Character3DModelers: vtuber.Character3DModelers,
+		})
+	}
+
+	return res, http.StatusOK, nil
 }

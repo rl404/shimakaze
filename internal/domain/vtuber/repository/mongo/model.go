@@ -50,6 +50,60 @@ func (n *vtuber) MarshalBSON() ([]byte, error) {
 	return bson.Marshal((*n2)(n))
 }
 
+func (v *vtuber) toEntity() *entity.Vtuber {
+	channels := make([]entity.Channel, len(v.Channels))
+	for i, c := range v.Channels {
+		videos := make([]entity.Video, len(c.Videos))
+		for j, vi := range c.Videos {
+			videos[j] = entity.Video{
+				Title:     vi.Title,
+				URL:       vi.URL,
+				Image:     vi.Image,
+				StartDate: vi.StartDate,
+				EndDate:   vi.EndDate,
+			}
+		}
+
+		channels[i] = entity.Channel{
+			Name:       c.Name,
+			Type:       c.Type,
+			URL:        c.URL,
+			Image:      c.Image,
+			Subscriber: c.Subscriber,
+			Videos:     videos,
+		}
+	}
+
+	return &entity.Vtuber{
+		ID:                  v.ID,
+		Name:                v.Name,
+		Image:               v.Image,
+		OriginalNames:       v.OriginalNames,
+		Nicknames:           v.Nicknames,
+		Caption:             v.Caption,
+		DebutDate:           v.DebutDate,
+		RetirementDate:      v.RetirementDate,
+		Has2D:               v.Has2D,
+		Has3D:               v.Has3D,
+		CharacterDesigners:  v.CharacterDesigners,
+		Character2DModelers: v.Character2DModelers,
+		Character3DModelers: v.Character3DModelers,
+		Agencies:            v.Agencies,
+		Affiliations:        v.Affiliations,
+		Channels:            channels,
+		SocialMedias:        v.SocialMedias,
+		OfficialWebsites:    v.OfficialWebsites,
+		Gender:              v.Gender,
+		Age:                 v.Age,
+		Birthday:            v.Birthday,
+		Height:              v.Height,
+		Weight:              v.Weight,
+		BloodType:           v.BloodType,
+		ZodiacSign:          v.ZodiacSign,
+		Emoji:               v.Emoji,
+	}
+}
+
 type channel struct {
 	Name       string             `bson:"name"`
 	Type       entity.ChannelType `bson:"type"`

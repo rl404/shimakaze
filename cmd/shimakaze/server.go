@@ -18,12 +18,15 @@ import (
 	"github.com/rl404/shimakaze/internal/delivery/rest/ping"
 	"github.com/rl404/shimakaze/internal/delivery/rest/swagger"
 	agencyRepository "github.com/rl404/shimakaze/internal/domain/agency/repository"
+	agencyCache "github.com/rl404/shimakaze/internal/domain/agency/repository/cache"
 	agencyMongo "github.com/rl404/shimakaze/internal/domain/agency/repository/mongo"
 	nonVtuberRepository "github.com/rl404/shimakaze/internal/domain/non_vtuber/repository"
+	nonVtuberCache "github.com/rl404/shimakaze/internal/domain/non_vtuber/repository/cache"
 	nonVtuberMongo "github.com/rl404/shimakaze/internal/domain/non_vtuber/repository/mongo"
 	publisherRepository "github.com/rl404/shimakaze/internal/domain/publisher/repository"
 	publisherPubsub "github.com/rl404/shimakaze/internal/domain/publisher/repository/pubsub"
 	vtuberRepository "github.com/rl404/shimakaze/internal/domain/vtuber/repository"
+	vtuberCache "github.com/rl404/shimakaze/internal/domain/vtuber/repository/cache"
 	vtuberMongo "github.com/rl404/shimakaze/internal/domain/vtuber/repository/mongo"
 	wikiaRepository "github.com/rl404/shimakaze/internal/domain/wikia/repository"
 	wikiaClient "github.com/rl404/shimakaze/internal/domain/wikia/repository/client"
@@ -97,16 +100,22 @@ func server() error {
 	// Init vtuber.
 	var vtuber vtuberRepository.Repository
 	vtuber = vtuberMongo.New(db, cfg.Cron.UpdateAge)
+	vtuber = vtuberCache.New(c, vtuber)
+	vtuber = vtuberCache.New(im, vtuber)
 	utils.Info("repository vtuber initialized")
 
 	// Init non-vtuber.
 	var nonVtuber nonVtuberRepository.Repository
 	nonVtuber = nonVtuberMongo.New(db)
+	nonVtuber = nonVtuberCache.New(c, nonVtuber)
+	nonVtuber = nonVtuberCache.New(im, nonVtuber)
 	utils.Info("repository non-vtuber initialized")
 
 	// Init agency.
 	var agency agencyRepository.Repository
 	agency = agencyMongo.New(db, cfg.Cron.UpdateAge)
+	agency = agencyCache.New(c, agency)
+	agency = agencyCache.New(im, agency)
 	utils.Info("repository agency initialized")
 
 	// Init publisher.
