@@ -235,7 +235,7 @@ github.com/swaggo/files
 # github.com/swaggo/http-swagger v1.3.3
 ## explicit; go 1.17
 github.com/swaggo/http-swagger
-# github.com/swaggo/swag v1.8.9
+# github.com/swaggo/swag v1.8.10
 ## explicit; go 1.18
 github.com/swaggo/swag
 # github.com/tmdvs/Go-Emoji-Utils v1.1.0
