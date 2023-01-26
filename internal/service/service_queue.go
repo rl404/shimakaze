@@ -87,7 +87,7 @@ func (s *service) QueueMissingAgency(ctx context.Context) (int, int, error) {
 			existMap[agency.ID] = true
 
 			if err := s.publisher.PublishParseAgency(ctx, entity.ParseAgencyRequest{ID: agency.ID}); err != nil {
-				return cnt, http.StatusInternalServerError, errors.Wrap(ctx, err, errors.ErrInternalServer)
+				return cnt, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
 			}
 
 			cnt++
@@ -110,7 +110,7 @@ func (s *service) QueueOldAgency(ctx context.Context) (int, int, error) {
 
 	for _, id := range ids {
 		if err := s.publisher.PublishParseAgency(ctx, entity.ParseAgencyRequest{ID: id}); err != nil {
-			return cnt, http.StatusInternalServerError, errors.Wrap(ctx, err, errors.ErrInternalServer)
+			return cnt, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
 		}
 		cnt++
 	}

@@ -14,4 +14,6 @@ type Repository interface {
 	GetCategoryMembers(ctx context.Context, cmTitle string, cmLimit int, cmContinue string) ([]entity.CategoryMember, string, int, error)
 	GetImageInfo(ctx context.Context, imageName string) (string, int, error)
 	GetPageCategories(ctx context.Context, id int64, clLimit int, clContinue string) ([]entity.PageCategory, string, int, error)
+
+	GetImage(ctx context.Context, path string) ([]byte, int, error)
 }

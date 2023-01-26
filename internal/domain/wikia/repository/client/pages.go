@@ -46,12 +46,12 @@ func (c *Client) GetPages(ctx context.Context, limit int, lastName string) ([]en
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url.String(), nil)
 	if err != nil {
-		return nil, "", http.StatusInternalServerError, errors.Wrap(ctx, err, errors.ErrInternalServer)
+		return nil, "", http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
 	}
 
 	resp, err := c.http.Do(req)
 	if err != nil {
-		return nil, "", http.StatusInternalServerError, errors.Wrap(ctx, err, errors.ErrInternalServer)
+		return nil, "", http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
 	}
 	defer resp.Body.Close()
 
@@ -61,12 +61,12 @@ func (c *Client) GetPages(ctx context.Context, limit int, lastName string) ([]en
 
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, "", http.StatusInternalServerError, errors.Wrap(ctx, err, errors.ErrInternalServer)
+		return nil, "", http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
 	}
 
 	var body getPagesResponse
 	if err := json.Unmarshal(respBody, &body); err != nil {
-		return nil, "", http.StatusInternalServerError, errors.Wrap(ctx, err, errors.ErrInternalServer)
+		return nil, "", http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
 	}
 
 	if body.Error.Info != "" {

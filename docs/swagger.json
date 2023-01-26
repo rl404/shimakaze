@@ -10,5 +10,371 @@
         "contact": {}
     },
     "basePath": "/",
-    "paths": {}
+    "paths": {
+        "/vtuber/family-trees": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vtuber"
+                ],
+                "summary": "Get vtuber family trees.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/service.vtuberFamilyTree"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/vtuber/images": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vtuber"
+                ],
+                "summary": "Get all vtuber images.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/service.vtuberImage"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/vtuber/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vtuber"
+                ],
+                "summary": "Get vtuber data.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/service.vtuber"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/wikia/image/{path}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Wikia"
+                ],
+                "summary": "Get wikia image.",
+                "responses": {
+                    "200": {
+                        "description": "PNG image"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "service.vtuber": {
+            "type": "object",
+            "properties": {
+                "affiliations": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "age": {
+                    "type": "number"
+                },
+                "agencies": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "birthday": {
+                    "type": "string"
+                },
+                "blood_type": {
+                    "type": "string"
+                },
+                "caption": {
+                    "type": "string"
+                },
+                "channels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.vtuberChannel"
+                    }
+                },
+                "character_2d_modelers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "character_3d_modelers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "character_designers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "debut_date": {
+                    "type": "string"
+                },
+                "emoji": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "has_2d": {
+                    "type": "boolean"
+                },
+                "has_3d": {
+                    "type": "boolean"
+                },
+                "height": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nicknames": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "official_websites": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "original_names": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "retirement_date": {
+                    "type": "string"
+                },
+                "social_medias": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "weight": {
+                    "type": "number"
+                },
+                "zodiac_sign": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.vtuberChannel": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.vtuberFamilyTree": {
+            "type": "object",
+            "properties": {
+                "links": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.vtuberFamilyTreeLink"
+                    }
+                },
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.vtuberFamilyTreeNode"
+                    }
+                }
+            }
+        },
+        "service.vtuberFamilyTreeLink": {
+            "type": "object",
+            "properties": {
+                "id1": {
+                    "type": "integer"
+                },
+                "id2": {
+                    "type": "integer"
+                },
+                "role": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.vtuberFamilyTreeNode": {
+            "type": "object",
+            "properties": {
+                "has_retired": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.vtuberImage": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "utils.Response": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "meta": {
+                    "type": "object"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
 }

@@ -15,6 +15,8 @@ var (
 	ErrInvalidRequestFormat = errors.New("invalid request format")
 	ErrInvalidMessageType   = errors.New("invalid message type")
 	ErrWikiaPageNotFound    = errors.New("wikia page not found")
+	ErrInvalidID            = errors.New("invalid id")
+	ErrVtuberNotFound       = errors.New("vtuber not found")
 )
 
 // ErrRequiredField is error for missing field.
