@@ -21,7 +21,7 @@ type vtuber struct {
 	CharacterDesigners  []string   `bson:"character_designers"`
 	Character2DModelers []string   `bson:"character_2d_modelers"`
 	Character3DModelers []string   `bson:"character_3d_modelers"`
-	Agencies            []string   `bson:"agencies"`
+	Agencies            []agency   `bson:"agencies"`
 	Affiliations        []string   `bson:"affiliations"`
 	Channels            []channel  `bson:"channels"`
 	SocialMedias        []string   `bson:"social_medias"`
@@ -51,6 +51,15 @@ func (n *vtuber) MarshalBSON() ([]byte, error) {
 }
 
 func (v *vtuber) toEntity() *entity.Vtuber {
+	agencies := make([]entity.Agency, len(v.Agencies))
+	for i, a := range v.Agencies {
+		agencies[i] = entity.Agency{
+			ID:    a.ID,
+			Name:  a.Name,
+			Image: a.Image,
+		}
+	}
+
 	channels := make([]entity.Channel, len(v.Channels))
 	for i, c := range v.Channels {
 		videos := make([]entity.Video, len(c.Videos))
@@ -88,7 +97,7 @@ func (v *vtuber) toEntity() *entity.Vtuber {
 		CharacterDesigners:  v.CharacterDesigners,
 		Character2DModelers: v.Character2DModelers,
 		Character3DModelers: v.Character3DModelers,
-		Agencies:            v.Agencies,
+		Agencies:            agencies,
 		Affiliations:        v.Affiliations,
 		Channels:            channels,
 		SocialMedias:        v.SocialMedias,
@@ -102,6 +111,12 @@ func (v *vtuber) toEntity() *entity.Vtuber {
 		ZodiacSign:          v.ZodiacSign,
 		Emoji:               v.Emoji,
 	}
+}
+
+type agency struct {
+	ID    int64  `json:"id"`
+	Name  string `json:"name"`
+	Image string `json:"image"`
 }
 
 type channel struct {
@@ -122,6 +137,15 @@ type video struct {
 }
 
 func (m *Mongo) vtuberFromEntity(v entity.Vtuber) *vtuber {
+	agencies := make([]agency, len(v.Agencies))
+	for i, a := range v.Agencies {
+		agencies[i] = agency{
+			ID:    a.ID,
+			Name:  a.Name,
+			Image: a.Image,
+		}
+	}
+
 	channels := make([]channel, len(v.Channels))
 	for i, c := range v.Channels {
 		videos := make([]video, len(c.Videos))
@@ -159,7 +183,7 @@ func (m *Mongo) vtuberFromEntity(v entity.Vtuber) *vtuber {
 		CharacterDesigners:  v.CharacterDesigners,
 		Character2DModelers: v.Character2DModelers,
 		Character3DModelers: v.Character3DModelers,
-		Agencies:            v.Agencies,
+		Agencies:            agencies,
 		Affiliations:        v.Affiliations,
 		Channels:            channels,
 		SocialMedias:        v.SocialMedias,

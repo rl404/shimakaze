@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"math/rand"
 	"net/http"
 	"time"
 
@@ -23,7 +24,7 @@ type vtuber struct {
 	CharacterDesigners  []string        `json:"character_designers"`
 	Character2DModelers []string        `json:"character_2d_modelers"`
 	Character3DModelers []string        `json:"character_3d_modelers"`
-	Agencies            []string        `json:"agencies"`
+	Agencies            []vtuberAgency  `json:"agencies"`
 	Affiliations        []string        `json:"affiliations"`
 	Channels            []vtuberChannel `json:"channels"`
 	SocialMedias        []string        `json:"social_medias"`
@@ -38,6 +39,12 @@ type vtuber struct {
 	Emoji               string          `json:"emoji"`
 }
 
+type vtuberAgency struct {
+	ID    int64  `json:"id"`
+	Name  string `json:"name"`
+	Image string `json:"image"`
+}
+
 type vtuberChannel struct {
 	Type entity.ChannelType `json:"type"`
 	URL  string             `json:"url"`
@@ -48,6 +55,15 @@ func (s *service) GetVtuberByID(ctx context.Context, id int64) (*vtuber, int, er
 	vt, code, err := s.vtuber.GetByID(ctx, id)
 	if err != nil {
 		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	agencies := make([]vtuberAgency, len(vt.Agencies))
+	for i, a := range vt.Agencies {
+		agencies[i] = vtuberAgency{
+			ID:    a.ID,
+			Name:  a.Name,
+			Image: a.Image,
+		}
 	}
 
 	channels := make([]vtuberChannel, len(vt.Channels))
@@ -72,7 +88,7 @@ func (s *service) GetVtuberByID(ctx context.Context, id int64) (*vtuber, int, er
 		CharacterDesigners:  vt.CharacterDesigners,
 		Character2DModelers: vt.Character2DModelers,
 		Character3DModelers: vt.Character3DModelers,
-		Agencies:            vt.Agencies,
+		Agencies:            agencies,
 		Affiliations:        vt.Affiliations,
 		Channels:            channels,
 		SocialMedias:        vt.SocialMedias,
@@ -95,8 +111,8 @@ type vtuberImage struct {
 }
 
 // GetVtuberImages to get all vtuber images.
-func (s *service) GetVtuberImages(ctx context.Context) ([]vtuberImage, int, error) {
-	images, code, err := s.vtuber.GetAllImages(ctx)
+func (s *service) GetVtuberImages(ctx context.Context, shuffle bool, limit int) ([]vtuberImage, int, error) {
+	images, code, err := s.vtuber.GetAllImages(ctx, shuffle, limit)
 	if err != nil {
 		return nil, code, errors.Wrap(ctx, err)
 	}
@@ -108,6 +124,13 @@ func (s *service) GetVtuberImages(ctx context.Context) ([]vtuberImage, int, erro
 			Name:  img.Name,
 			Image: img.Image,
 		}
+	}
+
+	if shuffle {
+		rand.Seed(time.Now().UnixNano())
+		rand.Shuffle(len(res), func(i, j int) {
+			res[i], res[j] = res[j], res[i]
+		})
 	}
 
 	return res, http.StatusOK, nil

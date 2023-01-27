@@ -14,7 +14,7 @@ import (
 // Service contains functions for service.
 type Service interface {
 	GetVtuberByID(ctx context.Context, id int64) (*vtuber, int, error)
-	GetVtuberImages(ctx context.Context) ([]vtuberImage, int, error)
+	GetVtuberImages(ctx context.Context, shuffle bool, limit int) ([]vtuberImage, int, error)
 	GetVtuberFamilyTrees(ctx context.Context) (*vtuberFamilyTree, int, error)
 
 	GetWikiaImage(ctx context.Context, path string) ([]byte, int, error)
