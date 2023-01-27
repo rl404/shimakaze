@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"math/rand"
 	"net/http"
 	"time"
 
@@ -95,8 +96,8 @@ type vtuberImage struct {
 }
 
 // GetVtuberImages to get all vtuber images.
-func (s *service) GetVtuberImages(ctx context.Context) ([]vtuberImage, int, error) {
-	images, code, err := s.vtuber.GetAllImages(ctx)
+func (s *service) GetVtuberImages(ctx context.Context, shuffle bool, limit int) ([]vtuberImage, int, error) {
+	images, code, err := s.vtuber.GetAllImages(ctx, shuffle, limit)
 	if err != nil {
 		return nil, code, errors.Wrap(ctx, err)
 	}
@@ -108,6 +109,13 @@ func (s *service) GetVtuberImages(ctx context.Context) ([]vtuberImage, int, erro
 			Name:  img.Name,
 			Image: img.Image,
 		}
+	}
+
+	if shuffle {
+		rand.Seed(time.Now().UnixNano())
+		rand.Shuffle(len(res), func(i, j int) {
+			res[i], res[j] = res[j], res[i]
+		})
 	}
 
 	return res, http.StatusOK, nil

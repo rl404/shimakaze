@@ -16,7 +16,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/vtuber/family-trees": {
+        "/vtubers/family-trees": {
             "get": {
                 "produces": [
                     "application/json"
@@ -53,7 +53,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/vtuber/images": {
+        "/vtubers/images": {
             "get": {
                 "produces": [
                     "application/json"
@@ -62,6 +62,20 @@ const docTemplate = `{
                     "Vtuber"
                 ],
                 "summary": "Get all vtuber images.",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "shuffle",
+                        "name": "shuffle",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -93,7 +107,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/vtuber/{id}": {
+        "/vtubers/{id}": {
             "get": {
                 "produces": [
                     "application/json"

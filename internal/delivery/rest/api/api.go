@@ -74,7 +74,7 @@ func (api *API) handleGetWikiaImage(w http.ResponseWriter, r *http.Request) {
 // @failure 400 {object} utils.Response
 // @failure 404 {object} utils.Response
 // @failure 500 {object} utils.Response
-// @router /vtuber/{id} [get]
+// @router /vtubers/{id} [get]
 func (api *API) handleGetVtuberByID(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
@@ -89,11 +89,15 @@ func (api *API) handleGetVtuberByID(w http.ResponseWriter, r *http.Request) {
 // @summary Get all vtuber images.
 // @tags Vtuber
 // @produce json
+// @param shuffle query boolean false "shuffle"
+// @param limit query integer false "limit"
 // @success 200 {object} utils.Response{data=[]service.vtuberImage}
 // @failure 500 {object} utils.Response
-// @router /vtuber/images [get]
+// @router /vtubers/images [get]
 func (api *API) handleGetVtuberImages(w http.ResponseWriter, r *http.Request) {
-	images, code, err := api.service.GetVtuberImages(r.Context())
+	shuffle, _ := strconv.ParseBool(r.URL.Query().Get("shuffle"))
+	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
+	images, code, err := api.service.GetVtuberImages(r.Context(), shuffle, limit)
 	utils.ResponseWithJSON(w, code, images, errors.Wrap(r.Context(), err))
 }
 
@@ -102,7 +106,7 @@ func (api *API) handleGetVtuberImages(w http.ResponseWriter, r *http.Request) {
 // @produce json
 // @success 200 {object} utils.Response{data=service.vtuberFamilyTree}
 // @failure 500 {object} utils.Response
-// @router /vtuber/family-trees [get]
+// @router /vtubers/family-trees [get]
 func (api *API) handleGetVtuberFamilyTrees(w http.ResponseWriter, r *http.Request) {
 	tree, code, err := api.service.GetVtuberFamilyTrees(r.Context())
 	utils.ResponseWithJSON(w, code, tree, errors.Wrap(r.Context(), err))

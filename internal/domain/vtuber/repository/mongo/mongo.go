@@ -124,7 +124,7 @@ func (m *Mongo) GetOldIDs(ctx context.Context) ([]int64, int, error) {
 }
 
 // GetAllImages to get all images.
-func (m *Mongo) GetAllImages(ctx context.Context) ([]entity.Vtuber, int, error) {
+func (m *Mongo) GetAllImages(ctx context.Context, _ bool, _ int) ([]entity.Vtuber, int, error) {
 	cursor, err := m.db.Find(ctx, bson.M{"image": bson.M{"$ne": ""}}, options.Find().SetProjection(bson.M{"id": 1, "name": 1, "image": 1}))
 	if err != nil {
 		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)

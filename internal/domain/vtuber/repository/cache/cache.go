@@ -2,7 +2,9 @@ package cache
 
 import (
 	"context"
+	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/rl404/fairy/cache"
 	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
@@ -50,15 +52,26 @@ func (c *Cache) GetAllIDs(ctx context.Context) ([]int64, int, error) {
 }
 
 // GetAllImages to get all images.
-func (c *Cache) GetAllImages(ctx context.Context) (data []entity.Vtuber, code int, err error) {
+func (c *Cache) GetAllImages(ctx context.Context, shuffle bool, limit int) (data []entity.Vtuber, code int, err error) {
 	key := utils.GetKey("vtuber", "images")
 	if c.cacher.Get(ctx, key, &data) == nil {
 		return data, http.StatusOK, nil
 	}
 
-	data, code, err = c.repo.GetAllImages(ctx)
+	data, code, err = c.repo.GetAllImages(ctx, shuffle, limit)
 	if err != nil {
 		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	if shuffle {
+		rand.Seed(time.Now().UnixNano())
+		rand.Shuffle(len(data), func(i, j int) {
+			data[i], data[j] = data[j], data[i]
+		})
+	}
+
+	if limit > 0 && len(data) > limit {
+		data = data[:limit]
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
