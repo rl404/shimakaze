@@ -51,6 +51,7 @@ func (api *API) Register(r chi.Router, nrApp *newrelic.Application) {
 // @summary Get wikia image.
 // @tags Wikia
 // @produce json
+// @param path path string true "wikia image url"
 // @success 200 "PNG image"
 // @success 400 {object} utils.Response
 // @success 404 {object} utils.Response
@@ -70,6 +71,7 @@ func (api *API) handleGetWikiaImage(w http.ResponseWriter, r *http.Request) {
 // @summary Get vtuber data.
 // @tags Vtuber
 // @produce json
+// @param id path integer true "wikia id"
 // @success 200 {object} utils.Response{data=service.vtuber}
 // @failure 400 {object} utils.Response
 // @failure 404 {object} utils.Response

@@ -75,7 +75,7 @@ func (s *service) getVtuberImage(ctx context.Context, id int64) string {
 type vtuberCategory struct {
 	has2D         bool
 	has3D         bool
-	agencies      []string
+	agencies      []vtuberEntity.Agency
 	charDesigner  []string
 	char2DModeler []string
 	char3DModeler []string
@@ -89,9 +89,13 @@ func (s *service) getVtuberCategory(ctx context.Context, id int64) (vtuberCatego
 		return
 	}
 
-	agencyMap := make(map[string]bool)
+	agencyMap := make(map[string]vtuberEntity.Agency)
 	for _, a := range agencies {
-		agencyMap[strings.ToLower(a.Name)] = true
+		agencyMap[strings.ToLower(a.Name)] = vtuberEntity.Agency{
+			ID:    a.ID,
+			Name:  a.Name,
+			Image: a.Image,
+		}
 	}
 
 	// Loop and map categories.
@@ -122,8 +126,8 @@ func (s *service) getVtuberCategory(ctx context.Context, id int64) (vtuberCatego
 				vtuberCategory.has3D = true
 			}
 
-			if v, ok := agencyMap[strings.ToLower(category)]; v && ok {
-				vtuberCategory.agencies = append(vtuberCategory.agencies, category)
+			if v, ok := agencyMap[strings.ToLower(category)]; ok {
+				vtuberCategory.agencies = append(vtuberCategory.agencies, v)
 			}
 
 			if designedBy := strings.Split(category, "Designed by "); len(designedBy) > 1 {

@@ -17,7 +17,7 @@ type Vtuber struct {
 	CharacterDesigners  []string
 	Character2DModelers []string
 	Character3DModelers []string
-	Agencies            []string
+	Agencies            []Agency
 	Affiliations        []string
 	Channels            []Channel
 	SocialMedias        []string
@@ -43,6 +43,13 @@ const (
 	ChannelNiconico ChannelType = "NICONICO"
 	ChannelOther    ChannelType = "OTHER"
 )
+
+// Agency is entity for agency.
+type Agency struct {
+	ID    int64
+	Name  string
+	Image string
+}
 
 // Channel is entity for channel.
 type Channel struct {

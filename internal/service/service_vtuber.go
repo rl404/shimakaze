@@ -24,7 +24,7 @@ type vtuber struct {
 	CharacterDesigners  []string        `json:"character_designers"`
 	Character2DModelers []string        `json:"character_2d_modelers"`
 	Character3DModelers []string        `json:"character_3d_modelers"`
-	Agencies            []string        `json:"agencies"`
+	Agencies            []vtuberAgency  `json:"agencies"`
 	Affiliations        []string        `json:"affiliations"`
 	Channels            []vtuberChannel `json:"channels"`
 	SocialMedias        []string        `json:"social_medias"`
@@ -39,6 +39,12 @@ type vtuber struct {
 	Emoji               string          `json:"emoji"`
 }
 
+type vtuberAgency struct {
+	ID    int64  `json:"id"`
+	Name  string `json:"name"`
+	Image string `json:"image"`
+}
+
 type vtuberChannel struct {
 	Type entity.ChannelType `json:"type"`
 	URL  string             `json:"url"`
@@ -49,6 +55,15 @@ func (s *service) GetVtuberByID(ctx context.Context, id int64) (*vtuber, int, er
 	vt, code, err := s.vtuber.GetByID(ctx, id)
 	if err != nil {
 		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	agencies := make([]vtuberAgency, len(vt.Agencies))
+	for i, a := range vt.Agencies {
+		agencies[i] = vtuberAgency{
+			ID:    a.ID,
+			Name:  a.Name,
+			Image: a.Image,
+		}
 	}
 
 	channels := make([]vtuberChannel, len(vt.Channels))
@@ -73,7 +88,7 @@ func (s *service) GetVtuberByID(ctx context.Context, id int64) (*vtuber, int, er
 		CharacterDesigners:  vt.CharacterDesigners,
 		Character2DModelers: vt.Character2DModelers,
 		Character3DModelers: vt.Character3DModelers,
-		Agencies:            vt.Agencies,
+		Agencies:            agencies,
 		Affiliations:        vt.Affiliations,
 		Channels:            channels,
 		SocialMedias:        vt.SocialMedias,

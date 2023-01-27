@@ -10,7 +10,7 @@ definitions:
         type: number
       agencies:
         items:
-          type: string
+          $ref: '#/definitions/service.vtuberAgency'
         type: array
       birthday:
         type: string
@@ -73,6 +73,15 @@ definitions:
       weight:
         type: number
       zodiac_sign:
+        type: string
+    type: object
+  service.vtuberAgency:
+    properties:
+      id:
+        type: integer
+      image:
+        type: string
+      name:
         type: string
     type: object
   service.vtuberChannel:
@@ -140,6 +149,12 @@ info:
 paths:
   /vtubers/{id}:
     get:
+      parameters:
+      - description: wikia id
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -222,6 +237,12 @@ paths:
       - Vtuber
   /wikia/image/{path}:
     get:
+      parameters:
+      - description: wikia image url
+        in: path
+        name: path
+        required: true
+        type: string
       produces:
       - application/json
       responses:

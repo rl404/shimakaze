@@ -116,6 +116,15 @@ const docTemplate = `{
                     "Vtuber"
                 ],
                 "summary": "Get vtuber data.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "wikia id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -165,6 +174,15 @@ const docTemplate = `{
                     "Wikia"
                 ],
                 "summary": "Get wikia image.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "wikia image url",
+                        "name": "path",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "PNG image"
@@ -207,7 +225,7 @@ const docTemplate = `{
                 "agencies": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/service.vtuberAgency"
                     }
                 },
                 "birthday": {
@@ -301,6 +319,20 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "zodiac_sign": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.vtuberAgency": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 }
             }
