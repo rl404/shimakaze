@@ -45,6 +45,7 @@ func (api *API) Register(r chi.Router, nrApp *newrelic.Application) {
 		r.Get("/vtubers/{id}", api.handleGetVtuberByID)
 		r.Get("/vtubers/images", api.handleGetVtuberImages)
 		r.Get("/vtubers/family-trees", api.handleGetVtuberFamilyTrees)
+		r.Get("/vtubers/agency-trees", api.handleGetVtuberAgencyTrees)
 	})
 }
 
@@ -111,5 +112,16 @@ func (api *API) handleGetVtuberImages(w http.ResponseWriter, r *http.Request) {
 // @router /vtubers/family-trees [get]
 func (api *API) handleGetVtuberFamilyTrees(w http.ResponseWriter, r *http.Request) {
 	tree, code, err := api.service.GetVtuberFamilyTrees(r.Context())
+	utils.ResponseWithJSON(w, code, tree, errors.Wrap(r.Context(), err))
+}
+
+// @summary Get vtuber agency trees.
+// @tags Vtuber
+// @produce json
+// @success 200 {object} utils.Response{data=service.vtuberAgencyTree}
+// @failure 500 {object} utils.Response
+// @router /vtubers/agency-trees [get]
+func (api *API) handleGetVtuberAgencyTrees(w http.ResponseWriter, r *http.Request) {
+	tree, code, err := api.service.GetVtuberAgencyTrees(r.Context())
 	utils.ResponseWithJSON(w, code, tree, errors.Wrap(r.Context(), err))
 }

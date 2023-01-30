@@ -164,7 +164,7 @@ const (
 
 // GetVtuberFamilyTrees to get all vtuber family tree.
 func (s *service) GetVtuberFamilyTrees(ctx context.Context) (*vtuberFamilyTree, int, error) {
-	vtubers, code, err := s.vtuber.GetAllForTree(ctx)
+	vtubers, code, err := s.vtuber.GetAllForFamilyTree(ctx)
 	if err != nil {
 		return nil, code, errors.Wrap(ctx, err)
 	}
@@ -222,6 +222,69 @@ func (s *service) GetVtuberFamilyTrees(ctx context.Context) (*vtuberFamilyTree, 
 		tree.Nodes = append(tree.Nodes, vtuberFamilyTreeNode{
 			ID:   v,
 			Name: k,
+		})
+	}
+
+	return &tree, http.StatusOK, nil
+}
+
+type vtuberAgencyTree struct {
+	Nodes []vtuberAgencyTreeNode `json:"nodes"`
+	Links []vtuberAgencyTreeLink `json:"links"`
+}
+
+type vtuberAgencyTreeNode struct {
+	ID         int64    `json:"id"`
+	Name       string   `json:"name"`
+	Image      string   `json:"image"`
+	HasRetired bool     `json:"has_retired"`
+	Agencies   []string `json:"agencies"`
+}
+
+type vtuberAgencyTreeLink struct {
+	ID1 int64 `json:"id1"`
+	ID2 int64 `json:"id2"`
+}
+
+// GetVtuberAgencyTrees to get all vtuber agency tree.
+func (s *service) GetVtuberAgencyTrees(ctx context.Context) (*vtuberAgencyTree, int, error) {
+	vtubers, code, err := s.vtuber.GetAllForAgencyTree(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	agencies, code, err := s.agency.GetAll(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	var tree vtuberAgencyTree
+
+	for _, agency := range agencies {
+		tree.Nodes = append(tree.Nodes, vtuberAgencyTreeNode{
+			ID:    -agency.ID,
+			Name:  agency.Name,
+			Image: agency.Image,
+		})
+	}
+
+	for _, vtuber := range vtubers {
+		agenciesTmp := make([]string, len(vtuber.Agencies))
+		for i, a := range vtuber.Agencies {
+			agenciesTmp[i] = a.Name
+
+			tree.Links = append(tree.Links, vtuberAgencyTreeLink{
+				ID1: -a.ID,
+				ID2: vtuber.ID,
+			})
+		}
+
+		tree.Nodes = append(tree.Nodes, vtuberAgencyTreeNode{
+			ID:         vtuber.ID,
+			Name:       vtuber.Name,
+			Image:      vtuber.Image,
+			HasRetired: vtuber.RetirementDate != nil,
+			Agencies:   agenciesTmp,
 		})
 	}
 

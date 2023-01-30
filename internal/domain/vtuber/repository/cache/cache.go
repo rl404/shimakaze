@@ -96,14 +96,33 @@ func (c *Cache) GetOldIDs(ctx context.Context) ([]int64, int, error) {
 	return c.repo.GetOldIDs(ctx)
 }
 
-// GetAllForTree to get all for family try.
-func (c *Cache) GetAllForTree(ctx context.Context) (data []entity.Vtuber, code int, err error) {
-	key := utils.GetKey("vtuber", "tree")
+// GetAllForFamilyTree to get all for family tree.
+func (c *Cache) GetAllForFamilyTree(ctx context.Context) (data []entity.Vtuber, code int, err error) {
+	key := utils.GetKey("vtuber", "tree", "family")
 	if c.cacher.Get(ctx, key, &data) == nil {
 		return data, http.StatusOK, nil
 	}
 
-	data, code, err = c.repo.GetAllForTree(ctx)
+	data, code, err = c.repo.GetAllForFamilyTree(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
+}
+
+// GetAllForAgencyTree to get all for agency tree.
+func (c *Cache) GetAllForAgencyTree(ctx context.Context) (data []entity.Vtuber, code int, err error) {
+	key := utils.GetKey("vtuber", "tree", "agency")
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.GetAllForAgencyTree(ctx)
 	if err != nil {
 		return nil, code, errors.Wrap(ctx, err)
 	}

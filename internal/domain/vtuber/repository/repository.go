@@ -14,5 +14,6 @@ type Repository interface {
 	UpdateByID(ctx context.Context, id int64, data entity.Vtuber) (int, error)
 	IsOld(ctx context.Context, id int64) (bool, int, error)
 	GetOldIDs(ctx context.Context) ([]int64, int, error)
-	GetAllForTree(ctx context.Context) ([]entity.Vtuber, int, error)
+	GetAllForFamilyTree(ctx context.Context) ([]entity.Vtuber, int, error)
+	GetAllForAgencyTree(ctx context.Context) ([]entity.Vtuber, int, error)
 }
