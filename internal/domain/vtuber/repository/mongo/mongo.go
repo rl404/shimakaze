@@ -147,8 +147,8 @@ func (m *Mongo) GetAllImages(ctx context.Context, _ bool, _ int) ([]entity.Vtube
 	return res, http.StatusOK, nil
 }
 
-// GetAllForTree to get all data for tree.
-func (m *Mongo) GetAllForTree(ctx context.Context) ([]entity.Vtuber, int, error) {
+// GetAllForFamilyTree to get all data for tree.
+func (m *Mongo) GetAllForFamilyTree(ctx context.Context) ([]entity.Vtuber, int, error) {
 	cursor, err := m.db.Find(ctx, bson.M{}, options.Find().SetProjection(bson.M{
 		"id":                    1,
 		"name":                  1,
@@ -177,6 +177,46 @@ func (m *Mongo) GetAllForTree(ctx context.Context) ([]entity.Vtuber, int, error)
 			CharacterDesigners:  vtuber.CharacterDesigners,
 			Character2DModelers: vtuber.Character2DModelers,
 			Character3DModelers: vtuber.Character3DModelers,
+		})
+	}
+
+	return res, http.StatusOK, nil
+}
+
+// GetAllForAgencyTree to get all data for agency tree.
+func (m *Mongo) GetAllForAgencyTree(ctx context.Context) ([]entity.Vtuber, int, error) {
+	cursor, err := m.db.Find(ctx, bson.M{}, options.Find().SetProjection(bson.M{
+		"id":              1,
+		"name":            1,
+		"image":           1,
+		"retirement_date": 1,
+		"agencies":        1,
+	}))
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	var res []entity.Vtuber
+	for cursor.Next(ctx) {
+		var vtuber vtuber
+		if err := cursor.Decode(&vtuber); err != nil {
+			return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		}
+
+		agencies := make([]entity.Agency, len(vtuber.Agencies))
+		for i, a := range vtuber.Agencies {
+			agencies[i] = entity.Agency{
+				ID:   a.ID,
+				Name: a.Name,
+			}
+		}
+
+		res = append(res, entity.Vtuber{
+			ID:             vtuber.ID,
+			Name:           vtuber.Name,
+			Image:          vtuber.Image,
+			RetirementDate: vtuber.RetirementDate,
+			Agencies:       agencies,
 		})
 	}
 

@@ -16,6 +16,43 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/vtubers/agency-trees": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vtuber"
+                ],
+                "summary": "Get vtuber agency trees.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/service.vtuberAgencyTree"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/vtubers/family-trees": {
             "get": {
                 "produces": [
@@ -326,6 +363,57 @@ const docTemplate = `{
         "service.vtuberAgency": {
             "type": "object",
             "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.vtuberAgencyTree": {
+            "type": "object",
+            "properties": {
+                "links": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.vtuberAgencyTreeLink"
+                    }
+                },
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.vtuberAgencyTreeNode"
+                    }
+                }
+            }
+        },
+        "service.vtuberAgencyTreeLink": {
+            "type": "object",
+            "properties": {
+                "id1": {
+                    "type": "integer"
+                },
+                "id2": {
+                    "type": "integer"
+                }
+            }
+        },
+        "service.vtuberAgencyTreeNode": {
+            "type": "object",
+            "properties": {
+                "agencies": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "has_retired": {
+                    "type": "boolean"
+                },
                 "id": {
                     "type": "integer"
                 },

@@ -84,6 +84,39 @@ definitions:
       name:
         type: string
     type: object
+  service.vtuberAgencyTree:
+    properties:
+      links:
+        items:
+          $ref: '#/definitions/service.vtuberAgencyTreeLink'
+        type: array
+      nodes:
+        items:
+          $ref: '#/definitions/service.vtuberAgencyTreeNode'
+        type: array
+    type: object
+  service.vtuberAgencyTreeLink:
+    properties:
+      id1:
+        type: integer
+      id2:
+        type: integer
+    type: object
+  service.vtuberAgencyTreeNode:
+    properties:
+      agencies:
+        items:
+          type: string
+        type: array
+      has_retired:
+        type: boolean
+      id:
+        type: integer
+      image:
+        type: string
+      name:
+        type: string
+    type: object
   service.vtuberChannel:
     properties:
       type:
@@ -180,6 +213,27 @@ paths:
           schema:
             $ref: '#/definitions/utils.Response'
       summary: Get vtuber data.
+      tags:
+      - Vtuber
+  /vtubers/agency-trees:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/service.vtuberAgencyTree'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get vtuber agency trees.
       tags:
       - Vtuber
   /vtubers/family-trees:
