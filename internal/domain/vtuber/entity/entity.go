@@ -69,3 +69,19 @@ type Video struct {
 	StartDate time.Time
 	EndDate   time.Time
 }
+
+// SearchMode is search mode.
+type SearchMode string
+
+// Available search mode.
+const (
+	SearchModeAll   SearchMode = "all"
+	SearchModeStats SearchMode = "stats"
+)
+
+// GetAllRequest is get all request model.
+type GetAllRequest struct {
+	Mode  SearchMode
+	Page  int
+	Limit int
+}

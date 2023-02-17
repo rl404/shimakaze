@@ -8,6 +8,7 @@ import (
 
 	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	"github.com/rl404/shimakaze/internal/errors"
+	"github.com/rl404/shimakaze/internal/utils"
 )
 
 type vtuber struct {
@@ -289,4 +290,82 @@ func (s *service) GetVtuberAgencyTrees(ctx context.Context) (*vtuberAgencyTree, 
 	}
 
 	return &tree, http.StatusOK, nil
+}
+
+// GetVtubersRequest is get vtubers request model.
+type GetVtubersRequest struct {
+	Mode  entity.SearchMode `validate:"oneof=all stats" mod:"default=all,trim,lcase"`
+	Page  int               `validate:"required,gte=1" mod:"default=1"`
+	Limit int               `validate:"required,gte=-1" mod:"default=20"`
+}
+
+// GetVtubers to get vtuber list.
+func (s *service) GetVtubers(ctx context.Context, data GetVtubersRequest) ([]vtuber, *pagination, int, error) {
+	if err := utils.Validate(&data); err != nil {
+		return nil, nil, http.StatusBadRequest, errors.Wrap(ctx, err)
+	}
+
+	vtubers, total, code, err := s.vtuber.GetAll(ctx, entity.GetAllRequest{
+		Mode:  data.Mode,
+		Page:  data.Page,
+		Limit: data.Limit,
+	})
+	if err != nil {
+		return nil, nil, code, errors.Wrap(ctx, err)
+	}
+
+	res := make([]vtuber, len(vtubers))
+	for i, vt := range vtubers {
+		agencies := make([]vtuberAgency, len(vt.Agencies))
+		for i, a := range vt.Agencies {
+			agencies[i] = vtuberAgency{
+				ID:    a.ID,
+				Name:  a.Name,
+				Image: a.Image,
+			}
+		}
+
+		channels := make([]vtuberChannel, len(vt.Channels))
+		for i, c := range vt.Channels {
+			channels[i] = vtuberChannel{
+				Type: c.Type,
+				URL:  c.URL,
+			}
+		}
+
+		res[i] = vtuber{
+			ID:                  vt.ID,
+			Name:                vt.Name,
+			Image:               vt.Image,
+			OriginalNames:       vt.OriginalNames,
+			Nicknames:           vt.Nicknames,
+			Caption:             vt.Caption,
+			DebutDate:           vt.DebutDate,
+			RetirementDate:      vt.RetirementDate,
+			Has2D:               vt.Has2D,
+			Has3D:               vt.Has3D,
+			CharacterDesigners:  vt.CharacterDesigners,
+			Character2DModelers: vt.Character2DModelers,
+			Character3DModelers: vt.Character3DModelers,
+			Agencies:            agencies,
+			Affiliations:        vt.Affiliations,
+			Channels:            channels,
+			SocialMedias:        vt.SocialMedias,
+			OfficialWebsites:    vt.OfficialWebsites,
+			Gender:              vt.Gender,
+			Age:                 vt.Age,
+			Birthday:            vt.Birthday,
+			Height:              vt.Height,
+			Weight:              vt.Weight,
+			BloodType:           vt.BloodType,
+			ZodiacSign:          vt.ZodiacSign,
+			Emoji:               vt.Emoji,
+		}
+	}
+
+	return res, &pagination{
+		Page:  data.Page,
+		Limit: data.Limit,
+		Total: total,
+	}, http.StatusOK, nil
 }

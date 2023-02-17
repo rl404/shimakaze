@@ -8,6 +8,7 @@ import (
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rl404/fairy/log"
 	"github.com/rl404/fairy/monitoring/newrelic/middleware"
+	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	"github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/service"
 	"github.com/rl404/shimakaze/internal/utils"
@@ -42,6 +43,7 @@ func (api *API) Register(r chi.Router, nrApp *newrelic.Application) {
 
 		r.Get("/wikia/image/*", api.maxConcurrent(api.handleGetWikiaImage, 5))
 
+		r.Get("/vtubers", api.handleGetVtubers)
 		r.Get("/vtubers/{id}", api.handleGetVtuberByID)
 		r.Get("/vtubers/images", api.handleGetVtuberImages)
 		r.Get("/vtubers/family-trees", api.handleGetVtuberFamilyTrees)
@@ -67,6 +69,30 @@ func (api *API) handleGetWikiaImage(w http.ResponseWriter, r *http.Request) {
 
 	image, code, err := api.service.GetWikiaImage(r.Context(), path)
 	utils.ResponseWithPNG(w, code, image, errors.Wrap(r.Context(), err))
+}
+
+// @summary Get vtuber data.
+// @tags Vtuber
+// @produce json
+// @param mode query string false "mode" enums(all, stats) default(all)
+// @param page query integer false "page" default(1)
+// @param limit query integer false "limit" default(20)
+// @success 200 {object} utils.Response{data=[]service.vtuber}
+// @failure 400 {object} utils.Response
+// @failure 500 {object} utils.Response
+// @router /vtubers [get]
+func (api *API) handleGetVtubers(w http.ResponseWriter, r *http.Request) {
+	mode := r.URL.Query().Get("mode")
+	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
+	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
+
+	vtubers, pagination, code, err := api.service.GetVtubers(r.Context(), service.GetVtubersRequest{
+		Mode:  entity.SearchMode(mode),
+		Page:  page,
+		Limit: limit,
+	})
+
+	utils.ResponseWithJSON(w, code, vtubers, errors.Wrap(r.Context(), err), pagination)
 }
 
 // @summary Get vtuber data.
