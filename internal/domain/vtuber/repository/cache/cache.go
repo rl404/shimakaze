@@ -133,3 +133,29 @@ func (c *Cache) GetAllForAgencyTree(ctx context.Context) (data []entity.Vtuber, 
 
 	return data, code, nil
 }
+
+type getAllCache struct {
+	Data  []entity.Vtuber
+	Total int
+}
+
+// GetAll to get vtuber list.
+func (c *Cache) GetAll(ctx context.Context, req entity.GetAllRequest) (_ []entity.Vtuber, _ int, code int, err error) {
+	key := utils.GetKey("vtuber", req.Mode, req.Limit, req.Page)
+
+	var data getAllCache
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data.Data, data.Total, http.StatusOK, nil
+	}
+
+	data.Data, data.Total, code, err = c.repo.GetAll(ctx, req)
+	if err != nil {
+		return nil, 0, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data.Data, data.Total, code, nil
+}

@@ -222,3 +222,45 @@ func (m *Mongo) GetAllForAgencyTree(ctx context.Context) ([]entity.Vtuber, int, 
 
 	return res, http.StatusOK, nil
 }
+
+// GetAll to get all data.
+func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity.Vtuber, int, int, error) {
+	filter := bson.M{}
+	opt := options.Find().SetSkip(int64((data.Page - 1) * data.Limit)).SetLimit(int64(data.Limit))
+
+	if data.Mode == entity.SearchModeStats {
+		opt.SetProjection(bson.M{
+			"image":             0,
+			"original_names":    0,
+			"nicknames":         0,
+			"caption":           0,
+			"affiliations":      0,
+			"official_websites": 0,
+		})
+	}
+
+	if data.Limit < 0 {
+		opt.SetLimit(0)
+	}
+
+	cursor, err := m.db.Find(ctx, filter, opt)
+	if err != nil {
+		return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	var res []entity.Vtuber
+	for cursor.Next(ctx) {
+		var vtuber vtuber
+		if err := cursor.Decode(&vtuber); err != nil {
+			return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		}
+		res = append(res, *vtuber.toEntity())
+	}
+
+	total, err := m.db.CountDocuments(ctx, filter, options.Count())
+	if err != nil {
+		return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	return res, int(total), http.StatusOK, nil
+}

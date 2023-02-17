@@ -8,6 +8,7 @@ import (
 
 // Repository contains functions for vtuber domain.
 type Repository interface {
+	GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity.Vtuber, int, int, error)
 	GetByID(ctx context.Context, id int64) (*entity.Vtuber, int, error)
 	GetAllIDs(ctx context.Context) ([]int64, int, error)
 	GetAllImages(ctx context.Context, shuffle bool, limit int) ([]entity.Vtuber, int, error)
