@@ -16,6 +16,7 @@ func CleanWikiaComment(str string) string {
 
 // CleanWikiaTag to remove wikia tag.
 func CleanWikiaTag(str, tag string, deleteContent bool) string {
+	str = regexp.MustCompile(`<`+tag+` .+/>`).ReplaceAllString(str, "")
 	if deleteContent {
 		doc, _ := goquery.NewDocumentFromReader(strings.NewReader(str))
 		doc.Find(tag).Remove()
