@@ -226,7 +226,7 @@ func (m *Mongo) GetAllForAgencyTree(ctx context.Context) ([]entity.Vtuber, int, 
 // GetAll to get all data.
 func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity.Vtuber, int, int, error) {
 	filter := bson.M{}
-	opt := options.Find().SetSkip(int64((data.Page - 1) * data.Limit)).SetLimit(int64(data.Limit))
+	opt := options.Find().SetSort(bson.D{{Key: "name", Value: 1}}).SetSkip(int64((data.Page - 1) * data.Limit)).SetLimit(int64(data.Limit))
 
 	if data.Mode == entity.SearchModeStats {
 		opt.SetProjection(bson.M{

@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"encoding/json"
 	"html"
 	"regexp"
 	"strings"
@@ -76,13 +75,4 @@ func GetWikiaExternalLink(str string) string {
 func RemoveAllHTMLTag(str string) string {
 	doc, _ := goquery.NewDocumentFromReader(strings.NewReader(str))
 	return html.UnescapeString(doc.Text())
-}
-
-//
-func Marshal(strs []string) string {
-	if len(strs) == 0 {
-		return ""
-	}
-	j, _ := json.Marshal(strs)
-	return string(j)
 }
