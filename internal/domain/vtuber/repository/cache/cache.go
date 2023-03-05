@@ -141,7 +141,7 @@ type getAllCache struct {
 
 // GetAll to get vtuber list.
 func (c *Cache) GetAll(ctx context.Context, req entity.GetAllRequest) (_ []entity.Vtuber, _ int, code int, err error) {
-	key := utils.GetKey("vtuber", req.Mode, req.Limit, req.Page)
+	key := utils.GetKey("vtuber", req.Mode, req.Name, req.Limit, req.Page)
 
 	var data getAllCache
 	if c.cacher.Get(ctx, key, &data) == nil {

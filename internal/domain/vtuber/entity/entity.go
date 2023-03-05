@@ -82,6 +82,7 @@ const (
 // GetAllRequest is get all request model.
 type GetAllRequest struct {
 	Mode  SearchMode
+	Name  string
 	Page  int
 	Limit int
 }

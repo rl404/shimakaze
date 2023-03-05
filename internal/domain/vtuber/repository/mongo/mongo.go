@@ -239,6 +239,14 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 		})
 	}
 
+	if data.Name != "" {
+		filter = bson.M{"$or": []interface{}{
+			bson.M{"name": bson.M{"$regex": data.Name, "$options": "i"}},
+			bson.M{"original_names": bson.M{"$regex": data.Name, "$options": "i"}},
+			bson.M{"nicknames": bson.M{"$regex": data.Name, "$options": "i"}},
+		}}
+	}
+
 	if data.Limit < 0 {
 		opt.SetLimit(0)
 	}
