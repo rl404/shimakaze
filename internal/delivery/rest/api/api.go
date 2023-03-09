@@ -1,15 +1,10 @@
 package api
 
 import (
-	"net/http"
-	"strconv"
-
 	"github.com/go-chi/chi"
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rl404/fairy/log"
 	"github.com/rl404/fairy/monitoring/newrelic/middleware"
-	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
-	"github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/service"
 	"github.com/rl404/shimakaze/internal/utils"
 )
@@ -48,109 +43,10 @@ func (api *API) Register(r chi.Router, nrApp *newrelic.Application) {
 		r.Get("/vtubers/images", api.handleGetVtuberImages)
 		r.Get("/vtubers/family-trees", api.handleGetVtuberFamilyTrees)
 		r.Get("/vtubers/agency-trees", api.handleGetVtuberAgencyTrees)
+		r.Get("/vtubers/character-designers", api.handleGetVtuberCharacterDesigners)
+		r.Get("/vtubers/character-2d-modelers", api.handleGetVtuberCharacter2DModelers)
+		r.Get("/vtubers/character-3d-modelers", api.handleGetVtuberCharacter3DModelers)
+
+		r.Get("/agencies", api.handleGetAgencies)
 	})
-}
-
-// @summary Get wikia image.
-// @tags Wikia
-// @produce json
-// @param path path string true "wikia image url"
-// @success 200 "PNG image"
-// @success 400 {object} utils.Response
-// @success 404 {object} utils.Response
-// @failure 500 {object} utils.Response
-// @router /wikia/image/{path} [get]
-func (api *API) handleGetWikiaImage(w http.ResponseWriter, r *http.Request) {
-	path := chi.URLParam(r, "*")
-	if path == "" {
-		utils.ResponseWithJSON(w, http.StatusBadRequest, nil, errors.Wrap(r.Context(), errors.ErrInvalidRequestFormat))
-		return
-	}
-
-	image, code, err := api.service.GetWikiaImage(r.Context(), path)
-	utils.ResponseWithPNG(w, code, image, errors.Wrap(r.Context(), err))
-}
-
-// @summary Get vtuber data.
-// @tags Vtuber
-// @produce json
-// @param mode query string false "mode" enums(all, stats) default(all)
-// @param name query string false "name"
-// @param page query integer false "page" default(1)
-// @param limit query integer false "limit" default(20)
-// @success 200 {object} utils.Response{data=[]service.vtuber}
-// @failure 400 {object} utils.Response
-// @failure 500 {object} utils.Response
-// @router /vtubers [get]
-func (api *API) handleGetVtubers(w http.ResponseWriter, r *http.Request) {
-	mode := r.URL.Query().Get("mode")
-	name := r.URL.Query().Get("name")
-	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
-	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
-
-	vtubers, pagination, code, err := api.service.GetVtubers(r.Context(), service.GetVtubersRequest{
-		Mode:  entity.SearchMode(mode),
-		Name:  name,
-		Page:  page,
-		Limit: limit,
-	})
-
-	utils.ResponseWithJSON(w, code, vtubers, errors.Wrap(r.Context(), err), pagination)
-}
-
-// @summary Get vtuber data.
-// @tags Vtuber
-// @produce json
-// @param id path integer true "wikia id"
-// @success 200 {object} utils.Response{data=service.vtuber}
-// @failure 400 {object} utils.Response
-// @failure 404 {object} utils.Response
-// @failure 500 {object} utils.Response
-// @router /vtubers/{id} [get]
-func (api *API) handleGetVtuberByID(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
-	if err != nil {
-		utils.ResponseWithJSON(w, http.StatusBadRequest, nil, errors.Wrap(r.Context(), errors.ErrInvalidID, err))
-		return
-	}
-
-	vtuber, code, err := api.service.GetVtuberByID(r.Context(), id)
-	utils.ResponseWithJSON(w, code, vtuber, errors.Wrap(r.Context(), err))
-}
-
-// @summary Get all vtuber images.
-// @tags Vtuber
-// @produce json
-// @param shuffle query boolean false "shuffle"
-// @param limit query integer false "limit"
-// @success 200 {object} utils.Response{data=[]service.vtuberImage}
-// @failure 500 {object} utils.Response
-// @router /vtubers/images [get]
-func (api *API) handleGetVtuberImages(w http.ResponseWriter, r *http.Request) {
-	shuffle, _ := strconv.ParseBool(r.URL.Query().Get("shuffle"))
-	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
-	images, code, err := api.service.GetVtuberImages(r.Context(), shuffle, limit)
-	utils.ResponseWithJSON(w, code, images, errors.Wrap(r.Context(), err))
-}
-
-// @summary Get vtuber family trees.
-// @tags Vtuber
-// @produce json
-// @success 200 {object} utils.Response{data=service.vtuberFamilyTree}
-// @failure 500 {object} utils.Response
-// @router /vtubers/family-trees [get]
-func (api *API) handleGetVtuberFamilyTrees(w http.ResponseWriter, r *http.Request) {
-	tree, code, err := api.service.GetVtuberFamilyTrees(r.Context())
-	utils.ResponseWithJSON(w, code, tree, errors.Wrap(r.Context(), err))
-}
-
-// @summary Get vtuber agency trees.
-// @tags Vtuber
-// @produce json
-// @success 200 {object} utils.Response{data=service.vtuberAgencyTree}
-// @failure 500 {object} utils.Response
-// @router /vtubers/agency-trees [get]
-func (api *API) handleGetVtuberAgencyTrees(w http.ResponseWriter, r *http.Request) {
-	tree, code, err := api.service.GetVtuberAgencyTrees(r.Context())
-	utils.ResponseWithJSON(w, code, tree, errors.Wrap(r.Context(), err))
 }

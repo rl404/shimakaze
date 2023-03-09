@@ -51,7 +51,7 @@ func (m *Mongo) GetAllIDs(ctx context.Context) ([]int64, int, error) {
 // GetAll to get all.
 func (m *Mongo) GetAll(ctx context.Context) ([]entity.Agency, int, error) {
 	var agencies []entity.Agency
-	c, err := m.db.Find(ctx, bson.M{}, options.Find())
+	c, err := m.db.Find(ctx, bson.M{}, options.Find().SetSort(bson.M{"name": 1}))
 	if err != nil {
 		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
 	}

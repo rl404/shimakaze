@@ -3,6 +3,7 @@ package utils
 import (
 	"html"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -75,4 +76,21 @@ func GetWikiaExternalLink(str string) string {
 func RemoveAllHTMLTag(str string) string {
 	doc, _ := goquery.NewDocumentFromReader(strings.NewReader(str))
 	return html.UnescapeString(doc.Text())
+}
+
+// PtrToBool to convert pointer to bool.
+func PtrToBool(b *bool) bool {
+	if b != nil {
+		return *b
+	}
+	return false
+}
+
+// StrToPtrBool to convert string to bool pointer.
+func StrToPtrBool(str string) *bool {
+	if str == "" {
+		return nil
+	}
+	b, _ := strconv.ParseBool(str)
+	return &b
 }

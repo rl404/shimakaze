@@ -1,5 +1,14 @@
 basePath: /
 definitions:
+  service.agency:
+    properties:
+      id:
+        type: integer
+      image:
+        type: string
+      name:
+        type: string
+    type: object
   service.vtuber:
     properties:
       affiliations:
@@ -180,6 +189,33 @@ info:
   description: Shimakaze API.
   title: Shimakaze API
 paths:
+  /agencies:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/service.agency'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get agency data.
+      tags:
+      - Agency
   /vtubers:
     get:
       parameters:
@@ -190,6 +226,86 @@ paths:
         - stats
         in: query
         name: mode
+        type: string
+      - description: names
+        in: query
+        name: names
+        type: string
+      - description: name
+        in: query
+        name: name
+        type: string
+      - description: original name
+        in: query
+        name: original_name
+        type: string
+      - description: nickname
+        in: query
+        name: nickname
+        type: string
+      - description: exclude active
+        in: query
+        name: exclude_active
+        type: boolean
+      - description: exclude retired
+        in: query
+        name: exclude_retired
+        type: boolean
+      - description: start debut year
+        in: query
+        name: start_debut_year
+        type: integer
+      - description: end debut year
+        in: query
+        name: end_debut_year
+        type: integer
+      - description: start retired year
+        in: query
+        name: start_retired_year
+        type: integer
+      - description: end retired year
+        in: query
+        name: end_retired_year
+        type: integer
+      - description: has 2d model
+        in: query
+        name: has_2d
+        type: boolean
+      - description: has 3d model
+        in: query
+        name: has_3d
+        type: boolean
+      - description: character designer
+        in: query
+        name: character_designer
+        type: string
+      - description: character 2d modeler
+        in: query
+        name: character_2d_modeler
+        type: string
+      - description: character 3d modeler
+        in: query
+        name: character_3d_modeler
+        type: string
+      - description: in agency
+        in: query
+        name: in_agency
+        type: boolean
+      - description: agency
+        in: query
+        name: agency
+        type: string
+      - default: name
+        description: sort
+        enum:
+        - name
+        - -name
+        - debut_date
+        - -debut_date
+        - retirement_date
+        - -retirement_date
+        in: query
+        name: sort
         type: string
       - default: 1
         description: page
@@ -261,6 +377,52 @@ paths:
       summary: Get vtuber data.
       tags:
       - Vtuber
+  /vtubers/2d-modelers:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    type: string
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get vtuber character 2D modelers.
+      tags:
+      - Vtuber
+  /vtubers/3d-modelers:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    type: string
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get vtuber character 3D modelers.
+      tags:
+      - Vtuber
   /vtubers/agency-trees:
     get:
       produces:
@@ -280,6 +442,29 @@ paths:
           schema:
             $ref: '#/definitions/utils.Response'
       summary: Get vtuber agency trees.
+      tags:
+      - Vtuber
+  /vtubers/character-designers:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    type: string
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get vtuber character designers.
       tags:
       - Vtuber
   /vtubers/family-trees:
