@@ -141,7 +141,7 @@ type getAllCache struct {
 
 // GetAll to get vtuber list.
 func (c *Cache) GetAll(ctx context.Context, req entity.GetAllRequest) (_ []entity.Vtuber, _ int, code int, err error) {
-	key := utils.GetKey("vtuber", req.Mode, req.Limit, req.Page)
+	key := utils.GetKey("vtuber", utils.QueryToKey(req))
 
 	var data getAllCache
 	if c.cacher.Get(ctx, key, &data) == nil {
@@ -158,4 +158,61 @@ func (c *Cache) GetAll(ctx context.Context, req entity.GetAllRequest) (_ []entit
 	}
 
 	return data.Data, data.Total, code, nil
+}
+
+// GetCharacterDesigners to get character designers.
+func (c *Cache) GetCharacterDesigners(ctx context.Context) (data []string, code int, err error) {
+	key := utils.GetKey("vtuber", "character-designers")
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.GetCharacterDesigners(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
+}
+
+// GetCharacter2DModelers to get 2d modelers.
+func (c *Cache) GetCharacter2DModelers(ctx context.Context) (data []string, code int, err error) {
+	key := utils.GetKey("vtuber", "character-2d-modelers")
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.GetCharacter2DModelers(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
+}
+
+// GetCharacter3DModelers to get 3d modelers.
+func (c *Cache) GetCharacter3DModelers(ctx context.Context) (data []string, code int, err error) {
+	key := utils.GetKey("vtuber", "character-3d-modelers")
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.GetCharacter3DModelers(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
 }

@@ -1,9 +1,9 @@
 package utils
 
 import (
-	"encoding/json"
 	"html"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -78,11 +78,19 @@ func RemoveAllHTMLTag(str string) string {
 	return html.UnescapeString(doc.Text())
 }
 
-//
-func Marshal(strs []string) string {
-	if len(strs) == 0 {
-		return ""
+// PtrToBool to convert pointer to bool.
+func PtrToBool(b *bool) bool {
+	if b != nil {
+		return *b
 	}
-	j, _ := json.Marshal(strs)
-	return string(j)
+	return false
+}
+
+// StrToPtrBool to convert string to bool pointer.
+func StrToPtrBool(str string) *bool {
+	if str == "" {
+		return nil
+	}
+	b, _ := strconv.ParseBool(str)
+	return &b
 }

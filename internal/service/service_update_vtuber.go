@@ -39,11 +39,15 @@ func (s *service) updateVtuber(ctx context.Context, id int64) (int, error) {
 	// Get image.
 	vtuber.Image = s.getVtuberImage(ctx, id)
 
+	// Get agencies.
+	agencyMap := s.getAgencyMap(ctx)
+	agencyFromAffiliation := s.getAgencyFromAffiliation(vtuber.Affiliations, agencyMap)
+
 	// Get categories.
-	category := s.getVtuberCategory(ctx, id)
+	category := s.getVtuberCategory(ctx, id, agencyMap)
 	vtuber.Has2D = category.has2D
 	vtuber.Has3D = category.has3D
-	vtuber.Agencies = category.agencies
+	vtuber.Agencies = s.mergeAgencies(agencyFromAffiliation, category.agencies)
 	vtuber.CharacterDesigners = category.charDesigner
 	vtuber.Character2DModelers = category.char2DModeler
 	vtuber.Character3DModelers = category.char3DModeler
@@ -72,21 +76,11 @@ func (s *service) getVtuberImage(ctx context.Context, id int64) string {
 	return pageImage.Image
 }
 
-type vtuberCategory struct {
-	has2D         bool
-	has3D         bool
-	agencies      []vtuberEntity.Agency
-	charDesigner  []string
-	char2DModeler []string
-	char3DModeler []string
-}
-
-func (s *service) getVtuberCategory(ctx context.Context, id int64) (vtuberCategory vtuberCategory) {
-	// Get all agency.
+func (s *service) getAgencyMap(ctx context.Context) map[string]vtuberEntity.Agency {
 	agencies, _, err := s.agency.GetAll(ctx)
 	if err != nil {
 		errors.Wrap(ctx, err)
-		return
+		return nil
 	}
 
 	agencyMap := make(map[string]vtuberEntity.Agency)
@@ -98,6 +92,19 @@ func (s *service) getVtuberCategory(ctx context.Context, id int64) (vtuberCatego
 		}
 	}
 
+	return agencyMap
+}
+
+type vtuberCategory struct {
+	has2D         bool
+	has3D         bool
+	agencies      []vtuberEntity.Agency
+	charDesigner  []string
+	char2DModeler []string
+	char3DModeler []string
+}
+
+func (s *service) getVtuberCategory(ctx context.Context, id int64, agencyMap map[string]vtuberEntity.Agency) (vtuberCategory vtuberCategory) {
 	// Loop and map categories.
 	var lastTitle string
 	limitPerPage := 500
@@ -147,4 +154,33 @@ func (s *service) getVtuberCategory(ctx context.Context, id int64) (vtuberCatego
 			return
 		}
 	}
+}
+
+func (s *service) getAgencyFromAffiliation(affiliations []string, agencyMap map[string]vtuberEntity.Agency) []vtuberEntity.Agency {
+	var res []vtuberEntity.Agency
+	for _, a := range affiliations {
+		if v, ok := agencyMap[strings.ToLower(a)]; ok {
+			res = append(res, v)
+		}
+	}
+	return res
+}
+
+func (s *service) mergeAgencies(a1, a2 []vtuberEntity.Agency) []vtuberEntity.Agency {
+
+	agencyMap := make(map[int64]vtuberEntity.Agency)
+	for _, a := range a1 {
+		agencyMap[a.ID] = a
+	}
+
+	for _, a := range a2 {
+		agencyMap[a.ID] = a
+	}
+
+	var a3 []vtuberEntity.Agency
+	for _, a := range agencyMap {
+		a3 = append(a3, a)
+	}
+
+	return a3
 }

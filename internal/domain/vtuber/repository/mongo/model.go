@@ -198,3 +198,21 @@ func (m *Mongo) vtuberFromEntity(v entity.Vtuber) *vtuber {
 		Emoji:               v.Emoji,
 	}
 }
+
+func (m *Mongo) convertSort(sort string) bson.D {
+	if sort == "" {
+		return nil
+	}
+
+	if sort[0] == '-' {
+		return bson.D{{Key: sort[1:], Value: -1}}
+	}
+
+	return bson.D{{Key: sort, Value: 1}}
+}
+
+func (m *Mongo) initFilter(filter bson.M, key string) {
+	if filter[key] == nil {
+		filter[key] = bson.M{}
+	}
+}

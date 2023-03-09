@@ -294,9 +294,27 @@ func (s *service) GetVtuberAgencyTrees(ctx context.Context) (*vtuberAgencyTree, 
 
 // GetVtubersRequest is get vtubers request model.
 type GetVtubersRequest struct {
-	Mode  entity.SearchMode `validate:"oneof=all stats" mod:"default=all,trim,lcase"`
-	Page  int               `validate:"required,gte=1" mod:"default=1"`
-	Limit int               `validate:"required,gte=-1" mod:"default=20"`
+	Mode               entity.SearchMode `validate:"oneof=all stats" mod:"default=all,trim,lcase"`
+	Names              string            `validate:"omitempty,gte=3" mod:"trim,lcase"`
+	Name               string            `validate:"omitempty,gte=3" mod:"trim,lcase"`
+	OriginalName       string            `validate:"omitempty,gte=3" mod:"trim,lcase"`
+	Nickname           string            `validate:"omitempty,gte=3" mod:"trim,lcase"`
+	ExcludeActive      bool              ``
+	ExcludeRetired     bool              ``
+	StartDebutYear     int               `validate:"gte=0"`
+	EndDebutYear       int               `validate:"gte=0"`
+	StartRetiredYear   int               `validate:"gte=0"`
+	EndRetiredYear     int               `validate:"gte=0"`
+	Has2D              *bool             ``
+	Has3D              *bool             ``
+	CharacterDesigner  string            `mod:"trim"`
+	Character2DModeler string            `mod:"trim"`
+	Character3DModeler string            `mod:"trim"`
+	InAgency           *bool             ``
+	Agency             string            `mod:"trim"`
+	Sort               string            `validate:"oneof=name -name debut_date -debut_date retirement_date -retirement_date" mod:"default=name,trim,lcase"`
+	Page               int               `validate:"required,gte=1" mod:"default=1"`
+	Limit              int               `validate:"required,gte=-1" mod:"default=20"`
 }
 
 // GetVtubers to get vtuber list.
@@ -306,9 +324,27 @@ func (s *service) GetVtubers(ctx context.Context, data GetVtubersRequest) ([]vtu
 	}
 
 	vtubers, total, code, err := s.vtuber.GetAll(ctx, entity.GetAllRequest{
-		Mode:  data.Mode,
-		Page:  data.Page,
-		Limit: data.Limit,
+		Mode:               data.Mode,
+		Names:              data.Names,
+		Name:               data.Name,
+		OriginalName:       data.OriginalName,
+		Nickname:           data.Nickname,
+		ExcludeActive:      data.ExcludeActive,
+		ExcludeRetired:     data.ExcludeRetired,
+		StartDebutYear:     data.StartDebutYear,
+		EndDebutYear:       data.EndDebutYear,
+		StartRetiredYear:   data.StartRetiredYear,
+		EndRetiredYear:     data.EndRetiredYear,
+		Has2D:              data.Has2D,
+		Has3D:              data.Has3D,
+		CharacterDesigner:  data.CharacterDesigner,
+		Character2DModeler: data.Character2DModeler,
+		Character3DModeler: data.Character3DModeler,
+		InAgency:           data.InAgency,
+		Agency:             data.Agency,
+		Sort:               data.Sort,
+		Page:               data.Page,
+		Limit:              data.Limit,
 	})
 	if err != nil {
 		return nil, nil, code, errors.Wrap(ctx, err)
@@ -368,4 +404,31 @@ func (s *service) GetVtubers(ctx context.Context, data GetVtubersRequest) ([]vtu
 		Limit: data.Limit,
 		Total: total,
 	}, http.StatusOK, nil
+}
+
+// GetVtuberCharacterDesigners to get vtuber character designer list.
+func (s *service) GetVtuberCharacterDesigners(ctx context.Context) ([]string, int, error) {
+	designers, code, err := s.vtuber.GetCharacterDesigners(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+	return designers, http.StatusOK, nil
+}
+
+// GetVtuberCharacter2DModelers to get vtuber 2d modeler list.
+func (s *service) GetVtuberCharacter2DModelers(ctx context.Context) ([]string, int, error) {
+	modelers, code, err := s.vtuber.GetCharacter2DModelers(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+	return modelers, http.StatusOK, nil
+}
+
+// GetVtuberCharacter3DModelers to get vtuber 3d modeler list.
+func (s *service) GetVtuberCharacter3DModelers(ctx context.Context) ([]string, int, error) {
+	modelers, code, err := s.vtuber.GetCharacter3DModelers(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+	return modelers, http.StatusOK, nil
 }

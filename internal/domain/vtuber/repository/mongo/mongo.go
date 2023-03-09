@@ -8,6 +8,7 @@ import (
 
 	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	"github.com/rl404/shimakaze/internal/errors"
+	"github.com/rl404/shimakaze/internal/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -226,7 +227,7 @@ func (m *Mongo) GetAllForAgencyTree(ctx context.Context) ([]entity.Vtuber, int, 
 // GetAll to get all data.
 func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity.Vtuber, int, int, error) {
 	filter := bson.M{}
-	opt := options.Find().SetSkip(int64((data.Page - 1) * data.Limit)).SetLimit(int64(data.Limit))
+	opt := options.Find().SetSort(m.convertSort(data.Sort)).SetSkip(int64((data.Page - 1) * data.Limit)).SetLimit(int64(data.Limit))
 
 	if data.Mode == entity.SearchModeStats {
 		opt.SetProjection(bson.M{
@@ -237,6 +238,92 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 			"affiliations":      0,
 			"official_websites": 0,
 		})
+	}
+
+	if data.Names != "" {
+		filter["$or"] = []interface{}{
+			bson.M{"name": bson.M{"$regex": data.Names, "$options": "i"}},
+			bson.M{"original_names": bson.M{"$regex": data.Names, "$options": "i"}},
+			bson.M{"nicknames": bson.M{"$regex": data.Names, "$options": "i"}},
+		}
+	}
+
+	if data.Name != "" {
+		filter["name"] = bson.M{"$regex": data.Name, "$options": "i"}
+	}
+
+	if data.OriginalName != "" {
+		filter["original_names"] = bson.M{"$regex": data.OriginalName, "$options": "i"}
+	}
+
+	if data.Nickname != "" {
+		filter["nicknames"] = bson.M{"$regex": data.Nickname, "$options": "i"}
+	}
+
+	if data.ExcludeActive {
+		m.initFilter(filter, "retirement_date")
+		filter["retirement_date"].(bson.M)["$ne"] = nil
+	}
+
+	if data.ExcludeRetired {
+		m.initFilter(filter, "retirement_date")
+		filter["retirement_date"].(bson.M)["$eq"] = nil
+	}
+
+	if data.ExcludeActive && data.ExcludeRetired {
+		return nil, 0, http.StatusOK, nil
+	}
+
+	if data.StartDebutYear > 0 {
+		m.initFilter(filter, "debut_date")
+		date := time.Date(data.StartDebutYear, 1, 1, 0, 0, 0, 0, time.UTC)
+		filter["debut_date"].(bson.M)["$gte"] = primitive.NewDateTimeFromTime(date)
+	}
+
+	if data.EndDebutYear > 0 {
+		m.initFilter(filter, "debut_date")
+		date := time.Date(data.EndDebutYear+1, 1, 1, 0, 0, 0, 0, time.UTC)
+		filter["debut_date"].(bson.M)["$lte"] = primitive.NewDateTimeFromTime(date)
+	}
+
+	if data.StartRetiredYear > 0 {
+		m.initFilter(filter, "retirement_date")
+		date := time.Date(data.StartRetiredYear, 1, 1, 0, 0, 0, 0, time.UTC)
+		filter["retirement_date"].(bson.M)["$gte"] = primitive.NewDateTimeFromTime(date)
+	}
+
+	if data.EndRetiredYear > 0 {
+		m.initFilter(filter, "retirement_date")
+		date := time.Date(data.EndRetiredYear+1, 1, 1, 0, 0, 0, 0, time.UTC)
+		filter["retirement_date"].(bson.M)["$lte"] = primitive.NewDateTimeFromTime(date)
+	}
+
+	if data.Has2D != nil {
+		filter["has_2d"] = utils.PtrToBool(data.Has2D)
+	}
+
+	if data.Has3D != nil {
+		filter["has_3d"] = utils.PtrToBool(data.Has3D)
+	}
+
+	if data.CharacterDesigner != "" {
+		filter["character_designers"] = data.CharacterDesigner
+	}
+
+	if data.Character2DModeler != "" {
+		filter["character_2d_modelers"] = data.Character2DModeler
+	}
+
+	if data.Character3DModeler != "" {
+		filter["character_3d_modelers"] = data.Character3DModeler
+	}
+
+	if data.InAgency != nil {
+		filter["agencies.0"] = bson.M{"$exists": utils.PtrToBool(data.InAgency)}
+	}
+
+	if data.Agency != "" {
+		filter["agencies.name"] = data.Agency
 	}
 
 	if data.Limit < 0 {
@@ -263,4 +350,61 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 	}
 
 	return res, int(total), http.StatusOK, nil
+}
+
+// GetCharacterDesigners to get character designers.
+func (m *Mongo) GetCharacterDesigners(ctx context.Context) ([]string, int, error) {
+	designers, err := m.db.Distinct(ctx, "character_designers", bson.M{"character_designers": bson.M{"$ne": nil}})
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	res := make([]string, len(designers))
+	for i, d := range designers {
+		v, ok := d.(string)
+		if !ok {
+			return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, _errors.New("invalid value"))
+		}
+		res[i] = v
+	}
+
+	return res, http.StatusOK, nil
+}
+
+// GetCharacter2DModelers to get 2d modelers.
+func (m *Mongo) GetCharacter2DModelers(ctx context.Context) ([]string, int, error) {
+	modelers, err := m.db.Distinct(ctx, "character_2d_modelers", bson.M{"character_2d_modelers": bson.M{"$ne": nil}})
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	res := make([]string, len(modelers))
+	for i, d := range modelers {
+		v, ok := d.(string)
+		if !ok {
+			return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, _errors.New("invalid value"))
+		}
+		res[i] = v
+	}
+
+	return res, http.StatusOK, nil
+}
+
+// GetCharacter3DModelers to get 3d modelers.
+func (m *Mongo) GetCharacter3DModelers(ctx context.Context) ([]string, int, error) {
+	modelers, err := m.db.Distinct(ctx, "character_3d_modelers", bson.M{"character_3d_modelers": bson.M{"$ne": nil}})
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	res := make([]string, len(modelers))
+	for i, d := range modelers {
+		v, ok := d.(string)
+		if !ok {
+			return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, _errors.New("invalid value"))
+		}
+		res[i] = v
+	}
+
+	return res, http.StatusOK, nil
 }

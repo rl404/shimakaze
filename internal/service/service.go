@@ -18,6 +18,11 @@ type Service interface {
 	GetVtuberImages(ctx context.Context, shuffle bool, limit int) ([]vtuberImage, int, error)
 	GetVtuberFamilyTrees(ctx context.Context) (*vtuberFamilyTree, int, error)
 	GetVtuberAgencyTrees(ctx context.Context) (*vtuberAgencyTree, int, error)
+	GetVtuberCharacterDesigners(ctx context.Context) ([]string, int, error)
+	GetVtuberCharacter2DModelers(ctx context.Context) ([]string, int, error)
+	GetVtuberCharacter3DModelers(ctx context.Context) ([]string, int, error)
+
+	GetAgencies(ctx context.Context) ([]agency, int, error)
 
 	GetWikiaImage(ctx context.Context, path string) ([]byte, int, error)
 

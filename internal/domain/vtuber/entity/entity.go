@@ -81,7 +81,25 @@ const (
 
 // GetAllRequest is get all request model.
 type GetAllRequest struct {
-	Mode  SearchMode
-	Page  int
-	Limit int
+	Mode               SearchMode
+	Names              string
+	Name               string
+	OriginalName       string
+	Nickname           string
+	ExcludeActive      bool
+	ExcludeRetired     bool
+	StartDebutYear     int
+	EndDebutYear       int
+	StartRetiredYear   int
+	EndRetiredYear     int
+	Has2D              *bool
+	Has3D              *bool
+	CharacterDesigner  string
+	Character2DModeler string
+	Character3DModeler string
+	InAgency           *bool
+	Agency             string
+	Sort               string
+	Page               int
+	Limit              int
 }

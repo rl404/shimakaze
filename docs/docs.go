@@ -16,6 +16,52 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/agencies": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Agency"
+                ],
+                "summary": "Get agency data.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/service.agency"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/vtubers": {
             "get": {
                 "produces": [
@@ -35,6 +81,123 @@ const docTemplate = `{
                         "default": "all",
                         "description": "mode",
                         "name": "mode",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "names",
+                        "name": "names",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "name",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "original name",
+                        "name": "original_name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "nickname",
+                        "name": "nickname",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "exclude active",
+                        "name": "exclude_active",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "exclude retired",
+                        "name": "exclude_retired",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "start debut year",
+                        "name": "start_debut_year",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "end debut year",
+                        "name": "end_debut_year",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "start retired year",
+                        "name": "start_retired_year",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "end retired year",
+                        "name": "end_retired_year",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "has 2d model",
+                        "name": "has_2d",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "has 3d model",
+                        "name": "has_3d",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "character designer",
+                        "name": "character_designer",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "character 2d modeler",
+                        "name": "character_2d_modeler",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "character 3d modeler",
+                        "name": "character_3d_modeler",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "in agency",
+                        "name": "in_agency",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "agency",
+                        "name": "agency",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "name",
+                            "-name",
+                            "debut_date",
+                            "-debut_date",
+                            "retirement_date",
+                            "-retirement_date"
+                        ],
+                        "type": "string",
+                        "default": "name",
+                        "description": "sort",
+                        "name": "sort",
                         "in": "query"
                     },
                     {
@@ -89,6 +252,86 @@ const docTemplate = `{
                 }
             }
         },
+        "/vtubers/2d-modelers": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vtuber"
+                ],
+                "summary": "Get vtuber character 2D modelers.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/vtubers/3d-modelers": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vtuber"
+                ],
+                "summary": "Get vtuber character 3D modelers.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/vtubers/agency-trees": {
             "get": {
                 "produces": [
@@ -111,6 +354,46 @@ const docTemplate = `{
                                     "properties": {
                                         "data": {
                                             "$ref": "#/definitions/service.vtuberAgencyTree"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/vtubers/character-designers": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vtuber"
+                ],
+                "summary": "Get vtuber character designers.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
                                         }
                                     }
                                 }
@@ -320,6 +603,20 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "service.agency": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "service.vtuber": {
             "type": "object",
             "properties": {
