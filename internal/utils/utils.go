@@ -94,3 +94,11 @@ func StrToPtrBool(str string) *bool {
 	b, _ := strconv.ParseBool(str)
 	return &b
 }
+
+// StrToStrSlice to convert string to slice of string.
+func StrToStrSlice(str string) []string {
+	if str == "" {
+		return nil
+	}
+	return strings.Split(str, ",")
+}

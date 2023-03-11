@@ -294,27 +294,28 @@ func (s *service) GetVtuberAgencyTrees(ctx context.Context) (*vtuberAgencyTree, 
 
 // GetVtubersRequest is get vtubers request model.
 type GetVtubersRequest struct {
-	Mode               entity.SearchMode `validate:"oneof=all stats" mod:"default=all,trim,lcase"`
-	Names              string            `validate:"omitempty,gte=3" mod:"trim,lcase"`
-	Name               string            `validate:"omitempty,gte=3" mod:"trim,lcase"`
-	OriginalName       string            `validate:"omitempty,gte=3" mod:"trim,lcase"`
-	Nickname           string            `validate:"omitempty,gte=3" mod:"trim,lcase"`
-	ExcludeActive      bool              ``
-	ExcludeRetired     bool              ``
-	StartDebutYear     int               `validate:"gte=0"`
-	EndDebutYear       int               `validate:"gte=0"`
-	StartRetiredYear   int               `validate:"gte=0"`
-	EndRetiredYear     int               `validate:"gte=0"`
-	Has2D              *bool             ``
-	Has3D              *bool             ``
-	CharacterDesigner  string            `mod:"trim"`
-	Character2DModeler string            `mod:"trim"`
-	Character3DModeler string            `mod:"trim"`
-	InAgency           *bool             ``
-	Agency             string            `mod:"trim"`
-	Sort               string            `validate:"oneof=name -name debut_date -debut_date retirement_date -retirement_date" mod:"default=name,trim,lcase"`
-	Page               int               `validate:"required,gte=1" mod:"default=1"`
-	Limit              int               `validate:"required,gte=-1" mod:"default=20"`
+	Mode               entity.SearchMode    `validate:"oneof=all stats" mod:"default=all,trim,lcase"`
+	Names              string               `validate:"omitempty,gte=3" mod:"trim,lcase"`
+	Name               string               `validate:"omitempty,gte=3" mod:"trim,lcase"`
+	OriginalName       string               `validate:"omitempty,gte=3" mod:"trim,lcase"`
+	Nickname           string               `validate:"omitempty,gte=3" mod:"trim,lcase"`
+	ExcludeActive      bool                 ``
+	ExcludeRetired     bool                 ``
+	StartDebutYear     int                  `validate:"gte=0"`
+	EndDebutYear       int                  `validate:"gte=0"`
+	StartRetiredYear   int                  `validate:"gte=0"`
+	EndRetiredYear     int                  `validate:"gte=0"`
+	Has2D              *bool                ``
+	Has3D              *bool                ``
+	CharacterDesigner  string               `mod:"trim"`
+	Character2DModeler string               `mod:"trim"`
+	Character3DModeler string               `mod:"trim"`
+	InAgency           *bool                ``
+	Agency             string               `mod:"trim"`
+	ChannelTypes       []entity.ChannelType `validate:"dive,gte=1" mod:"dive,trim"`
+	Sort               string               `validate:"oneof=name -name debut_date -debut_date retirement_date -retirement_date" mod:"default=name,trim,lcase"`
+	Page               int                  `validate:"required,gte=1" mod:"default=1"`
+	Limit              int                  `validate:"required,gte=-1" mod:"default=20"`
 }
 
 // GetVtubers to get vtuber list.
@@ -342,6 +343,7 @@ func (s *service) GetVtubers(ctx context.Context, data GetVtubersRequest) ([]vtu
 		Character3DModeler: data.Character3DModeler,
 		InAgency:           data.InAgency,
 		Agency:             data.Agency,
+		ChannelTypes:       data.ChannelTypes,
 		Sort:               data.Sort,
 		Page:               data.Page,
 		Limit:              data.Limit,

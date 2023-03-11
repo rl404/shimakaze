@@ -216,3 +216,25 @@ func (m *Mongo) initFilter(filter bson.M, key string) {
 		filter[key] = bson.M{}
 	}
 }
+
+func (m *Mongo) getChannelTypeFilter(types []entity.ChannelType) bson.M {
+	var includeTypes, excludeTypes []entity.ChannelType
+	for _, t := range types {
+		if t[0] == '-' {
+			excludeTypes = append(excludeTypes, t[1:])
+		} else {
+			includeTypes = append(includeTypes, t)
+		}
+	}
+
+	filter := bson.M{}
+	if len(includeTypes) > 0 {
+		filter["$all"] = includeTypes
+	}
+
+	if len(excludeTypes) > 0 {
+		filter["$nin"] = excludeTypes
+	}
+
+	return filter
+}
