@@ -99,6 +99,7 @@ type GetAllRequest struct {
 	Character3DModeler string
 	InAgency           *bool
 	Agency             string
+	ChannelTypes       []ChannelType
 	Sort               string
 	Page               int
 	Limit              int

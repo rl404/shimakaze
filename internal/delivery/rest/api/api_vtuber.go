@@ -32,6 +32,7 @@ import (
 // @param character_3d_modeler query string false "character 3d modeler"
 // @param in_agency query boolean false "in agency"
 // @param agency query string false "agency"
+// @param channel_types query string false "channel types"
 // @param sort query string false "sort" enums(name,-name,debut_date,-debut_date,retirement_date,-retirement_date) default(name)
 // @param page query integer false "page" default(1)
 // @param limit query integer false "limit" default(20)
@@ -58,6 +59,7 @@ func (api *API) handleGetVtubers(w http.ResponseWriter, r *http.Request) {
 	character3DModeler := r.URL.Query().Get("character_3d_modeler")
 	inAgency := utils.StrToPtrBool(r.URL.Query().Get("in_agency"))
 	agency := r.URL.Query().Get("agency")
+	channelTypes := utils.StrToStrSlice(r.URL.Query().Get("channel_types"))
 	sort := r.URL.Query().Get("sort")
 	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
@@ -81,6 +83,7 @@ func (api *API) handleGetVtubers(w http.ResponseWriter, r *http.Request) {
 		Character3DModeler: character3DModeler,
 		InAgency:           inAgency,
 		Agency:             agency,
+		ChannelTypes:       entity.StrsToChannelTypes(channelTypes),
 		Sort:               sort,
 		Page:               page,
 		Limit:              limit,

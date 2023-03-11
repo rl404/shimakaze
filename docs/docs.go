@@ -186,6 +186,12 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "string",
+                        "description": "channel types",
+                        "name": "channel_types",
+                        "in": "query"
+                    },
+                    {
                         "enum": [
                             "name",
                             "-name",

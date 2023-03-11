@@ -295,6 +295,10 @@ paths:
         in: query
         name: agency
         type: string
+      - description: channel types
+        in: query
+        name: channel_types
+        type: string
       - default: name
         description: sort
         enum:

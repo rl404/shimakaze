@@ -326,6 +326,10 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 		filter["agencies.name"] = data.Agency
 	}
 
+	if len(data.ChannelTypes) > 0 {
+		filter["channels.type"] = m.getChannelTypeFilter(data.ChannelTypes)
+	}
+
 	if data.Limit < 0 {
 		opt.SetLimit(0)
 	}

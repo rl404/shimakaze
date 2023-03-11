@@ -373,3 +373,12 @@ func parseEmoji(data string) (string, string) {
 
 	return strings.Join(s, ""), raw
 }
+
+// StrsToChannelTypes to convert slice of string to slice of ChannelType.
+func StrsToChannelTypes(strs []string) []ChannelType {
+	ct := make([]ChannelType, len(strs))
+	for i, str := range strs {
+		ct[i] = ChannelType(str)
+	}
+	return ct
+}
