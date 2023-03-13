@@ -38,6 +38,7 @@ type vtuber struct {
 	BloodType           string          `json:"blood_type"`
 	ZodiacSign          string          `json:"zodiac_sign"`
 	Emoji               string          `json:"emoji"`
+	UpdatedAt           time.Time       `json:"updated_at"`
 }
 
 type vtuberAgency struct {
@@ -102,6 +103,7 @@ func (s *service) GetVtuberByID(ctx context.Context, id int64) (*vtuber, int, er
 		BloodType:           vt.BloodType,
 		ZodiacSign:          vt.ZodiacSign,
 		Emoji:               vt.Emoji,
+		UpdatedAt:           vt.UpdatedAt,
 	}, http.StatusOK, nil
 }
 
@@ -398,6 +400,7 @@ func (s *service) GetVtubers(ctx context.Context, data GetVtubersRequest) ([]vtu
 			BloodType:           vt.BloodType,
 			ZodiacSign:          vt.ZodiacSign,
 			Emoji:               vt.Emoji,
+			UpdatedAt:           vt.UpdatedAt,
 		}
 	}
 

@@ -110,6 +110,7 @@ func (v *vtuber) toEntity() *entity.Vtuber {
 		BloodType:           v.BloodType,
 		ZodiacSign:          v.ZodiacSign,
 		Emoji:               v.Emoji,
+		UpdatedAt:           v.UpdatedAt,
 	}
 }
 

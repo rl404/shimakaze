@@ -30,6 +30,7 @@ type Vtuber struct {
 	BloodType           string
 	ZodiacSign          string
 	Emoji               string
+	UpdatedAt           time.Time
 }
 
 // ChannelType is channel types.
