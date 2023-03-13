@@ -83,7 +83,17 @@ func (c *Cache) GetAllImages(ctx context.Context, shuffle bool, limit int) (data
 
 // UpdateByID to update by id.
 func (c *Cache) UpdateByID(ctx context.Context, id int64, data entity.Vtuber) (int, error) {
-	return c.repo.UpdateByID(ctx, id, data)
+	if code, err := c.repo.UpdateByID(ctx, id, data); err != nil {
+		return code, errors.Wrap(ctx, err)
+	}
+
+	key := utils.GetKey("vtuber", id)
+	if err := c.cacher.Delete(ctx, key); err != nil {
+		return http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+
+	}
+
+	return http.StatusOK, nil
 }
 
 // IsOld to check if old data.
