@@ -28,6 +28,18 @@ func New(db *mongo.Database, oldAge int) *Mongo {
 	}
 }
 
+// GetByID to get by id.
+func (m *Mongo) GetByID(ctx context.Context, id int64) (*entity.Agency, int, error) {
+	var agency agency
+	if err := m.db.FindOne(ctx, bson.M{"id": id}).Decode(&agency); err != nil {
+		if _errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, http.StatusNotFound, errors.Wrap(ctx, errors.ErrAgencyNotFound, err)
+		}
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+	return agency.toEntity(), http.StatusOK, nil
+}
+
 // GetAllIDs to get all ids.
 func (m *Mongo) GetAllIDs(ctx context.Context) ([]int64, int, error) {
 	var ids []int64
@@ -62,7 +74,7 @@ func (m *Mongo) GetAll(ctx context.Context) ([]entity.Agency, int, error) {
 		if err := c.Decode(&agency); err != nil {
 			return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
 		}
-		agencies = append(agencies, agency.toEntity())
+		agencies = append(agencies, *agency.toEntity())
 	}
 
 	return agencies, http.StatusOK, nil

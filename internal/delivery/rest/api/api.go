@@ -48,5 +48,6 @@ func (api *API) Register(r chi.Router, nrApp *newrelic.Application) {
 		r.Get("/vtubers/character-3d-modelers", api.handleGetVtuberCharacter3DModelers)
 
 		r.Get("/agencies", api.handleGetAgencies)
+		r.Get("/agencies/{id}", api.handleGetAgencyByID)
 	})
 }

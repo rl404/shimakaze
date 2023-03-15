@@ -17,6 +17,7 @@ var (
 	ErrWikiaPageNotFound    = errors.New("wikia page not found")
 	ErrInvalidID            = errors.New("invalid id")
 	ErrVtuberNotFound       = errors.New("vtuber not found")
+	ErrAgencyNotFound       = errors.New("agency not found")
 )
 
 // ErrRequiredField is error for missing field.

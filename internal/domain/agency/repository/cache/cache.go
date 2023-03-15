@@ -22,6 +22,11 @@ func New(cacher cache.Cacher, repo repository.Repository) *Cache {
 	}
 }
 
+// GetByID to get by id.
+func (c *Cache) GetByID(ctx context.Context, id int64) (*entity.Agency, int, error) {
+	return c.repo.GetByID(ctx, id)
+}
+
 // GetAllIDs to get all ids.
 func (c *Cache) GetAllIDs(ctx context.Context) ([]int64, int, error) {
 	return c.repo.GetAllIDs(ctx)
