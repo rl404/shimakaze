@@ -27,18 +27,20 @@ func (a *agency) MarshalBSON() ([]byte, error) {
 	return bson.Marshal((*a2)(a))
 }
 
-func (a *agency) toEntity() entity.Agency {
-	return entity.Agency{
-		ID:    a.ID,
-		Name:  a.Name,
-		Image: a.Image,
+func (a *agency) toEntity() *entity.Agency {
+	return &entity.Agency{
+		ID:        a.ID,
+		Name:      a.Name,
+		Image:     a.Image,
+		UpdatedAt: a.UpdatedAt,
 	}
 }
 
 func (m *Mongo) agencyFromEntity(a entity.Agency) *agency {
 	return &agency{
-		ID:    a.ID,
-		Name:  a.Name,
-		Image: a.Image,
+		ID:        a.ID,
+		Name:      a.Name,
+		Image:     a.Image,
+		UpdatedAt: a.UpdatedAt,
 	}
 }

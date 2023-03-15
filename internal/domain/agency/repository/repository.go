@@ -8,6 +8,7 @@ import (
 
 // Repository contains functions for agency domain.
 type Repository interface {
+	GetByID(ctx context.Context, id int64) (*entity.Agency, int, error)
 	GetAllIDs(ctx context.Context) ([]int64, int, error)
 	GetAll(ctx context.Context) ([]entity.Agency, int, error)
 	IsOld(ctx context.Context, id int64) (bool, int, error)

@@ -2,7 +2,9 @@ package api
 
 import (
 	"net/http"
+	"strconv"
 
+	"github.com/go-chi/chi"
 	"github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/utils"
 )
@@ -17,4 +19,24 @@ import (
 func (api *API) handleGetAgencies(w http.ResponseWriter, r *http.Request) {
 	agencies, code, err := api.service.GetAgencies(r.Context())
 	utils.ResponseWithJSON(w, code, agencies, errors.Wrap(r.Context(), err))
+}
+
+// @summary Get agency data.
+// @tags Agency
+// @produce json
+// @param id path integer true "wikia id"
+// @success 200 {object} utils.Response{data=service.agency}
+// @failure 400 {object} utils.Response
+// @failure 404 {object} utils.Response
+// @failure 500 {object} utils.Response
+// @router /agencies/{id} [get]
+func (api *API) handleGetAgencyByID(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		utils.ResponseWithJSON(w, http.StatusBadRequest, nil, errors.Wrap(r.Context(), errors.ErrInvalidID, err))
+		return
+	}
+
+	agency, code, err := api.service.GetAgencyByID(r.Context(), id)
+	utils.ResponseWithJSON(w, code, agency, errors.Wrap(r.Context(), err))
 }
