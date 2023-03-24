@@ -314,7 +314,13 @@ type GetVtubersRequest struct {
 	Character3DModeler string               `mod:"trim"`
 	InAgency           *bool                ``
 	Agency             string               `mod:"trim"`
+	AgencyID           int64                `validate:"omitempty,gte=1"`
 	ChannelTypes       []entity.ChannelType `validate:"dive,gte=1" mod:"dive,trim"`
+	BirthdayDay        int                  `validate:"omitempty,gte=1"`
+	BirthdayMonth      int                  `validate:"omitempty,gte=1"`
+	BloodTypes         []string             `validate:"dive,gte=1" mod:"dive,trim"`
+	Genders            []string             `validate:"dive,gte=1" mod:"dive,trim"`
+	Zodiacs            []string             `validate:"dive,gte=1" mod:"dive,trim"`
 	Sort               string               `validate:"oneof=name -name debut_date -debut_date retirement_date -retirement_date" mod:"default=name,trim,lcase"`
 	Page               int                  `validate:"required,gte=1" mod:"default=1"`
 	Limit              int                  `validate:"required,gte=-1" mod:"default=20"`
@@ -345,7 +351,13 @@ func (s *service) GetVtubers(ctx context.Context, data GetVtubersRequest) ([]vtu
 		Character3DModeler: data.Character3DModeler,
 		InAgency:           data.InAgency,
 		Agency:             data.Agency,
+		AgencyID:           data.AgencyID,
 		ChannelTypes:       data.ChannelTypes,
+		BirthdayDay:        data.BirthdayDay,
+		BirthdayMonth:      data.BirthdayMonth,
+		BloodTypes:         data.BloodTypes,
+		Genders:            data.Genders,
+		Zodiacs:            data.Zodiacs,
 		Sort:               data.Sort,
 		Page:               data.Page,
 		Limit:              data.Limit,

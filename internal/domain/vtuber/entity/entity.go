@@ -100,7 +100,13 @@ type GetAllRequest struct {
 	Character3DModeler string
 	InAgency           *bool
 	Agency             string
+	AgencyID           int64
 	ChannelTypes       []ChannelType
+	BirthdayDay        int
+	BirthdayMonth      int
+	BloodTypes         []string
+	Genders            []string
+	Zodiacs            []string
 	Sort               string
 	Page               int
 	Limit              int

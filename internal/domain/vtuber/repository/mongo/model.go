@@ -5,6 +5,7 @@ import (
 
 	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type vtuber struct {
@@ -212,30 +213,83 @@ func (m *Mongo) convertSort(sort string) bson.D {
 	return bson.D{{Key: sort, Value: 1}}
 }
 
-func (m *Mongo) initFilter(filter bson.M, key string) {
-	if filter[key] == nil {
-		filter[key] = bson.M{}
+func (m *Mongo) getChannelTypeFilter(types []entity.ChannelType) bson.M {
+	values := make([]string, len(types))
+	for i, t := range types {
+		values[i] = string(t)
 	}
+	return m.getArrayFilter(values)
 }
 
-func (m *Mongo) getChannelTypeFilter(types []entity.ChannelType) bson.M {
-	var includeTypes, excludeTypes []entity.ChannelType
-	for _, t := range types {
-		if t[0] == '-' {
-			excludeTypes = append(excludeTypes, t[1:])
+func (m *Mongo) getArrayFilter(values []string) bson.M {
+	var includeValues, excludeValues []string
+	for _, v := range values {
+		if v[0] == '-' {
+			excludeValues = append(excludeValues, v[1:])
 		} else {
-			includeTypes = append(includeTypes, t)
+			includeValues = append(includeValues, v)
 		}
 	}
 
 	filter := bson.M{}
-	if len(includeTypes) > 0 {
-		filter["$all"] = includeTypes
+	if len(includeValues) > 0 {
+		filter["$all"] = includeValues
 	}
 
-	if len(excludeTypes) > 0 {
-		filter["$nin"] = excludeTypes
+	if len(excludeValues) > 0 {
+		filter["$nin"] = excludeValues
 	}
 
 	return filter
+}
+
+func (m *Mongo) getPipeline(stages ...bson.D) mongo.Pipeline {
+	var pipelines mongo.Pipeline
+	for _, stage := range stages {
+		if len(stage) > 0 {
+			pipelines = append(pipelines, stage)
+		}
+	}
+	return pipelines
+}
+
+func (m *Mongo) addStage(stageKey string, stages bson.D, key string, value interface{}) bson.D {
+	for i, stage := range stages {
+		if stage.Key != stageKey {
+			continue
+		}
+
+		matchValue, ok := stage.Value.(bson.M)
+		if !ok {
+			continue
+		}
+
+		if matchValue[key] == nil {
+			matchValue[key] = bson.M{}
+		}
+
+		if mValue, ok := value.(bson.M); ok {
+			for k, v := range mValue {
+				matchValue[key].(bson.M)[k] = v
+			}
+		} else {
+			matchValue[key] = value
+		}
+
+		stages[i].Value = matchValue
+		return stages
+	}
+
+	return append(stages, bson.E{
+		Key:   stageKey,
+		Value: bson.M{key: value},
+	})
+}
+
+func (m *Mongo) addMatch(matchStage bson.D, key string, value interface{}) bson.D {
+	return m.addStage("$match", matchStage, key, value)
+}
+
+func (m *Mongo) addField(projStage bson.D, key string, value interface{}) bson.D {
+	return m.addStage("$addFields", projStage, key, value)
 }
