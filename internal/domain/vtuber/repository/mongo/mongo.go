@@ -236,7 +236,6 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 
 	if data.Mode == entity.SearchModeStats {
 		omitStage = append(omitStage, bson.E{Key: "$unset", Value: bson.A{
-			"image",
 			"original_names",
 			"nicknames",
 			"caption",
