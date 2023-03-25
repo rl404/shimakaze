@@ -226,48 +226,50 @@ func (m *Mongo) GetAllForAgencyTree(ctx context.Context) ([]entity.Vtuber, int, 
 
 // GetAll to get all data.
 func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity.Vtuber, int, int, error) {
-	filter := bson.M{}
-	opt := options.Find().SetSort(m.convertSort(data.Sort)).SetSkip(int64((data.Page - 1) * data.Limit)).SetLimit(int64(data.Limit))
+	newFieldStage := bson.D{}
+	matchStage := bson.D{}
+	omitStage := bson.D{}
+	sortStage := bson.D{{Key: "$sort", Value: m.convertSort(data.Sort)}}
+	skipStage := bson.D{{Key: "$skip", Value: (data.Page - 1) * data.Limit}}
+	limitStage := bson.D{}
+	countStage := bson.D{{Key: "$count", Value: "count"}}
 
 	if data.Mode == entity.SearchModeStats {
-		opt.SetProjection(bson.M{
-			"image":             0,
-			"original_names":    0,
-			"nicknames":         0,
-			"caption":           0,
-			"affiliations":      0,
-			"official_websites": 0,
-		})
+		omitStage = append(omitStage, bson.E{Key: "$unset", Value: bson.A{
+			"original_names",
+			"nicknames",
+			"caption",
+			"affiliations",
+			"official_websites",
+		}})
 	}
 
 	if data.Names != "" {
-		filter["$or"] = []interface{}{
-			bson.M{"name": bson.M{"$regex": data.Names, "$options": "i"}},
-			bson.M{"original_names": bson.M{"$regex": data.Names, "$options": "i"}},
-			bson.M{"nicknames": bson.M{"$regex": data.Names, "$options": "i"}},
-		}
+		matchStage = m.addMatch(matchStage, "$or", []bson.M{
+			{"name": bson.M{"$regex": data.Names, "$options": "i"}},
+			{"original_names": bson.M{"$regex": data.Names, "$options": "i"}},
+			{"nicknames": bson.M{"$regex": data.Names, "$options": "i"}},
+		})
 	}
 
 	if data.Name != "" {
-		filter["name"] = bson.M{"$regex": data.Name, "$options": "i"}
+		matchStage = m.addMatch(matchStage, "name", bson.M{"$regex": data.Name, "$options": "i"})
 	}
 
 	if data.OriginalName != "" {
-		filter["original_names"] = bson.M{"$regex": data.OriginalName, "$options": "i"}
+		matchStage = m.addMatch(matchStage, "original_names", bson.M{"$regex": data.OriginalName, "$options": "i"})
 	}
 
 	if data.Nickname != "" {
-		filter["nicknames"] = bson.M{"$regex": data.Nickname, "$options": "i"}
+		matchStage = m.addMatch(matchStage, "nicknames", bson.M{"$regex": data.Nickname, "$options": "i"})
 	}
 
 	if data.ExcludeActive {
-		m.initFilter(filter, "retirement_date")
-		filter["retirement_date"].(bson.M)["$ne"] = nil
+		matchStage = m.addMatch(matchStage, "retirement_date", bson.M{"$ne": nil})
 	}
 
 	if data.ExcludeRetired {
-		m.initFilter(filter, "retirement_date")
-		filter["retirement_date"].(bson.M)["$eq"] = nil
+		matchStage = m.addMatch(matchStage, "retirement_date", bson.M{"$eq": nil})
 	}
 
 	if data.ExcludeActive && data.ExcludeRetired {
@@ -275,85 +277,117 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 	}
 
 	if data.StartDebutYear > 0 {
-		m.initFilter(filter, "debut_date")
-		date := time.Date(data.StartDebutYear, 1, 1, 0, 0, 0, 0, time.UTC)
-		filter["debut_date"].(bson.M)["$gte"] = primitive.NewDateTimeFromTime(date)
+		newFieldStage = m.addField(newFieldStage, "debut_year", bson.M{"$year": "$debut_date"})
+		matchStage = m.addMatch(matchStage, "debut_year", bson.M{"$gte": data.StartDebutYear})
 	}
 
 	if data.EndDebutYear > 0 {
-		m.initFilter(filter, "debut_date")
-		date := time.Date(data.EndDebutYear+1, 1, 1, 0, 0, 0, 0, time.UTC)
-		filter["debut_date"].(bson.M)["$lte"] = primitive.NewDateTimeFromTime(date)
+		newFieldStage = m.addField(newFieldStage, "debut_year", bson.M{"$year": "$debut_date"})
+		matchStage = m.addMatch(matchStage, "debut_year", bson.M{"$lte": data.EndDebutYear})
 	}
 
 	if data.StartRetiredYear > 0 {
-		m.initFilter(filter, "retirement_date")
-		date := time.Date(data.StartRetiredYear, 1, 1, 0, 0, 0, 0, time.UTC)
-		filter["retirement_date"].(bson.M)["$gte"] = primitive.NewDateTimeFromTime(date)
+		newFieldStage = m.addField(newFieldStage, "retired_year", bson.M{"$year": "$retirement_date"})
+		matchStage = m.addMatch(matchStage, "retired_year", bson.M{"$gte": data.StartRetiredYear})
 	}
 
 	if data.EndRetiredYear > 0 {
-		m.initFilter(filter, "retirement_date")
-		date := time.Date(data.EndRetiredYear+1, 1, 1, 0, 0, 0, 0, time.UTC)
-		filter["retirement_date"].(bson.M)["$lte"] = primitive.NewDateTimeFromTime(date)
+		newFieldStage = m.addField(newFieldStage, "retired_year", bson.M{"$year": "$retirement_date"})
+		matchStage = m.addMatch(matchStage, "retired_year", bson.M{"$lte": data.EndRetiredYear})
 	}
 
 	if data.Has2D != nil {
-		filter["has_2d"] = utils.PtrToBool(data.Has2D)
+		matchStage = m.addMatch(matchStage, "has_2d", utils.PtrToBool(data.Has2D))
 	}
 
 	if data.Has3D != nil {
-		filter["has_3d"] = utils.PtrToBool(data.Has3D)
+		matchStage = m.addMatch(matchStage, "has_3d", utils.PtrToBool(data.Has3D))
 	}
 
 	if data.CharacterDesigner != "" {
-		filter["character_designers"] = data.CharacterDesigner
+		matchStage = m.addMatch(matchStage, "character_designers", data.CharacterDesigner)
 	}
 
 	if data.Character2DModeler != "" {
-		filter["character_2d_modelers"] = data.Character2DModeler
+		matchStage = m.addMatch(matchStage, "character_2d_modelers", data.Character2DModeler)
 	}
 
 	if data.Character3DModeler != "" {
-		filter["character_3d_modelers"] = data.Character3DModeler
+		matchStage = m.addMatch(matchStage, "character_3d_modelers", data.Character3DModeler)
 	}
 
 	if data.InAgency != nil {
-		filter["agencies.0"] = bson.M{"$exists": utils.PtrToBool(data.InAgency)}
+		matchStage = m.addMatch(matchStage, "agencies.0", bson.M{"$exists": utils.PtrToBool(data.InAgency)})
 	}
 
 	if data.Agency != "" {
-		filter["agencies.name"] = data.Agency
+		matchStage = m.addMatch(matchStage, "agencies.name", data.Agency)
+	}
+
+	if data.AgencyID > 0 {
+		matchStage = m.addMatch(matchStage, "agencies.id", data.AgencyID)
 	}
 
 	if len(data.ChannelTypes) > 0 {
-		filter["channels.type"] = m.getChannelTypeFilter(data.ChannelTypes)
+		matchStage = m.addMatch(matchStage, "channels.type", m.getChannelTypeFilter(data.ChannelTypes))
 	}
 
-	if data.Limit < 0 {
-		opt.SetLimit(0)
+	if data.BirthdayDay > 0 {
+		newFieldStage = m.addField(newFieldStage, "birthday_day", bson.M{"$dayOfMonth": "$birthday"})
+		matchStage = m.addMatch(matchStage, "birthday_day", data.BirthdayDay)
 	}
 
-	cursor, err := m.db.Find(ctx, filter, opt)
+	if data.BirthdayMonth > 0 {
+		newFieldStage = m.addField(newFieldStage, "birthday_month", bson.M{"$month": "$birthday"})
+		matchStage = m.addMatch(matchStage, "birthday_month", data.BirthdayMonth)
+	}
+
+	if len(data.BloodTypes) > 0 {
+		matchStage = m.addMatch(matchStage, "blood_type", m.getArrayFilter(data.BloodTypes))
+	}
+
+	if len(data.Genders) > 0 {
+		matchStage = m.addMatch(matchStage, "gender", m.getArrayFilter(data.Genders))
+	}
+
+	if len(data.Zodiacs) > 0 {
+		matchStage = m.addMatch(matchStage, "zodiac_sign", m.getArrayFilter(data.Zodiacs))
+	}
+
+	if data.Limit > 0 {
+		limitStage = append(limitStage, bson.E{Key: "$limit", Value: data.Limit})
+	}
+
+	cursor, err := m.db.Aggregate(ctx, m.getPipeline(newFieldStage, matchStage, omitStage, sortStage, skipStage, limitStage))
 	if err != nil {
 		return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
 	}
 
-	var res []entity.Vtuber
-	for cursor.Next(ctx) {
-		var vtuber vtuber
-		if err := cursor.Decode(&vtuber); err != nil {
-			return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
-		}
-		res = append(res, *vtuber.toEntity())
+	var vtubers []vtuber
+	if err := cursor.All(ctx, &vtubers); err != nil {
+		return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
 	}
 
-	total, err := m.db.CountDocuments(ctx, filter, options.Count())
+	res := make([]entity.Vtuber, len(vtubers))
+	for i, vtuber := range vtubers {
+		res[i] = *vtuber.toEntity()
+	}
+
+	if len(res) == 0 {
+		return res, 0, http.StatusOK, nil
+	}
+
+	cntCursor, err := m.db.Aggregate(ctx, m.getPipeline(newFieldStage, matchStage, countStage))
 	if err != nil {
 		return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
 	}
 
-	return res, int(total), http.StatusOK, nil
+	var total []map[string]int64
+	if err := cntCursor.All(ctx, &total); err != nil {
+		return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	return res, int(total[0]["count"]), http.StatusOK, nil
 }
 
 // GetCharacterDesigners to get character designers.

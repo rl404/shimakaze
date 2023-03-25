@@ -32,7 +32,13 @@ import (
 // @param character_3d_modeler query string false "character 3d modeler"
 // @param in_agency query boolean false "in agency"
 // @param agency query string false "agency"
+// @param agency_id query integer false "agency id"
 // @param channel_types query string false "channel types"
+// @param birthday_day query integer false "birthday day"
+// @param birthday_month query integer false "birthday month"
+// @param blood_types query string false "blood types"
+// @param genders query string false "gender types"
+// @param zodiacs query string false "zodiac types"
 // @param sort query string false "sort" enums(name,-name,debut_date,-debut_date,retirement_date,-retirement_date) default(name)
 // @param page query integer false "page" default(1)
 // @param limit query integer false "limit" default(20)
@@ -59,7 +65,13 @@ func (api *API) handleGetVtubers(w http.ResponseWriter, r *http.Request) {
 	character3DModeler := r.URL.Query().Get("character_3d_modeler")
 	inAgency := utils.StrToPtrBool(r.URL.Query().Get("in_agency"))
 	agency := r.URL.Query().Get("agency")
+	agencyID, _ := strconv.ParseInt(r.URL.Query().Get("agency_id"), 10, 64)
 	channelTypes := utils.StrToStrSlice(r.URL.Query().Get("channel_types"))
+	birthdayDay, _ := strconv.Atoi(r.URL.Query().Get("birthday_day"))
+	birthdayMonth, _ := strconv.Atoi(r.URL.Query().Get("birthday_month"))
+	bloodTypes := utils.StrToStrSlice(r.URL.Query().Get("blood_types"))
+	genders := utils.StrToStrSlice(r.URL.Query().Get("genders"))
+	zodiacs := utils.StrToStrSlice(r.URL.Query().Get("zodiacs"))
 	sort := r.URL.Query().Get("sort")
 	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
@@ -83,7 +95,13 @@ func (api *API) handleGetVtubers(w http.ResponseWriter, r *http.Request) {
 		Character3DModeler: character3DModeler,
 		InAgency:           inAgency,
 		Agency:             agency,
+		AgencyID:           agencyID,
 		ChannelTypes:       entity.StrsToChannelTypes(channelTypes),
+		BirthdayDay:        birthdayDay,
+		BirthdayMonth:      birthdayMonth,
+		BloodTypes:         bloodTypes,
+		Genders:            genders,
+		Zodiacs:            zodiacs,
 		Sort:               sort,
 		Page:               page,
 		Limit:              limit,

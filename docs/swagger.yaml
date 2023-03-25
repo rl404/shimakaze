@@ -334,9 +334,33 @@ paths:
         in: query
         name: agency
         type: string
+      - description: agency id
+        in: query
+        name: agency_id
+        type: integer
       - description: channel types
         in: query
         name: channel_types
+        type: string
+      - description: birthday day
+        in: query
+        name: birthday_day
+        type: integer
+      - description: birthday month
+        in: query
+        name: birthday_month
+        type: integer
+      - description: blood types
+        in: query
+        name: blood_types
+        type: string
+      - description: gender types
+        in: query
+        name: genders
+        type: string
+      - description: zodiac types
+        in: query
+        name: zodiacs
         type: string
       - default: name
         description: sort

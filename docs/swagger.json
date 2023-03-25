@@ -239,9 +239,45 @@
                         "in": "query"
                     },
                     {
+                        "type": "integer",
+                        "description": "agency id",
+                        "name": "agency_id",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "description": "channel types",
                         "name": "channel_types",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "birthday day",
+                        "name": "birthday_day",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "birthday month",
+                        "name": "birthday_month",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "blood types",
+                        "name": "blood_types",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "gender types",
+                        "name": "genders",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "zodiac types",
+                        "name": "zodiacs",
                         "in": "query"
                     },
                     {
