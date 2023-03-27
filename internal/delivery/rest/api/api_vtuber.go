@@ -21,8 +21,12 @@ import (
 // @param nickname query string false "nickname"
 // @param exclude_active query boolean false "exclude active"
 // @param exclude_retired query boolean false "exclude retired"
+// @param start_debut_month query integer false "start debut month"
+// @param end_debut_month query integer false "end debut month"
 // @param start_debut_year query integer false "start debut year"
 // @param end_debut_year query integer false "end debut year"
+// @param start_retired_month query integer false "start retired month"
+// @param end_retired_month query integer false "end retired month"
 // @param start_retired_year query integer false "start retired year"
 // @param end_retired_year query integer false "end retired year"
 // @param has_2d query boolean false "has 2d model"
@@ -35,7 +39,8 @@ import (
 // @param agency_id query integer false "agency id"
 // @param channel_types query string false "channel types"
 // @param birthday_day query integer false "birthday day"
-// @param birthday_month query integer false "birthday month"
+// @param start_birthday_month query integer false "start birthday month"
+// @param end_birthday_month query integer false "end birthday month"
 // @param blood_types query string false "blood types"
 // @param genders query string false "gender types"
 // @param zodiacs query string false "zodiac types"
@@ -54,8 +59,12 @@ func (api *API) handleGetVtubers(w http.ResponseWriter, r *http.Request) {
 	nickname := r.URL.Query().Get("nickname")
 	excludeActive, _ := strconv.ParseBool(r.URL.Query().Get("exclude_active"))
 	excludeRetired, _ := strconv.ParseBool(r.URL.Query().Get("exclude_retired"))
+	startDebutMonth, _ := strconv.Atoi(r.URL.Query().Get("start_debut_month"))
+	endDebutMonth, _ := strconv.Atoi(r.URL.Query().Get("end_debut_month"))
 	startDebutYear, _ := strconv.Atoi(r.URL.Query().Get("start_debut_year"))
 	endDebutYear, _ := strconv.Atoi(r.URL.Query().Get("end_debut_year"))
+	startRetiredMonth, _ := strconv.Atoi(r.URL.Query().Get("start_retired_month"))
+	endRetiredMonth, _ := strconv.Atoi(r.URL.Query().Get("end_retired_month"))
 	startRetiredYear, _ := strconv.Atoi(r.URL.Query().Get("start_retired_year"))
 	endRetiredYear, _ := strconv.Atoi(r.URL.Query().Get("end_retired_year"))
 	has2D := utils.StrToPtrBool(r.URL.Query().Get("has_2d"))
@@ -68,7 +77,8 @@ func (api *API) handleGetVtubers(w http.ResponseWriter, r *http.Request) {
 	agencyID, _ := strconv.ParseInt(r.URL.Query().Get("agency_id"), 10, 64)
 	channelTypes := utils.StrToStrSlice(r.URL.Query().Get("channel_types"))
 	birthdayDay, _ := strconv.Atoi(r.URL.Query().Get("birthday_day"))
-	birthdayMonth, _ := strconv.Atoi(r.URL.Query().Get("birthday_month"))
+	startBirthdayMonth, _ := strconv.Atoi(r.URL.Query().Get("start_birthday_month"))
+	endBirthdayMonth, _ := strconv.Atoi(r.URL.Query().Get("end_birthday_month"))
 	bloodTypes := utils.StrToStrSlice(r.URL.Query().Get("blood_types"))
 	genders := utils.StrToStrSlice(r.URL.Query().Get("genders"))
 	zodiacs := utils.StrToStrSlice(r.URL.Query().Get("zodiacs"))
@@ -84,8 +94,12 @@ func (api *API) handleGetVtubers(w http.ResponseWriter, r *http.Request) {
 		Nickname:           nickname,
 		ExcludeActive:      excludeActive,
 		ExcludeRetired:     excludeRetired,
+		StartDebutMonth:    startDebutMonth,
+		EndDebutMonth:      endDebutMonth,
 		StartDebutYear:     startDebutYear,
 		EndDebutYear:       endDebutYear,
+		StartRetiredMonth:  startRetiredMonth,
+		EndRetiredMonth:    endRetiredMonth,
 		StartRetiredYear:   startRetiredYear,
 		EndRetiredYear:     endRetiredYear,
 		Has2D:              has2D,
@@ -98,7 +112,8 @@ func (api *API) handleGetVtubers(w http.ResponseWriter, r *http.Request) {
 		AgencyID:           agencyID,
 		ChannelTypes:       entity.StrsToChannelTypes(channelTypes),
 		BirthdayDay:        birthdayDay,
-		BirthdayMonth:      birthdayMonth,
+		StartBirthdayMonth: startBirthdayMonth,
+		EndBirthdayMonth:   endBirthdayMonth,
 		BloodTypes:         bloodTypes,
 		Genders:            genders,
 		Zodiacs:            zodiacs,

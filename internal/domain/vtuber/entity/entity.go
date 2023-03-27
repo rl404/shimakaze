@@ -89,8 +89,12 @@ type GetAllRequest struct {
 	Nickname           string
 	ExcludeActive      bool
 	ExcludeRetired     bool
+	StartDebutMonth    int
+	EndDebutMonth      int
 	StartDebutYear     int
 	EndDebutYear       int
+	StartRetiredMonth  int
+	EndRetiredMonth    int
 	StartRetiredYear   int
 	EndRetiredYear     int
 	Has2D              *bool
@@ -103,7 +107,8 @@ type GetAllRequest struct {
 	AgencyID           int64
 	ChannelTypes       []ChannelType
 	BirthdayDay        int
-	BirthdayMonth      int
+	StartBirthdayMonth int
+	EndBirthdayMonth   int
 	BloodTypes         []string
 	Genders            []string
 	Zodiacs            []string

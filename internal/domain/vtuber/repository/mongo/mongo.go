@@ -276,6 +276,16 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 		return nil, 0, http.StatusOK, nil
 	}
 
+	if data.StartDebutMonth > 0 {
+		newFieldStage = m.addField(newFieldStage, "debut_month", bson.M{"$month": "$debut_date"})
+		matchStage = m.addMatch(matchStage, "debut_month", bson.M{"$gte": data.StartDebutMonth})
+	}
+
+	if data.EndDebutMonth > 0 {
+		newFieldStage = m.addField(newFieldStage, "debut_month", bson.M{"$month": "$debut_date"})
+		matchStage = m.addMatch(matchStage, "debut_month", bson.M{"$lte": data.EndDebutMonth})
+	}
+
 	if data.StartDebutYear > 0 {
 		newFieldStage = m.addField(newFieldStage, "debut_year", bson.M{"$year": "$debut_date"})
 		matchStage = m.addMatch(matchStage, "debut_year", bson.M{"$gte": data.StartDebutYear})
@@ -284,6 +294,16 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 	if data.EndDebutYear > 0 {
 		newFieldStage = m.addField(newFieldStage, "debut_year", bson.M{"$year": "$debut_date"})
 		matchStage = m.addMatch(matchStage, "debut_year", bson.M{"$lte": data.EndDebutYear})
+	}
+
+	if data.StartRetiredMonth > 0 {
+		newFieldStage = m.addField(newFieldStage, "retired_month", bson.M{"$month": "$retirement_date"})
+		matchStage = m.addMatch(matchStage, "retired_month", bson.M{"$gte": data.StartRetiredMonth})
+	}
+
+	if data.EndRetiredMonth > 0 {
+		newFieldStage = m.addField(newFieldStage, "retired_month", bson.M{"$month": "$retirement_date"})
+		matchStage = m.addMatch(matchStage, "retired_month", bson.M{"$lte": data.EndRetiredMonth})
 	}
 
 	if data.StartRetiredYear > 0 {
@@ -337,9 +357,14 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 		matchStage = m.addMatch(matchStage, "birthday_day", data.BirthdayDay)
 	}
 
-	if data.BirthdayMonth > 0 {
+	if data.StartBirthdayMonth > 0 {
 		newFieldStage = m.addField(newFieldStage, "birthday_month", bson.M{"$month": "$birthday"})
-		matchStage = m.addMatch(matchStage, "birthday_month", data.BirthdayMonth)
+		matchStage = m.addMatch(matchStage, "birthday_month", bson.M{"$gte": data.StartBirthdayMonth})
+	}
+
+	if data.EndBirthdayMonth > 0 {
+		newFieldStage = m.addField(newFieldStage, "birthday_month", bson.M{"$month": "$birthday"})
+		matchStage = m.addMatch(matchStage, "birthday_month", bson.M{"$lte": data.EndBirthdayMonth})
 	}
 
 	if len(data.BloodTypes) > 0 {
@@ -371,10 +396,6 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 	res := make([]entity.Vtuber, len(vtubers))
 	for i, vtuber := range vtubers {
 		res[i] = *vtuber.toEntity()
-	}
-
-	if len(res) == 0 {
-		return res, 0, http.StatusOK, nil
 	}
 
 	cntCursor, err := m.db.Aggregate(ctx, m.getPipeline(newFieldStage, matchStage, countStage))
