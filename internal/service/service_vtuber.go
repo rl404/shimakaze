@@ -303,10 +303,14 @@ type GetVtubersRequest struct {
 	Nickname           string               `validate:"omitempty,gte=3" mod:"trim,lcase"`
 	ExcludeActive      bool                 ``
 	ExcludeRetired     bool                 ``
-	StartDebutYear     int                  `validate:"gte=0"`
-	EndDebutYear       int                  `validate:"gte=0"`
-	StartRetiredYear   int                  `validate:"gte=0"`
-	EndRetiredYear     int                  `validate:"gte=0"`
+	StartDebutMonth    int                  `validate:"omitempty,gte=1"`
+	EndDebutMonth      int                  `validate:"omitempty,gte=1"`
+	StartDebutYear     int                  `validate:"omitempty,gte=1"`
+	EndDebutYear       int                  `validate:"omitempty,gte=1"`
+	StartRetiredMonth  int                  `validate:"omitempty,gte=1"`
+	EndRetiredMonth    int                  `validate:"omitempty,gte=1"`
+	StartRetiredYear   int                  `validate:"omitempty,gte=1"`
+	EndRetiredYear     int                  `validate:"omitempty,gte=1"`
 	Has2D              *bool                ``
 	Has3D              *bool                ``
 	CharacterDesigner  string               `mod:"trim"`
@@ -317,7 +321,8 @@ type GetVtubersRequest struct {
 	AgencyID           int64                `validate:"omitempty,gte=1"`
 	ChannelTypes       []entity.ChannelType `validate:"dive,gte=1" mod:"dive,trim"`
 	BirthdayDay        int                  `validate:"omitempty,gte=1"`
-	BirthdayMonth      int                  `validate:"omitempty,gte=1"`
+	StartBirthdayMonth int                  `validate:"omitempty,gte=1"`
+	EndBirthdayMonth   int                  `validate:"omitempty,gte=1"`
 	BloodTypes         []string             `validate:"dive,gte=1" mod:"dive,trim"`
 	Genders            []string             `validate:"dive,gte=1" mod:"dive,trim"`
 	Zodiacs            []string             `validate:"dive,gte=1" mod:"dive,trim"`
@@ -340,8 +345,12 @@ func (s *service) GetVtubers(ctx context.Context, data GetVtubersRequest) ([]vtu
 		Nickname:           data.Nickname,
 		ExcludeActive:      data.ExcludeActive,
 		ExcludeRetired:     data.ExcludeRetired,
+		StartDebutMonth:    data.StartDebutMonth,
+		EndDebutMonth:      data.EndDebutMonth,
 		StartDebutYear:     data.StartDebutYear,
 		EndDebutYear:       data.EndDebutYear,
+		StartRetiredMonth:  data.StartRetiredMonth,
+		EndRetiredMonth:    data.EndRetiredMonth,
 		StartRetiredYear:   data.StartRetiredYear,
 		EndRetiredYear:     data.EndRetiredYear,
 		Has2D:              data.Has2D,
@@ -354,7 +363,8 @@ func (s *service) GetVtubers(ctx context.Context, data GetVtubersRequest) ([]vtu
 		AgencyID:           data.AgencyID,
 		ChannelTypes:       data.ChannelTypes,
 		BirthdayDay:        data.BirthdayDay,
-		BirthdayMonth:      data.BirthdayMonth,
+		StartBirthdayMonth: data.StartBirthdayMonth,
+		EndBirthdayMonth:   data.EndBirthdayMonth,
 		BloodTypes:         data.BloodTypes,
 		Genders:            data.Genders,
 		Zodiacs:            data.Zodiacs,
