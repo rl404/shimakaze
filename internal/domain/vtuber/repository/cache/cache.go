@@ -96,6 +96,21 @@ func (c *Cache) UpdateByID(ctx context.Context, id int64, data entity.Vtuber) (i
 	return http.StatusOK, nil
 }
 
+// DeleteByID to delete by id.
+func (c *Cache) DeleteByID(ctx context.Context, id int64) (int, error) {
+	if code, err := c.repo.DeleteByID(ctx, id); err != nil {
+		return code, errors.Wrap(ctx, err)
+	}
+
+	key := utils.GetKey("vtuber", id)
+	if err := c.cacher.Delete(ctx, key); err != nil {
+		return http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+
+	}
+
+	return http.StatusOK, nil
+}
+
 // IsOld to check if old data.
 func (c *Cache) IsOld(ctx context.Context, id int64) (bool, int, error) {
 	return c.repo.IsOld(ctx, id)

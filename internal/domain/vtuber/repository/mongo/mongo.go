@@ -84,6 +84,14 @@ func (m *Mongo) UpdateByID(ctx context.Context, id int64, data entity.Vtuber) (i
 	return http.StatusOK, nil
 }
 
+// DeleteByID to delete by id.
+func (m *Mongo) DeleteByID(ctx context.Context, id int64) (int, error) {
+	if _, err := m.db.DeleteOne(ctx, bson.M{"id": id}); err != nil {
+		return http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+	return http.StatusOK, nil
+}
+
 // IsOld to check if old data.
 func (m *Mongo) IsOld(ctx context.Context, id int64) (bool, int, error) {
 	filter := bson.M{

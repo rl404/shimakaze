@@ -26,10 +26,16 @@ func (s *service) updateVtuber(ctx context.Context, id int64) (int, error) {
 
 	// Non-vtuber page.
 	if s.isNonVtuberPage(*page) {
+		// Delete existing vtuber.
+		if code, err := s.vtuber.DeleteByID(ctx, id); err != nil {
+			return code, errors.Wrap(ctx, err)
+		}
+
 		// Insert to non-vtuber.
 		if code, err := s.nonVtuber.Create(ctx, id); err != nil {
 			return code, errors.Wrap(ctx, err)
 		}
+
 		return http.StatusOK, nil
 	}
 
