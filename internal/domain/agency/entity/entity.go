@@ -7,5 +7,6 @@ type Agency struct {
 	ID        int64
 	Name      string
 	Image     string
+	Member    int
 	UpdatedAt time.Time
 }

@@ -179,6 +179,18 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
+                        "description": "start debut month",
+                        "name": "start_debut_month",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "end debut month",
+                        "name": "end_debut_month",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
                         "description": "start debut year",
                         "name": "start_debut_year",
                         "in": "query"
@@ -187,6 +199,18 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "end debut year",
                         "name": "end_debut_year",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "start retired month",
+                        "name": "start_retired_month",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "end retired month",
+                        "name": "end_retired_month",
                         "in": "query"
                     },
                     {
@@ -263,8 +287,14 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "birthday month",
-                        "name": "birthday_month",
+                        "description": "start birthday month",
+                        "name": "start_birthday_month",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "end birthday month",
+                        "name": "end_birthday_month",
                         "in": "query"
                     },
                     {
@@ -711,6 +741,9 @@ const docTemplate = `{
                 },
                 "image": {
                     "type": "string"
+                },
+                "member": {
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
