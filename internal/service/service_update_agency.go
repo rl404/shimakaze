@@ -6,6 +6,7 @@ import (
 	"regexp"
 
 	"github.com/rl404/shimakaze/internal/domain/agency/entity"
+	vtuberEntity "github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	"github.com/rl404/shimakaze/internal/errors"
 )
 
@@ -16,11 +17,23 @@ func (s *service) updateAgency(ctx context.Context, id int64) (int, error) {
 		return code, errors.Wrap(ctx, err)
 	}
 
+	// Get members.
+	_, total, code, err := s.vtuber.GetAll(ctx, vtuberEntity.GetAllRequest{
+		Mode:     vtuberEntity.SearchModeStats,
+		AgencyID: page.ID,
+		Page:     1,
+		Limit:    1,
+	})
+	if err != nil {
+		return code, errors.Wrap(ctx, err)
+	}
+
 	// Update data.
 	if code, err := s.agency.UpdateByID(ctx, id, entity.Agency{
-		ID:    page.ID,
-		Name:  page.Title,
-		Image: s.getAgencyLogo(ctx, page.Content),
+		ID:     page.ID,
+		Name:   page.Title,
+		Image:  s.getAgencyLogo(ctx, page.Content),
+		Member: total,
 	}); err != nil {
 		return code, errors.Wrap(ctx, err)
 	}

@@ -11,6 +11,7 @@ type agency struct {
 	ID        int64     `bson:"id"`
 	Name      string    `bson:"name"`
 	Image     string    `bson:"image"`
+	Member    int       `bson:"member"`
 	CreatedAt time.Time `bson:"created_at"`
 	UpdatedAt time.Time `bson:"updated_at"`
 }
@@ -32,6 +33,7 @@ func (a *agency) toEntity() *entity.Agency {
 		ID:        a.ID,
 		Name:      a.Name,
 		Image:     a.Image,
+		Member:    a.Member,
 		UpdatedAt: a.UpdatedAt,
 	}
 }
@@ -41,6 +43,7 @@ func (m *Mongo) agencyFromEntity(a entity.Agency) *agency {
 		ID:        a.ID,
 		Name:      a.Name,
 		Image:     a.Image,
+		Member:    a.Member,
 		UpdatedAt: a.UpdatedAt,
 	}
 }

@@ -408,6 +408,10 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 		return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
 	}
 
+	if len(total) == 0 {
+		return res, 0, http.StatusOK, nil
+	}
+
 	return res, int(total[0]["count"]), http.StatusOK, nil
 }
 

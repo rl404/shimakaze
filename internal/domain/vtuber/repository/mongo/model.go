@@ -203,7 +203,7 @@ func (m *Mongo) vtuberFromEntity(v entity.Vtuber) *vtuber {
 
 func (m *Mongo) convertSort(sort string) bson.D {
 	if sort == "" {
-		return nil
+		sort = "name"
 	}
 
 	if sort[0] == '-' {

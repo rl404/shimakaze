@@ -12,6 +12,7 @@ type agency struct {
 	ID        int64     `json:"id"`
 	Name      string    `json:"name"`
 	Image     string    `json:"image"`
+	Member    int       `json:"member"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
@@ -28,6 +29,7 @@ func (s *service) GetAgencies(ctx context.Context) ([]agency, int, error) {
 			ID:        a.ID,
 			Name:      a.Name,
 			Image:     a.Image,
+			Member:    a.Member,
 			UpdatedAt: a.UpdatedAt,
 		}
 	}
@@ -46,6 +48,7 @@ func (s *service) GetAgencyByID(ctx context.Context, id int64) (*agency, int, er
 		ID:        a.ID,
 		Name:      a.Name,
 		Image:     a.Image,
+		Member:    a.Member,
 		UpdatedAt: a.UpdatedAt,
 	}, http.StatusOK, nil
 }
