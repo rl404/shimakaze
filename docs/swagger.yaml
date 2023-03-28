@@ -6,6 +6,8 @@ definitions:
         type: integer
       image:
         type: string
+      member:
+        type: integer
       name:
         type: string
       updated_at:
@@ -290,6 +292,14 @@ paths:
         in: query
         name: exclude_retired
         type: boolean
+      - description: start debut month
+        in: query
+        name: start_debut_month
+        type: integer
+      - description: end debut month
+        in: query
+        name: end_debut_month
+        type: integer
       - description: start debut year
         in: query
         name: start_debut_year
@@ -297,6 +307,14 @@ paths:
       - description: end debut year
         in: query
         name: end_debut_year
+        type: integer
+      - description: start retired month
+        in: query
+        name: start_retired_month
+        type: integer
+      - description: end retired month
+        in: query
+        name: end_retired_month
         type: integer
       - description: start retired year
         in: query
@@ -346,9 +364,13 @@ paths:
         in: query
         name: birthday_day
         type: integer
-      - description: birthday month
+      - description: start birthday month
         in: query
-        name: birthday_month
+        name: start_birthday_month
+        type: integer
+      - description: end birthday month
+        in: query
+        name: end_birthday_month
         type: integer
       - description: blood types
         in: query
