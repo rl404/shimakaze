@@ -250,6 +250,10 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 			"affiliations",
 			"official_websites",
 		}})
+	} else {
+		omitStage = append(omitStage, bson.E{Key: "$unset", Value: bson.A{
+			"channels.videos",
+		}})
 	}
 
 	if data.Names != "" {

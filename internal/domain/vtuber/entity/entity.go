@@ -54,6 +54,7 @@ type Agency struct {
 
 // Channel is entity for channel.
 type Channel struct {
+	ID         string
 	Name       string
 	Type       ChannelType
 	URL        string
@@ -64,11 +65,12 @@ type Channel struct {
 
 // Video is entity for video.
 type Video struct {
+	ID        string
 	Title     string
 	URL       string
 	Image     string
-	StartDate time.Time
-	EndDate   time.Time
+	StartDate *time.Time
+	EndDate   *time.Time
 }
 
 // SearchMode is search mode.

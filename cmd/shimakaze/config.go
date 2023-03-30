@@ -26,6 +26,7 @@ type config struct {
 	Cron     cronConfig     `envconfig:"CRON"`
 	Log      logConfig      `envconfig:"LOG"`
 	Newrelic newrelicConfig `envconfig:"NEWRELIC"`
+	Youtube  youtubeConfig  `envconfig:"YOUTUBE"`
 }
 
 type appConfig struct {
@@ -73,6 +74,11 @@ type logConfig struct {
 type newrelicConfig struct {
 	Name       string `envconfig:"NAME" default:"shimakaze"`
 	LicenseKey string `envconfig:"LICENSE_KEY"`
+}
+
+type youtubeConfig struct {
+	Key    string `envconfig:"KEY"`
+	MaxAge int    `envconfig:"MAX_AGE" validate:"required,gte=0" mod:"default=60"`
 }
 
 const envPath = "../../.env"

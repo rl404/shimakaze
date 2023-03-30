@@ -66,6 +66,7 @@ func (v *vtuber) toEntity() *entity.Vtuber {
 		videos := make([]entity.Video, len(c.Videos))
 		for j, vi := range c.Videos {
 			videos[j] = entity.Video{
+				ID:        vi.ID,
 				Title:     vi.Title,
 				URL:       vi.URL,
 				Image:     vi.Image,
@@ -75,6 +76,7 @@ func (v *vtuber) toEntity() *entity.Vtuber {
 		}
 
 		channels[i] = entity.Channel{
+			ID:         c.ID,
 			Name:       c.Name,
 			Type:       c.Type,
 			URL:        c.URL,
@@ -122,6 +124,7 @@ type agency struct {
 }
 
 type channel struct {
+	ID         string             `bson:"id"`
 	Name       string             `bson:"name"`
 	Type       entity.ChannelType `bson:"type"`
 	URL        string             `bson:"url"`
@@ -131,11 +134,12 @@ type channel struct {
 }
 
 type video struct {
-	Title     string    `bson:"title"`
-	URL       string    `bson:"url"`
-	Image     string    `bson:"image"`
-	StartDate time.Time `bson:"start_date"`
-	EndDate   time.Time `bson:"end_date"`
+	ID        string     `bson:"id"`
+	Title     string     `bson:"title"`
+	URL       string     `bson:"url"`
+	Image     string     `bson:"image"`
+	StartDate *time.Time `bson:"start_date"`
+	EndDate   *time.Time `bson:"end_date"`
 }
 
 func (m *Mongo) vtuberFromEntity(v entity.Vtuber) *vtuber {
@@ -153,6 +157,7 @@ func (m *Mongo) vtuberFromEntity(v entity.Vtuber) *vtuber {
 		videos := make([]video, len(c.Videos))
 		for j, vid := range c.Videos {
 			videos[j] = video{
+				ID:        vid.ID,
 				Title:     vid.Title,
 				URL:       vid.URL,
 				Image:     vid.Image,
@@ -162,6 +167,7 @@ func (m *Mongo) vtuberFromEntity(v entity.Vtuber) *vtuber {
 		}
 
 		channels[i] = channel{
+			ID:         c.ID,
 			Name:       c.Name,
 			Type:       c.Type,
 			URL:        c.URL,
