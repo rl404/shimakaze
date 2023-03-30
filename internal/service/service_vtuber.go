@@ -48,8 +48,22 @@ type vtuberAgency struct {
 }
 
 type vtuberChannel struct {
-	Type entity.ChannelType `json:"type"`
-	URL  string             `json:"url"`
+	ID         string             `json:"id"`
+	Name       string             `json:"name"`
+	Type       entity.ChannelType `json:"type"`
+	URL        string             `json:"url"`
+	Image      string             `json:"image"`
+	Subscriber int                `json:"subscriber"`
+	Videos     []vtuberVideo      `json:"videos"`
+}
+
+type vtuberVideo struct {
+	ID        string     `json:"id"`
+	Title     string     `json:"title"`
+	URL       string     `json:"url"`
+	Image     string     `json:"image"`
+	StartDate *time.Time `json:"start_date"`
+	EndDate   *time.Time `json:"end_date"`
 }
 
 // GetVtuberByID to get vtuber by id.
@@ -70,9 +84,26 @@ func (s *service) GetVtuberByID(ctx context.Context, id int64) (*vtuber, int, er
 
 	channels := make([]vtuberChannel, len(vt.Channels))
 	for i, c := range vt.Channels {
+		videos := make([]vtuberVideo, len(c.Videos))
+		for j, v := range c.Videos {
+			videos[j] = vtuberVideo{
+				ID:        v.ID,
+				Title:     v.Title,
+				URL:       v.URL,
+				Image:     v.Image,
+				StartDate: v.StartDate,
+				EndDate:   v.EndDate,
+			}
+		}
+
 		channels[i] = vtuberChannel{
-			Type: c.Type,
-			URL:  c.URL,
+			ID:         c.ID,
+			Name:       c.Name,
+			Type:       c.Type,
+			URL:        c.URL,
+			Image:      c.Image,
+			Subscriber: c.Subscriber,
+			Videos:     videos,
 		}
 	}
 
@@ -389,9 +420,26 @@ func (s *service) GetVtubers(ctx context.Context, data GetVtubersRequest) ([]vtu
 
 		channels := make([]vtuberChannel, len(vt.Channels))
 		for i, c := range vt.Channels {
+			videos := make([]vtuberVideo, len(c.Videos))
+			for j, v := range c.Videos {
+				videos[j] = vtuberVideo{
+					ID:        v.ID,
+					Title:     v.Title,
+					URL:       v.URL,
+					Image:     v.Image,
+					StartDate: v.StartDate,
+					EndDate:   v.EndDate,
+				}
+			}
+
 			channels[i] = vtuberChannel{
-				Type: c.Type,
-				URL:  c.URL,
+				ID:         c.ID,
+				Name:       c.Name,
+				Type:       c.Type,
+				URL:        c.URL,
+				Image:      c.Image,
+				Subscriber: c.Subscriber,
+				Videos:     videos,
 			}
 		}
 

@@ -1,10 +1,15 @@
 package utils
 
 import (
+	"errors"
 	"html"
+	"math"
+	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
+	"unicode"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -101,4 +106,131 @@ func StrToStrSlice(str string) []string {
 		return nil
 	}
 	return strings.Split(str, ",")
+}
+
+// GetLastPathFromURL to get the last path from url.
+func GetLastPathFromURL(str string) string {
+	url, err := url.Parse(str)
+	if err != nil {
+		return ""
+	}
+	splitPath := strings.Split(url.Path, "/")
+	return splitPath[len(splitPath)-1]
+}
+
+const (
+	parsingPeriod = iota
+	parsingTime
+)
+
+// ParseDuration to parse ISO 8601 duration.
+func ParseDuration(durationStr string) (time.Duration, error) {
+	state := parsingPeriod
+	duration := 0 * time.Second
+	num := ""
+
+	err := errors.New("invalid duration")
+
+	for _, c := range durationStr {
+		switch c {
+		case 'P':
+			state = parsingPeriod
+		case 'T':
+			state = parsingTime
+		case 'Y':
+			if state != parsingPeriod {
+				return 0, err
+			}
+
+			y, err := strconv.ParseFloat(num, 64)
+			if err != nil {
+				return 0, err
+			}
+
+			duration += time.Duration(math.Round(y)) * 365 * 24 * time.Hour
+
+			num = ""
+		case 'M':
+			if state == parsingPeriod {
+				m, err := strconv.ParseFloat(num, 64)
+				if err != nil {
+					return 0, err
+				}
+
+				duration += time.Duration(math.Round(m)) * 30 * 24 * time.Hour
+
+				num = ""
+			} else if state == parsingTime {
+				m, err := strconv.ParseFloat(num, 64)
+				if err != nil {
+					return 0, err
+				}
+
+				duration += time.Duration(math.Round(m)) * time.Minute
+
+				num = ""
+			}
+		case 'W':
+			if state != parsingPeriod {
+				return 0, err
+			}
+
+			w, err := strconv.ParseFloat(num, 64)
+			if err != nil {
+				return 0, err
+			}
+
+			duration += time.Duration(math.Round(w)) * 7 * 24 * time.Hour
+
+			num = ""
+		case 'D':
+			if state != parsingPeriod {
+				return 0, err
+			}
+
+			d, err := strconv.ParseFloat(num, 64)
+			if err != nil {
+				return 0, err
+			}
+
+			duration += time.Duration(math.Round(d)) * 24 * time.Hour
+
+			num = ""
+		case 'H':
+			if state != parsingTime {
+				return 0, err
+			}
+
+			h, err := strconv.ParseFloat(num, 64)
+			if err != nil {
+				return 0, err
+			}
+
+			duration += time.Duration(math.Round(h)) * time.Hour
+
+			num = ""
+		case 'S':
+			if state != parsingTime {
+				return 0, err
+			}
+
+			s, err := strconv.ParseFloat(num, 64)
+			if err != nil {
+				return 0, err
+			}
+
+			duration += time.Duration(math.Round(s)) * time.Second
+
+			num = ""
+		default:
+			if unicode.IsNumber(c) || c == '.' {
+				num += string(c)
+				continue
+			}
+
+			return 0, err
+		}
+	}
+
+	return duration, nil
 }

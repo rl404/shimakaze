@@ -2,12 +2,14 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 
 	vtuberEntity "github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	wikiaEntity "github.com/rl404/shimakaze/internal/domain/wikia/entity"
 	"github.com/rl404/shimakaze/internal/errors"
+	"github.com/rl404/shimakaze/internal/utils"
 )
 
 func (s *service) updateVtuber(ctx context.Context, id int64) (int, error) {
@@ -57,6 +59,9 @@ func (s *service) updateVtuber(ctx context.Context, id int64) (int, error) {
 	vtuber.CharacterDesigners = category.charDesigner
 	vtuber.Character2DModelers = category.char2DModeler
 	vtuber.Character3DModelers = category.char3DModeler
+
+	// Fill channel data.
+	vtuber.Channels = s.fillChannelData(ctx, vtuber.Channels)
 
 	// Update data.
 	if code, err := s.vtuber.UpdateByID(ctx, id, vtuber); err != nil {
@@ -189,4 +194,90 @@ func (s *service) mergeAgencies(a1, a2 []vtuberEntity.Agency) []vtuberEntity.Age
 	}
 
 	return a3
+}
+
+func (s *service) fillChannelData(ctx context.Context, channels []vtuberEntity.Channel) []vtuberEntity.Channel {
+	return s.fillChannelDataYoutube(ctx, channels)
+}
+
+func (s *service) fillChannelDataYoutube(ctx context.Context, channels []vtuberEntity.Channel) []vtuberEntity.Channel {
+	for i, channel := range channels {
+		if channel.Type != vtuberEntity.ChannelYoutube {
+			continue
+		}
+
+		channels[i] = s.fillYoutubeChannel(ctx, channels[i])
+		channels[i] = s.fillYoutubeVideos(ctx, channels[i])
+	}
+
+	return channels
+}
+
+func (s *service) fillYoutubeChannel(ctx context.Context, channel vtuberEntity.Channel) vtuberEntity.Channel {
+	channelID := utils.GetLastPathFromURL(channel.URL)
+	if channelID == "" {
+		return channel
+	}
+
+	ch, _, err := s.youtube.GetChannelByID(ctx, channelID)
+	if err == nil {
+		channel.ID = ch.ID
+		channel.Name = ch.Name
+		channel.Image = ch.Image
+		channel.Subscriber = ch.Subscriber
+		return channel
+	}
+
+	// URL not contain channel id.
+	errors.Wrap(ctx, err)
+
+	channelID, _, err = s.youtube.GetChannelIDByURL(ctx, channel.URL)
+	if err != nil {
+		errors.Wrap(ctx, err)
+		return channel
+	}
+
+	ch, _, err = s.youtube.GetChannelByID(ctx, channelID)
+	if err != nil {
+		errors.Wrap(ctx, err)
+		return channel
+	}
+
+	channel.ID = ch.ID
+	channel.Name = ch.Name
+	channel.Image = ch.Image
+	channel.Subscriber = ch.Subscriber
+
+	return channel
+}
+
+func (s *service) fillYoutubeVideos(ctx context.Context, channel vtuberEntity.Channel) vtuberEntity.Channel {
+	if channel.ID == "" {
+		return channel
+	}
+
+	videoIDs, _, err := s.youtube.GetVideoIDsByChannelID(ctx, channel.ID)
+	if err != nil {
+		errors.Wrap(ctx, err)
+		return channel
+	}
+
+	videos, _, err := s.youtube.GetVideosByIDs(ctx, videoIDs)
+	if err != nil {
+		errors.Wrap(ctx, err)
+		return channel
+	}
+
+	for _, v := range videos {
+		channel.Videos = append(channel.Videos, vtuberEntity.Video{
+			ID:        v.ID,
+			Title:     v.Title,
+			URL:       fmt.Sprintf("https://www.youtube.com/watch?v=%s", v.ID),
+			Image:     v.Image,
+			StartDate: v.StartDate,
+			EndDate:   v.EndDate,
+		})
+	}
+
+	return channel
 }
