@@ -79,7 +79,7 @@ func (c *Client) GetVideoIDsByChannelID(ctx context.Context, channelID string) (
 			res = append(res, item.ContentDetails.VideoID)
 		}
 
-		if len(body.Items) == 0 || done {
+		if len(body.Items) == 0 || body.NextPageToken == "" || done {
 			break
 		}
 

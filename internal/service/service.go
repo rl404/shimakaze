@@ -7,6 +7,7 @@ import (
 	nonVtuberRepository "github.com/rl404/shimakaze/internal/domain/non_vtuber/repository"
 	"github.com/rl404/shimakaze/internal/domain/publisher/entity"
 	publisherRepository "github.com/rl404/shimakaze/internal/domain/publisher/repository"
+	twitchRepository "github.com/rl404/shimakaze/internal/domain/twitch/repository"
 	vtuberRepository "github.com/rl404/shimakaze/internal/domain/vtuber/repository"
 	wikiaRepository "github.com/rl404/shimakaze/internal/domain/wikia/repository"
 	youtubeRepository "github.com/rl404/shimakaze/internal/domain/youtube/repository"
@@ -43,6 +44,7 @@ type service struct {
 	agency    agencyRepository.Repository
 	publisher publisherRepository.Repository
 	youtube   youtubeRepository.Repository
+	twitch    twitchRepository.Repository
 }
 
 // New to create new service.
@@ -53,6 +55,7 @@ func New(
 	agency agencyRepository.Repository,
 	publisher publisherRepository.Repository,
 	youtube youtubeRepository.Repository,
+	twitch twitchRepository.Repository,
 ) Service {
 	return &service{
 		wikia:     wikia,
@@ -61,6 +64,7 @@ func New(
 		agency:    agency,
 		publisher: publisher,
 		youtube:   youtube,
+		twitch:    twitch,
 	}
 }
 

@@ -27,6 +27,7 @@ type config struct {
 	Log      logConfig      `envconfig:"LOG"`
 	Newrelic newrelicConfig `envconfig:"NEWRELIC"`
 	Youtube  youtubeConfig  `envconfig:"YOUTUBE"`
+	Twitch   twitchConfig   `envconfig:"TWITCH"`
 }
 
 type appConfig struct {
@@ -79,6 +80,11 @@ type newrelicConfig struct {
 type youtubeConfig struct {
 	Key    string `envconfig:"KEY"`
 	MaxAge int    `envconfig:"MAX_AGE" validate:"required,gte=0" mod:"default=60"`
+}
+
+type twitchConfig struct {
+	ClientID     string `envconfig:"CLIENT_ID"`
+	ClientSecret string `envconfig:"CLIENT_SECRET"`
 }
 
 const envPath = "../../.env"

@@ -134,7 +134,7 @@ func (c *Client) getVideoEndDate(video video) *time.Time {
 		return nil
 	}
 
-	tmp := startDate.Add(duration)
+	endDate := startDate.Add(duration)
 
-	return &tmp
+	return &endDate
 }
