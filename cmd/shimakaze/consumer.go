@@ -8,7 +8,9 @@ import (
 	"time"
 
 	"github.com/newrelic/go-agent/v3/newrelic"
+	"github.com/rl404/fairy/cache"
 	_nr "github.com/rl404/fairy/log/newrelic"
+	nrCache "github.com/rl404/fairy/monitoring/newrelic/cache"
 	nrPS "github.com/rl404/fairy/monitoring/newrelic/pubsub"
 	"github.com/rl404/fairy/pubsub"
 	_consumer "github.com/rl404/shimakaze/internal/delivery/consumer"
@@ -18,6 +20,8 @@ import (
 	nonVtuberMongo "github.com/rl404/shimakaze/internal/domain/non_vtuber/repository/mongo"
 	publisherRepository "github.com/rl404/shimakaze/internal/domain/publisher/repository"
 	publisherPubsub "github.com/rl404/shimakaze/internal/domain/publisher/repository/pubsub"
+	twitchRepository "github.com/rl404/shimakaze/internal/domain/twitch/repository"
+	twitchClient "github.com/rl404/shimakaze/internal/domain/twitch/repository/client"
 	vtuberRepository "github.com/rl404/shimakaze/internal/domain/vtuber/repository"
 	vtuberMongo "github.com/rl404/shimakaze/internal/domain/vtuber/repository/mongo"
 	wikiaRepository "github.com/rl404/shimakaze/internal/domain/wikia/repository"
@@ -50,6 +54,15 @@ func consumer() error {
 		utils.AddLog(_nr.NewFromNewrelicApp(nrApp, _nr.ErrorLevel))
 		utils.Info("newrelic initialized")
 	}
+
+	// Init in-memory.
+	im, err := cache.New(cache.InMemory, "", "", 5*time.Second)
+	if err != nil {
+		return err
+	}
+	im = nrCache.New("inmemory", "inmemory", im)
+	utils.Info("in-memory initialized")
+	defer im.Close()
 
 	// Init db.
 	db, err := newDB(cfg.DB)
@@ -92,8 +105,12 @@ func consumer() error {
 	var youtube youtubeRepository.Repository = youtubeClient.New(cfg.Youtube.Key, cfg.Youtube.MaxAge)
 	utils.Info("repository youtube initialized")
 
+	// Init twitch.
+	var twitch twitchRepository.Repository = twitchClient.New(im, cfg.Twitch.ClientID, cfg.Twitch.ClientSecret)
+	utils.Info("repository twitch initialized")
+
 	// Init service.
-	service := service.New(wikia, vtuber, nonVtuber, agency, publisher, youtube)
+	service := service.New(wikia, vtuber, nonVtuber, agency, publisher, youtube, twitch)
 	utils.Info("service initialized")
 
 	// Init consumer.

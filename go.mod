@@ -9,6 +9,7 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/newrelic/go-agent/v3 v3.20.3
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.3
+	github.com/nicklaw5/helix/v2 v2.22.0
 	github.com/rl404/fairy v0.22.0
 	github.com/spf13/cobra v1.6.1
 	github.com/swaggo/http-swagger v1.3.3
@@ -40,6 +41,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.11.2 // indirect
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
+	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect

@@ -124,8 +124,12 @@ const (
 )
 
 // ParseDuration to parse ISO 8601 duration.
-func ParseDuration(durationStr string) (time.Duration, error) {
+func ParseDuration(durationStr string, startFromTime ...bool) (time.Duration, error) {
 	state := parsingPeriod
+	if len(startFromTime) > 0 && startFromTime[0] {
+		state = parsingTime
+	}
+
 	duration := 0 * time.Second
 	num := ""
 
@@ -133,11 +137,11 @@ func ParseDuration(durationStr string) (time.Duration, error) {
 
 	for _, c := range durationStr {
 		switch c {
-		case 'P':
+		case 'P', 'p':
 			state = parsingPeriod
-		case 'T':
+		case 'T', 't':
 			state = parsingTime
-		case 'Y':
+		case 'Y', 'y':
 			if state != parsingPeriod {
 				return 0, err
 			}
@@ -150,7 +154,7 @@ func ParseDuration(durationStr string) (time.Duration, error) {
 			duration += time.Duration(math.Round(y)) * 365 * 24 * time.Hour
 
 			num = ""
-		case 'M':
+		case 'M', 'm':
 			if state == parsingPeriod {
 				m, err := strconv.ParseFloat(num, 64)
 				if err != nil {
@@ -170,7 +174,7 @@ func ParseDuration(durationStr string) (time.Duration, error) {
 
 				num = ""
 			}
-		case 'W':
+		case 'W', 'w':
 			if state != parsingPeriod {
 				return 0, err
 			}
@@ -183,7 +187,7 @@ func ParseDuration(durationStr string) (time.Duration, error) {
 			duration += time.Duration(math.Round(w)) * 7 * 24 * time.Hour
 
 			num = ""
-		case 'D':
+		case 'D', 'd':
 			if state != parsingPeriod {
 				return 0, err
 			}
@@ -196,7 +200,7 @@ func ParseDuration(durationStr string) (time.Duration, error) {
 			duration += time.Duration(math.Round(d)) * 24 * time.Hour
 
 			num = ""
-		case 'H':
+		case 'H', 'h':
 			if state != parsingTime {
 				return 0, err
 			}
@@ -209,7 +213,7 @@ func ParseDuration(durationStr string) (time.Duration, error) {
 			duration += time.Duration(math.Round(h)) * time.Hour
 
 			num = ""
-		case 'S':
+		case 'S', 's':
 			if state != parsingTime {
 				return 0, err
 			}

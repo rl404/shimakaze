@@ -197,17 +197,15 @@ func (s *service) mergeAgencies(a1, a2 []vtuberEntity.Agency) []vtuberEntity.Age
 }
 
 func (s *service) fillChannelData(ctx context.Context, channels []vtuberEntity.Channel) []vtuberEntity.Channel {
-	return s.fillChannelDataYoutube(ctx, channels)
-}
-
-func (s *service) fillChannelDataYoutube(ctx context.Context, channels []vtuberEntity.Channel) []vtuberEntity.Channel {
 	for i, channel := range channels {
-		if channel.Type != vtuberEntity.ChannelYoutube {
-			continue
+		switch channel.Type {
+		case vtuberEntity.ChannelYoutube:
+			channels[i] = s.fillYoutubeChannel(ctx, channels[i])
+			channels[i] = s.fillYoutubeVideos(ctx, channels[i])
+		case vtuberEntity.ChannelTwitch:
+			channels[i] = s.fillTwitchChannel(ctx, channels[i])
+			channels[i] = s.fillTwitchVideo(ctx, channels[i])
 		}
-
-		channels[i] = s.fillYoutubeChannel(ctx, channels[i])
-		channels[i] = s.fillYoutubeVideos(ctx, channels[i])
 	}
 
 	return channels
@@ -273,6 +271,58 @@ func (s *service) fillYoutubeVideos(ctx context.Context, channel vtuberEntity.Ch
 			ID:        v.ID,
 			Title:     v.Title,
 			URL:       fmt.Sprintf("https://www.youtube.com/watch?v=%s", v.ID),
+			Image:     v.Image,
+			StartDate: v.StartDate,
+			EndDate:   v.EndDate,
+		})
+	}
+
+	return channel
+}
+
+func (s *service) fillTwitchChannel(ctx context.Context, channel vtuberEntity.Channel) vtuberEntity.Channel {
+	username := utils.GetLastPathFromURL(channel.URL)
+	if username == "" {
+		return channel
+	}
+
+	user, _, err := s.twitch.GetUser(ctx, username)
+	if err != nil {
+		errors.Wrap(ctx, err)
+		return channel
+	}
+
+	channel.ID = user.ID
+	channel.Name = user.Name
+	channel.Image = user.Image
+
+	follower, _, err := s.twitch.GetFollowerCount(ctx, user.ID)
+	if err != nil {
+		errors.Wrap(ctx, err)
+		return channel
+	}
+
+	channel.Subscriber = follower
+
+	return channel
+}
+
+func (s *service) fillTwitchVideo(ctx context.Context, channel vtuberEntity.Channel) vtuberEntity.Channel {
+	if channel.ID == "" {
+		return channel
+	}
+
+	videos, _, err := s.twitch.GetVideos(ctx, channel.ID)
+	if err != nil {
+		errors.Wrap(ctx, err)
+		return channel
+	}
+
+	for _, v := range videos {
+		channel.Videos = append(channel.Videos, vtuberEntity.Video{
+			ID:        v.ID,
+			Title:     v.Title,
+			URL:       v.URL,
 			Image:     v.Image,
 			StartDate: v.StartDate,
 			EndDate:   v.EndDate,

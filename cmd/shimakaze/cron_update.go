@@ -19,8 +19,6 @@ import (
 	vtuberMongo "github.com/rl404/shimakaze/internal/domain/vtuber/repository/mongo"
 	wikiaRepository "github.com/rl404/shimakaze/internal/domain/wikia/repository"
 	wikiaClient "github.com/rl404/shimakaze/internal/domain/wikia/repository/client"
-	youtubeRepository "github.com/rl404/shimakaze/internal/domain/youtube/repository"
-	youtubeClient "github.com/rl404/shimakaze/internal/domain/youtube/repository/client"
 	"github.com/rl404/shimakaze/internal/service"
 	"github.com/rl404/shimakaze/internal/utils"
 )
@@ -85,12 +83,8 @@ func cronUpdate() error {
 	var publisher publisherRepository.Repository = publisherPubsub.New(ps, pubsubTopic)
 	utils.Info("repository publisher initialized")
 
-	// Init youtube.
-	var youtube youtubeRepository.Repository = youtubeClient.New(cfg.Youtube.Key, cfg.Youtube.MaxAge)
-	utils.Info("repository youtube initialized")
-
 	// Init service.
-	service := service.New(wikia, vtuber, nonVtuber, agency, publisher, youtube)
+	service := service.New(wikia, vtuber, nonVtuber, agency, publisher, nil, nil)
 	utils.Info("service initialized")
 
 	// Run cron.
