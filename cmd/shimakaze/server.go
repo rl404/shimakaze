@@ -123,7 +123,7 @@ func server() error {
 	utils.Info("repository publisher initialized")
 
 	// Init service.
-	service := service.New(wikia, vtuber, nonVtuber, agency, publisher, nil, nil)
+	service := service.New(wikia, vtuber, nonVtuber, agency, publisher, nil, nil, nil)
 	utils.Info("service initialized")
 
 	// Init web server.

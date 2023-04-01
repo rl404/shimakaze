@@ -28,6 +28,7 @@ type config struct {
 	Newrelic newrelicConfig `envconfig:"NEWRELIC"`
 	Youtube  youtubeConfig  `envconfig:"YOUTUBE"`
 	Twitch   twitchConfig   `envconfig:"TWITCH"`
+	Bilibili bilibiliConfig `envconfig:"BILIBILI"`
 }
 
 type appConfig struct {
@@ -85,6 +86,12 @@ type youtubeConfig struct {
 type twitchConfig struct {
 	ClientID     string `envconfig:"CLIENT_ID"`
 	ClientSecret string `envconfig:"CLIENT_SECRET"`
+	MaxAge       int    `envconfig:"MAX_AGE" validate:"required,gte=0" mod:"default=60"`
+}
+
+type bilibiliConfig struct {
+	Cookie string `envconfig:"COOKIE"`
+	MaxAge int    `envconfig:"MAX_AGE" validate:"required,gte=0" mod:"default=60"`
 }
 
 const envPath = "../../.env"
