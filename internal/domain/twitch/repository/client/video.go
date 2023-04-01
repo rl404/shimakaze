@@ -46,7 +46,7 @@ func (c *Client) GetVideos(ctx context.Context, id string) ([]entity.Video, int,
 			})
 		}
 
-		if len(resp.Data.Videos) == 0 {
+		if len(resp.Data.Videos) < 100 {
 			break
 		}
 

@@ -16,6 +16,8 @@ import (
 	_consumer "github.com/rl404/shimakaze/internal/delivery/consumer"
 	agencyRepository "github.com/rl404/shimakaze/internal/domain/agency/repository"
 	agencyMongo "github.com/rl404/shimakaze/internal/domain/agency/repository/mongo"
+	bilibiliRepository "github.com/rl404/shimakaze/internal/domain/bilibili/repository"
+	bilibiliClient "github.com/rl404/shimakaze/internal/domain/bilibili/repository/client"
 	nonVtuberRepository "github.com/rl404/shimakaze/internal/domain/non_vtuber/repository"
 	nonVtuberMongo "github.com/rl404/shimakaze/internal/domain/non_vtuber/repository/mongo"
 	publisherRepository "github.com/rl404/shimakaze/internal/domain/publisher/repository"
@@ -109,8 +111,12 @@ func consumer() error {
 	var twitch twitchRepository.Repository = twitchClient.New(im, cfg.Twitch.ClientID, cfg.Twitch.ClientSecret)
 	utils.Info("repository twitch initialized")
 
+	// Init bilibili.
+	var bilibili bilibiliRepository.Repository = bilibiliClient.New(cfg.Bilibili.Cookie, cfg.Bilibili.MaxAge)
+	utils.Info("repository bilibili initialized")
+
 	// Init service.
-	service := service.New(wikia, vtuber, nonVtuber, agency, publisher, youtube, twitch)
+	service := service.New(wikia, vtuber, nonVtuber, agency, publisher, youtube, twitch, bilibili)
 	utils.Info("service initialized")
 
 	// Init consumer.

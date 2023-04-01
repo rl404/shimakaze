@@ -205,6 +205,9 @@ func (s *service) fillChannelData(ctx context.Context, channels []vtuberEntity.C
 		case vtuberEntity.ChannelTwitch:
 			channels[i] = s.fillTwitchChannel(ctx, channels[i])
 			channels[i] = s.fillTwitchVideo(ctx, channels[i])
+		case vtuberEntity.ChannelBilibili:
+			channels[i] = s.fillBilibiliChannel(ctx, channels[i])
+			channels[i] = s.fillBilibiliVideo(ctx, channels[i])
 		}
 	}
 
@@ -323,6 +326,58 @@ func (s *service) fillTwitchVideo(ctx context.Context, channel vtuberEntity.Chan
 			ID:        v.ID,
 			Title:     v.Title,
 			URL:       v.URL,
+			Image:     v.Image,
+			StartDate: v.StartDate,
+			EndDate:   v.EndDate,
+		})
+	}
+
+	return channel
+}
+
+func (s *service) fillBilibiliChannel(ctx context.Context, channel vtuberEntity.Channel) vtuberEntity.Channel {
+	userID := utils.GetLastPathFromURL(channel.URL)
+	if userID == "" {
+		return channel
+	}
+
+	user, _, err := s.bilibili.GetUser(ctx, userID)
+	if err != nil {
+		errors.Wrap(ctx, err)
+		return channel
+	}
+
+	channel.ID = user.ID
+	channel.Name = user.Name
+	channel.Image = user.Image
+
+	follower, _, err := s.bilibili.GetFollowerCount(ctx, user.ID)
+	if err != nil {
+		errors.Wrap(ctx, err)
+		return channel
+	}
+
+	channel.Subscriber = follower
+
+	return channel
+}
+
+func (s *service) fillBilibiliVideo(ctx context.Context, channel vtuberEntity.Channel) vtuberEntity.Channel {
+	if channel.ID == "" {
+		return channel
+	}
+
+	videos, _, err := s.bilibili.GetVideos(ctx, channel.ID)
+	if err != nil {
+		errors.Wrap(ctx, err)
+		return channel
+	}
+
+	for _, v := range videos {
+		channel.Videos = append(channel.Videos, vtuberEntity.Video{
+			ID:        v.ID,
+			Title:     v.Title,
+			URL:       fmt.Sprintf("https://www.bilibili.com/video/%s", v.ID),
 			Image:     v.Image,
 			StartDate: v.StartDate,
 			EndDate:   v.EndDate,
