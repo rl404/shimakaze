@@ -35,18 +35,25 @@ func (c *Client) GetVideos(ctx context.Context, id string) ([]entity.Video, int,
 			return nil, resp.StatusCode, errors.Wrap(ctx, _errors.New(resp.Error), _errors.New(resp.ErrorMessage))
 		}
 
+		var done bool
 		for _, v := range resp.Data.Videos {
+			startDate := c.getStartDate(v.CreatedAt)
+			if startDate == nil || startDate.Before(c.maxAge) {
+				done = true
+				break
+			}
+
 			res = append(res, entity.Video{
 				ID:        v.ID,
 				Title:     v.Title,
 				URL:       v.URL,
 				Image:     c.getVideoImage(v.ThumbnailURL),
-				StartDate: c.getStartDate(v.CreatedAt),
-				EndDate:   c.getEndDate(v.CreatedAt, v.Duration),
+				StartDate: startDate,
+				EndDate:   c.getEndDate(startDate, v.Duration),
 			})
 		}
 
-		if len(resp.Data.Videos) < 100 {
+		if len(resp.Data.Videos) < 100 || done {
 			break
 		}
 
@@ -70,8 +77,7 @@ func (c *Client) getStartDate(d string) *time.Time {
 	return &t
 }
 
-func (c *Client) getEndDate(start string, dur string) *time.Time {
-	startDate := c.getStartDate(start)
+func (c *Client) getEndDate(startDate *time.Time, dur string) *time.Time {
 	if startDate == nil {
 		return nil
 	}

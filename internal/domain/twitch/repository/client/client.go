@@ -13,10 +13,11 @@ import (
 type Client struct {
 	cacher cache.Cacher
 	client *helix.Client
+	maxAge time.Time
 }
 
 // New to create new twitch api client.
-func New(cacher cache.Cacher, clientID, clientSecret string) *Client {
+func New(cacher cache.Cacher, clientID, clientSecret string, maxAge int) *Client {
 	client, _ := helix.NewClient(&helix.Options{
 		ClientID:     clientID,
 		ClientSecret: clientSecret,
@@ -28,5 +29,6 @@ func New(cacher cache.Cacher, clientID, clientSecret string) *Client {
 	return &Client{
 		cacher: cacher,
 		client: client,
+		maxAge: time.Now().Add(time.Duration(maxAge*-24) * time.Hour),
 	}
 }

@@ -108,7 +108,7 @@ func consumer() error {
 	utils.Info("repository youtube initialized")
 
 	// Init twitch.
-	var twitch twitchRepository.Repository = twitchClient.New(im, cfg.Twitch.ClientID, cfg.Twitch.ClientSecret)
+	var twitch twitchRepository.Repository = twitchClient.New(im, cfg.Twitch.ClientID, cfg.Twitch.ClientSecret, cfg.Twitch.MaxAge)
 	utils.Info("repository twitch initialized")
 
 	// Init bilibili.
