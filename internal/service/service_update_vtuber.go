@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	_errors "errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -233,7 +234,9 @@ func (s *service) fillYoutubeChannel(ctx context.Context, channel vtuberEntity.C
 	}
 
 	// URL not contain channel id.
-	errors.Wrap(ctx, err)
+	if !_errors.Is(err, errors.ErrChannelNotFound) {
+		errors.Wrap(ctx, err)
+	}
 
 	channelID, _, err = s.youtube.GetChannelIDByURL(ctx, channel.URL)
 	if err != nil {
