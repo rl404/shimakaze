@@ -208,6 +208,9 @@ func (s *service) fillChannelData(ctx context.Context, channels []vtuberEntity.C
 		case vtuberEntity.ChannelBilibili:
 			channels[i] = s.fillBilibiliChannel(ctx, channels[i])
 			channels[i] = s.fillBilibiliVideo(ctx, channels[i])
+		case vtuberEntity.ChannelNiconico:
+			channels[i] = s.fillNiconicoChannel(ctx, channels[i])
+			channels[i] = s.fillNiconicoVideo(ctx, channels[i])
 		}
 	}
 
@@ -269,16 +272,19 @@ func (s *service) fillYoutubeVideos(ctx context.Context, channel vtuberEntity.Ch
 		return channel
 	}
 
-	for _, v := range videos {
-		channel.Videos = append(channel.Videos, vtuberEntity.Video{
+	res := make([]vtuberEntity.Video, len(videos))
+	for i, v := range videos {
+		res[i] = vtuberEntity.Video{
 			ID:        v.ID,
 			Title:     v.Title,
 			URL:       fmt.Sprintf("https://www.youtube.com/watch?v=%s", v.ID),
 			Image:     v.Image,
 			StartDate: v.StartDate,
 			EndDate:   v.EndDate,
-		})
+		}
 	}
+
+	channel.Videos = res
 
 	return channel
 }
@@ -321,16 +327,19 @@ func (s *service) fillTwitchVideo(ctx context.Context, channel vtuberEntity.Chan
 		return channel
 	}
 
-	for _, v := range videos {
-		channel.Videos = append(channel.Videos, vtuberEntity.Video{
+	res := make([]vtuberEntity.Video, len(videos))
+	for i, v := range videos {
+		res[i] = vtuberEntity.Video{
 			ID:        v.ID,
 			Title:     v.Title,
 			URL:       v.URL,
 			Image:     v.Image,
 			StartDate: v.StartDate,
 			EndDate:   v.EndDate,
-		})
+		}
 	}
+
+	channel.Videos = res
 
 	return channel
 }
@@ -373,16 +382,66 @@ func (s *service) fillBilibiliVideo(ctx context.Context, channel vtuberEntity.Ch
 		return channel
 	}
 
-	for _, v := range videos {
-		channel.Videos = append(channel.Videos, vtuberEntity.Video{
+	res := make([]vtuberEntity.Video, len(videos))
+	for i, v := range videos {
+		res[i] = vtuberEntity.Video{
 			ID:        v.ID,
 			Title:     v.Title,
 			URL:       fmt.Sprintf("https://www.bilibili.com/video/%s", v.ID),
 			Image:     v.Image,
 			StartDate: v.StartDate,
 			EndDate:   v.EndDate,
-		})
+		}
 	}
+
+	channel.Videos = res
+
+	return channel
+}
+
+func (s *service) fillNiconicoChannel(ctx context.Context, channel vtuberEntity.Channel) vtuberEntity.Channel {
+	if channel.URL == "" {
+		return channel
+	}
+
+	user, _, err := s.niconico.GetUser(ctx, channel.URL)
+	if err != nil {
+		errors.Wrap(ctx, err)
+		return channel
+	}
+
+	channel.ID = user.ID
+	channel.Name = user.Name
+	channel.Image = user.Image
+	channel.Subscriber = user.Subscriber
+
+	return channel
+}
+
+func (s *service) fillNiconicoVideo(ctx context.Context, channel vtuberEntity.Channel) vtuberEntity.Channel {
+	if channel.ID == "" {
+		return channel
+	}
+
+	videos, _, err := s.niconico.GetVideos(ctx, channel.ID)
+	if err != nil {
+		errors.Wrap(ctx, err)
+		return channel
+	}
+
+	res := make([]vtuberEntity.Video, len(videos))
+	for i, v := range videos {
+		res[i] = vtuberEntity.Video{
+			ID:        v.ID,
+			Title:     v.Title,
+			URL:       fmt.Sprintf("https://www.nicovideo.jp/watch/%s", v.ID),
+			Image:     v.Image,
+			StartDate: v.StartDate,
+			EndDate:   v.EndDate,
+		}
+	}
+
+	channel.Videos = res
 
 	return channel
 }

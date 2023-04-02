@@ -114,6 +114,9 @@ func GetLastPathFromURL(str string) string {
 	if err != nil {
 		return ""
 	}
+	if url.Path[len(url.Path)-1] == '/' {
+		url.Path = url.Path[:len(url.Path)-1]
+	}
 	splitPath := strings.Split(url.Path, "/")
 	return splitPath[len(splitPath)-1]
 }

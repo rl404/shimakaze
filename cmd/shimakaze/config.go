@@ -29,6 +29,7 @@ type config struct {
 	Youtube  youtubeConfig  `envconfig:"YOUTUBE"`
 	Twitch   twitchConfig   `envconfig:"TWITCH"`
 	Bilibili bilibiliConfig `envconfig:"BILIBILI"`
+	Niconico niconicoConfig `envconfig:"NICONICO"`
 }
 
 type appConfig struct {
@@ -92,6 +93,10 @@ type twitchConfig struct {
 type bilibiliConfig struct {
 	Cookie string `envconfig:"COOKIE"`
 	MaxAge int    `envconfig:"MAX_AGE" validate:"required,gte=0" mod:"default=60"`
+}
+
+type niconicoConfig struct {
+	MaxAge int `envconfig:"MAX_AGE" validate:"required,gte=0" mod:"default=60"`
 }
 
 const envPath = "../../.env"
