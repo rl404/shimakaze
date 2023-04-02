@@ -234,7 +234,7 @@ func (s *service) fillYoutubeChannel(ctx context.Context, channel vtuberEntity.C
 	}
 
 	// URL not contain channel id.
-	if _errors.Is(err, errors.ErrChannelNotFound) {
+	if !_errors.Is(err, errors.ErrChannelNotFound) {
 		errors.Wrap(ctx, err)
 	}
 
