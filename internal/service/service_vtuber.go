@@ -357,7 +357,9 @@ type GetVtubersRequest struct {
 	BloodTypes         []string             `validate:"dive,gte=1" mod:"dive,trim"`
 	Genders            []string             `validate:"dive,gte=1" mod:"dive,trim"`
 	Zodiacs            []string             `validate:"dive,gte=1" mod:"dive,trim"`
-	Sort               string               `validate:"oneof=name -name debut_date -debut_date retirement_date -retirement_date" mod:"default=name,trim,lcase"`
+	StartSubscriber    int                  `validate:"omitempty,gte=1"`
+	EndSubscriber      int                  `validate:"omitempty,gte=1"`
+	Sort               string               `validate:"oneof=name -name debut_date -debut_date retirement_date -retirement_date subscriber -subscriber" mod:"default=name,trim,lcase"`
 	Page               int                  `validate:"required,gte=1" mod:"default=1"`
 	Limit              int                  `validate:"required,gte=-1" mod:"default=20"`
 }
@@ -399,6 +401,8 @@ func (s *service) GetVtubers(ctx context.Context, data GetVtubersRequest) ([]vtu
 		BloodTypes:         data.BloodTypes,
 		Genders:            data.Genders,
 		Zodiacs:            data.Zodiacs,
+		StartSubscriber:    data.StartSubscriber,
+		EndSubscriber:      data.EndSubscriber,
 		Sort:               data.Sort,
 		Page:               data.Page,
 		Limit:              data.Limit,

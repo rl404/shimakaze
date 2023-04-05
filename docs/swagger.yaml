@@ -10,6 +10,8 @@ definitions:
         type: integer
       name:
         type: string
+      subscriber:
+        type: integer
       updated_at:
         type: string
     type: object
@@ -134,10 +136,22 @@ definitions:
     type: object
   service.vtuberChannel:
     properties:
+      id:
+        type: string
+      image:
+        type: string
+      name:
+        type: string
+      subscriber:
+        type: integer
       type:
         type: string
       url:
         type: string
+      videos:
+        items:
+          $ref: '#/definitions/service.vtuberVideo'
+        type: array
     type: object
   service.vtuberFamilyTree:
     properties:
@@ -177,6 +191,21 @@ definitions:
       image:
         type: string
       name:
+        type: string
+    type: object
+  service.vtuberVideo:
+    properties:
+      end_date:
+        type: string
+      id:
+        type: string
+      image:
+        type: string
+      start_date:
+        type: string
+      title:
+        type: string
+      url:
         type: string
     type: object
   utils.Response:
@@ -384,6 +413,14 @@ paths:
         in: query
         name: zodiacs
         type: string
+      - description: start subscriber
+        in: query
+        name: start_subscriber
+        type: integer
+      - description: end subscriber
+        in: query
+        name: end_subscriber
+        type: integer
       - default: name
         description: sort
         enum:
@@ -393,6 +430,8 @@ paths:
         - -debut_date
         - retirement_date
         - -retirement_date
+        - subscriber
+        - -subscriber
         in: query
         name: sort
         type: string

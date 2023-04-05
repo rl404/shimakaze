@@ -114,6 +114,8 @@ type GetAllRequest struct {
 	BloodTypes         []string
 	Genders            []string
 	Zodiacs            []string
+	StartSubscriber    int
+	EndSubscriber      int
 	Sort               string
 	Page               int
 	Limit              int

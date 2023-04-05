@@ -89,7 +89,7 @@ func (c *Client) GetVideos(ctx context.Context, id string) ([]entity.Video, int,
 			res = append(res, entity.Video{
 				ID:        v.BVID,
 				Title:     v.Title,
-				Image:     v.PIC,
+				Image:     v.PIC + "@200h",
 				StartDate: startDate,
 				EndDate:   c.getEndDate(startDate, v.Length),
 			})

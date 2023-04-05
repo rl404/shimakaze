@@ -316,13 +316,27 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "integer",
+                        "description": "start subscriber",
+                        "name": "start_subscriber",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "end subscriber",
+                        "name": "end_subscriber",
+                        "in": "query"
+                    },
+                    {
                         "enum": [
                             "name",
                             "-name",
                             "debut_date",
                             "-debut_date",
                             "retirement_date",
-                            "-retirement_date"
+                            "-retirement_date",
+                            "subscriber",
+                            "-subscriber"
                         ],
                         "type": "string",
                         "default": "name",
@@ -748,6 +762,9 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "subscriber": {
+                    "type": "integer"
+                },
                 "updated_at": {
                     "type": "string"
                 }
@@ -937,11 +954,29 @@ const docTemplate = `{
         "service.vtuberChannel": {
             "type": "object",
             "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "subscriber": {
+                    "type": "integer"
+                },
                 "type": {
                     "type": "string"
                 },
                 "url": {
                     "type": "string"
+                },
+                "videos": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.vtuberVideo"
+                    }
                 }
             }
         },
@@ -1003,6 +1038,29 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.vtuberVideo": {
+            "type": "object",
+            "properties": {
+                "end_date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "url": {
                     "type": "string"
                 }
             }
