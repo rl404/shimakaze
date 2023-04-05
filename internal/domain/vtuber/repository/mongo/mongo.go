@@ -396,7 +396,7 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 	}
 
 	if data.EndSubscriber > 0 {
-		matchStage = m.addMatch(matchStage, "subscriber", bson.M{"$lte": data.StartSubscriber})
+		matchStage = m.addMatch(matchStage, "subscriber", bson.M{"$lte": data.EndSubscriber})
 	}
 
 	if data.Limit > 0 {
