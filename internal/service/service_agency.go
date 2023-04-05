@@ -9,11 +9,12 @@ import (
 )
 
 type agency struct {
-	ID        int64     `json:"id"`
-	Name      string    `json:"name"`
-	Image     string    `json:"image"`
-	Member    int       `json:"member"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID         int64     `json:"id"`
+	Name       string    `json:"name"`
+	Image      string    `json:"image"`
+	Member     int       `json:"member"`
+	Subscriber int       `json:"subscriber"`
+	UpdatedAt  time.Time `json:"updated_at"`
 }
 
 // GetAgencies to get agency list.
@@ -26,11 +27,12 @@ func (s *service) GetAgencies(ctx context.Context) ([]agency, int, error) {
 	res := make([]agency, len(agencies))
 	for i, a := range agencies {
 		res[i] = agency{
-			ID:        a.ID,
-			Name:      a.Name,
-			Image:     a.Image,
-			Member:    a.Member,
-			UpdatedAt: a.UpdatedAt,
+			ID:         a.ID,
+			Name:       a.Name,
+			Image:      a.Image,
+			Member:     a.Member,
+			Subscriber: a.Subscriber,
+			UpdatedAt:  a.UpdatedAt,
 		}
 	}
 
@@ -45,10 +47,11 @@ func (s *service) GetAgencyByID(ctx context.Context, id int64) (*agency, int, er
 	}
 
 	return &agency{
-		ID:        a.ID,
-		Name:      a.Name,
-		Image:     a.Image,
-		Member:    a.Member,
-		UpdatedAt: a.UpdatedAt,
+		ID:         a.ID,
+		Name:       a.Name,
+		Image:      a.Image,
+		Member:     a.Member,
+		Subscriber: a.Subscriber,
+		UpdatedAt:  a.UpdatedAt,
 	}, http.StatusOK, nil
 }

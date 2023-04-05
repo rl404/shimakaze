@@ -18,22 +18,35 @@ func (s *service) updateAgency(ctx context.Context, id int64) (int, error) {
 	}
 
 	// Get members.
-	_, total, code, err := s.vtuber.GetAll(ctx, vtuberEntity.GetAllRequest{
-		Mode:     vtuberEntity.SearchModeStats,
+	vtubers, total, code, err := s.vtuber.GetAll(ctx, vtuberEntity.GetAllRequest{
+		Mode:     vtuberEntity.SearchModeAll,
 		AgencyID: page.ID,
 		Page:     1,
-		Limit:    1,
+		Limit:    -1,
 	})
 	if err != nil {
 		return code, errors.Wrap(ctx, err)
 	}
 
+	// Get total subs.
+	subsTotal := 0
+	for _, vtuber := range vtubers {
+		max := 0
+		for _, channel := range vtuber.Channels {
+			if channel.Subscriber > max {
+				max = channel.Subscriber
+			}
+		}
+		subsTotal += max
+	}
+
 	// Update data.
 	if code, err := s.agency.UpdateByID(ctx, id, entity.Agency{
-		ID:     page.ID,
-		Name:   page.Title,
-		Image:  s.getAgencyLogo(ctx, page.Content),
-		Member: total,
+		ID:         page.ID,
+		Name:       page.Title,
+		Image:      s.getAgencyLogo(ctx, page.Content),
+		Member:     total,
+		Subscriber: subsTotal,
 	}); err != nil {
 		return code, errors.Wrap(ctx, err)
 	}
