@@ -44,7 +44,9 @@ import (
 // @param blood_types query string false "blood types"
 // @param genders query string false "gender types"
 // @param zodiacs query string false "zodiac types"
-// @param sort query string false "sort" enums(name,-name,debut_date,-debut_date,retirement_date,-retirement_date) default(name)
+// @param start_subscriber query integer false "start subscriber"
+// @param end_subscriber query integer false "end subscriber"
+// @param sort query string false "sort" enums(name,-name,debut_date,-debut_date,retirement_date,-retirement_date,subscriber,-subscriber) default(name)
 // @param page query integer false "page" default(1)
 // @param limit query integer false "limit" default(20)
 // @success 200 {object} utils.Response{data=[]service.vtuber}
@@ -82,6 +84,8 @@ func (api *API) handleGetVtubers(w http.ResponseWriter, r *http.Request) {
 	bloodTypes := utils.StrToStrSlice(r.URL.Query().Get("blood_types"))
 	genders := utils.StrToStrSlice(r.URL.Query().Get("genders"))
 	zodiacs := utils.StrToStrSlice(r.URL.Query().Get("zodiacs"))
+	startSubscriber, _ := strconv.Atoi(r.URL.Query().Get("start_subscriber"))
+	endSubscriber, _ := strconv.Atoi(r.URL.Query().Get("end_subscriber"))
 	sort := r.URL.Query().Get("sort")
 	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
@@ -117,6 +121,8 @@ func (api *API) handleGetVtubers(w http.ResponseWriter, r *http.Request) {
 		BloodTypes:         bloodTypes,
 		Genders:            genders,
 		Zodiacs:            zodiacs,
+		StartSubscriber:    startSubscriber,
+		EndSubscriber:      endSubscriber,
 		Sort:               sort,
 		Page:               page,
 		Limit:              limit,
