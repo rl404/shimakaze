@@ -25,9 +25,12 @@ type Service interface {
 	GetVtuberCharacterDesigners(ctx context.Context) ([]string, int, error)
 	GetVtuberCharacter2DModelers(ctx context.Context) ([]string, int, error)
 	GetVtuberCharacter3DModelers(ctx context.Context) ([]string, int, error)
+	GetVtuberCount(ctx context.Context) (int, int, error)
+	GetVtuberAverageActiveTime(ctx context.Context) (float64, int, error)
 
 	GetAgencies(ctx context.Context) ([]agency, int, error)
 	GetAgencyByID(ctx context.Context, id int64) (*agency, int, error)
+	GetAgencyCount(ctx context.Context) (int, int, error)
 
 	GetWikiaImage(ctx context.Context, path string) ([]byte, int, error)
 

@@ -14,4 +14,5 @@ type Repository interface {
 	IsOld(ctx context.Context, id int64) (bool, int, error)
 	UpdateByID(ctx context.Context, id int64, data entity.Agency) (int, error)
 	GetOldIDs(ctx context.Context) ([]int64, int, error)
+	GetCount(ctx context.Context) (int, int, error)
 }

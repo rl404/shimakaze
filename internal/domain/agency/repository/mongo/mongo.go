@@ -142,3 +142,12 @@ func (m *Mongo) GetOldIDs(ctx context.Context) ([]int64, int, error) {
 
 	return ids, http.StatusOK, nil
 }
+
+// GetCount to get count.
+func (m *Mongo) GetCount(ctx context.Context) (int, int, error) {
+	cnt, err := m.db.CountDocuments(ctx, bson.M{})
+	if err != nil {
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+	return int(cnt), http.StatusOK, nil
+}

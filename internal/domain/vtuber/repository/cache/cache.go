@@ -241,3 +241,41 @@ func (c *Cache) GetCharacter3DModelers(ctx context.Context) (data []string, code
 
 	return data, code, nil
 }
+
+// GetCount to get count.
+func (c *Cache) GetCount(ctx context.Context) (data int, code int, err error) {
+	key := utils.GetKey("vtuber", "stats", "count")
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.GetCount(ctx)
+	if err != nil {
+		return 0, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
+}
+
+// GetAverageActiveTime to get average active time.
+func (c *Cache) GetAverageActiveTime(ctx context.Context) (data float64, code int, err error) {
+	key := utils.GetKey("vtuber", "stats", "average-active-time")
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.GetAverageActiveTime(ctx)
+	if err != nil {
+		return 0, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
+}
