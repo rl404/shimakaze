@@ -204,6 +204,17 @@ definitions:
       name:
         type: string
     type: object
+  service.vtuberModelCount:
+    properties:
+      both:
+        type: integer
+      has_2d_only:
+        type: integer
+      has_3d_only:
+        type: integer
+      none:
+        type: integer
+    type: object
   service.vtuberStatusCount:
     properties:
       active:
@@ -432,6 +443,29 @@ paths:
           schema:
             $ref: '#/definitions/utils.Response'
       summary: Get vtuber debut & retire count yearly.
+      tags:
+      - Statistic
+  /statistics/vtubers/model-count:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/service.vtuberModelCount'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get vtuber 2d & 3d model count.
       tags:
       - Statistic
   /vtubers:

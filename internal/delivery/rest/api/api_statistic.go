@@ -72,3 +72,14 @@ func (api *API) handleGetVtuberDebutRetireCountYearly(w http.ResponseWriter, r *
 	cnt, code, err := api.service.GetVtuberDebutRetireCountYearly(r.Context())
 	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
 }
+
+// @summary Get vtuber 2d & 3d model count.
+// @tags Statistic
+// @produce json
+// @success 200 {object} utils.Response{data=[]service.vtuberModelCount}
+// @failure 500 {object} utils.Response
+// @router /statistics/vtubers/model-count [get]
+func (api *API) handleGetVtuberModelCount(w http.ResponseWriter, r *http.Request) {
+	cnt, code, err := api.service.GetVtuberModelCount(r.Context())
+	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+}

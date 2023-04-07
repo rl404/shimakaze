@@ -147,3 +147,45 @@ func (m *Mongo) GetDebutRetireCountYearly(ctx context.Context) ([]entity.DebutRe
 
 	return m.mergeDebutRetiredYearly(debutCount, retiredCount), http.StatusOK, nil
 }
+
+type modelCount struct {
+	None      int `bson:"none"`
+	Has2DOnly int `bson:"has_2d_only"`
+	Has3DOnly int `bson:"has_3d_only"`
+	Both      int `bson:"both"`
+}
+
+// GetModelCount to get 2d & 3d model count.
+func (m *Mongo) GetModelCount(ctx context.Context) (*entity.ModelCount, int, error) {
+	projectStage := bson.D{{Key: "$project", Value: bson.M{
+		"none":        bson.M{"$cond": []interface{}{bson.M{"$and": []bson.M{{"$eq": []interface{}{"$has_2d", false}}, {"$eq": []interface{}{"$has_3d", false}}}}, 1, 0}},
+		"has_2d_only": bson.M{"$cond": []interface{}{bson.M{"$and": []bson.M{{"$eq": []interface{}{"$has_2d", true}}, {"$eq": []interface{}{"$has_3d", false}}}}, 1, 0}},
+		"has_3d_only": bson.M{"$cond": []interface{}{bson.M{"$and": []bson.M{{"$eq": []interface{}{"$has_2d", false}}, {"$eq": []interface{}{"$has_3d", true}}}}, 1, 0}},
+		"both":        bson.M{"$cond": []interface{}{bson.M{"$and": []bson.M{{"$eq": []interface{}{"$has_2d", true}}, {"$eq": []interface{}{"$has_3d", true}}}}, 1, 0}},
+	}}}
+
+	groupStage := bson.D{{Key: "$group", Value: bson.M{
+		"_id":         nil,
+		"none":        bson.M{"$sum": "$none"},
+		"has_2d_only": bson.M{"$sum": "$has_2d_only"},
+		"has_3d_only": bson.M{"$sum": "$has_3d_only"},
+		"both":        bson.M{"$sum": "$both"},
+	}}}
+
+	countCursor, err := m.db.Aggregate(ctx, m.getPipeline(projectStage, groupStage))
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	var cnt []modelCount
+	if err := countCursor.All(ctx, &cnt); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	return &entity.ModelCount{
+		None:      cnt[0].None,
+		Has2DOnly: cnt[0].Has2DOnly,
+		Has3DOnly: cnt[0].Has3DOnly,
+		Both:      cnt[0].Both,
+	}, http.StatusOK, nil
+}

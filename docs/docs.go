@@ -348,6 +348,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/statistics/vtubers/model-count": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Statistic"
+                ],
+                "summary": "Get vtuber 2d \u0026 3d model count.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/service.vtuberModelCount"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/vtubers": {
             "get": {
                 "produces": [
@@ -1284,6 +1324,23 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "service.vtuberModelCount": {
+            "type": "object",
+            "properties": {
+                "both": {
+                    "type": "integer"
+                },
+                "has_2d_only": {
+                    "type": "integer"
+                },
+                "has_3d_only": {
+                    "type": "integer"
+                },
+                "none": {
+                    "type": "integer"
                 }
             }
         },

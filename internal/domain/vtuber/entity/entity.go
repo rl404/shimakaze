@@ -134,3 +134,11 @@ type DebutRetireCount struct {
 	Debut  int
 	Retire int
 }
+
+// ModelCount is entity for 2d & 3d model count.
+type ModelCount struct {
+	None      int
+	Has2DOnly int
+	Has3DOnly int
+	Both      int
+}

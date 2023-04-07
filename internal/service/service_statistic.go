@@ -97,3 +97,24 @@ func (s *service) GetVtuberDebutRetireCountYearly(ctx context.Context) ([]vtuber
 
 	return res, http.StatusOK, nil
 }
+
+type vtuberModelCount struct {
+	None      int `json:"none"`
+	Has2DOnly int `json:"has_2d_only"`
+	Has3DOnly int `json:"has_3d_only"`
+	Both      int `json:"both"`
+}
+
+// GetVtuberModelCount to get vtuber 2d & 3d model count.
+func (s *service) GetVtuberModelCount(ctx context.Context) (*vtuberModelCount, int, error) {
+	cnt, code, err := s.vtuber.GetModelCount(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+	return &vtuberModelCount{
+		None:      cnt.None,
+		Has2DOnly: cnt.Has2DOnly,
+		Has3DOnly: cnt.Has3DOnly,
+		Both:      cnt.Both,
+	}, http.StatusOK, nil
+}
