@@ -153,6 +153,17 @@ definitions:
           $ref: '#/definitions/service.vtuberVideo'
         type: array
     type: object
+  service.vtuberDebutRetireCount:
+    properties:
+      debut:
+        type: integer
+      month:
+        type: integer
+      retire:
+        type: integer
+      year:
+        type: integer
+    type: object
   service.vtuberFamilyTree:
     properties:
       links:
@@ -192,6 +203,13 @@ definitions:
         type: string
       name:
         type: string
+    type: object
+  service.vtuberStatusCount:
+    properties:
+      active:
+        type: integer
+      retired:
+        type: integer
     type: object
   service.vtuberVideo:
     properties:
@@ -347,6 +365,73 @@ paths:
           schema:
             $ref: '#/definitions/utils.Response'
       summary: Get vtuber count.
+      tags:
+      - Statistic
+  /statistics/vtubers/count-by-status:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/service.vtuberStatusCount'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get vtuber status count.
+      tags:
+      - Statistic
+  /statistics/vtubers/debut-retire-count-monthly:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/service.vtuberDebutRetireCount'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get vtuber debut & retire count monthly.
+      tags:
+      - Statistic
+  /statistics/vtubers/debut-retire-count-yearly:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/service.vtuberDebutRetireCount'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get vtuber debut & retire count yearly.
       tags:
       - Statistic
   /vtubers:

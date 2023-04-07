@@ -317,3 +317,22 @@ func (c *Cache) GetDebutRetireCountMonthly(ctx context.Context) (data []entity.D
 
 	return data, code, nil
 }
+
+// GetDebutRetireCountYearly to get debut & retire count yearly.
+func (c *Cache) GetDebutRetireCountYearly(ctx context.Context) (data []entity.DebutRetireCount, code int, err error) {
+	key := utils.GetKey("vtuber", "stats", "debut-retire-count-yearly")
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.GetDebutRetireCountYearly(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
+}

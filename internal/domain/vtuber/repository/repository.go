@@ -25,4 +25,5 @@ type Repository interface {
 	GetAverageActiveTime(ctx context.Context) (float64, int, error)
 	GetStatusCount(ctx context.Context) (*entity.StatusCount, int, error)
 	GetDebutRetireCountMonthly(ctx context.Context) ([]entity.DebutRetireCount, int, error)
+	GetDebutRetireCountYearly(ctx context.Context) ([]entity.DebutRetireCount, int, error)
 }

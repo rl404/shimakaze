@@ -61,3 +61,14 @@ func (api *API) handleGetVtuberDebutRetireCountMonthly(w http.ResponseWriter, r 
 	cnt, code, err := api.service.GetVtuberDebutRetireCountMonthly(r.Context())
 	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
 }
+
+// @summary Get vtuber debut & retire count yearly.
+// @tags Statistic
+// @produce json
+// @success 200 {object} utils.Response{data=[]service.vtuberDebutRetireCount}
+// @failure 500 {object} utils.Response
+// @router /statistics/vtubers/debut-retire-count-yearly [get]
+func (api *API) handleGetVtuberDebutRetireCountYearly(w http.ResponseWriter, r *http.Request) {
+	cnt, code, err := api.service.GetVtuberDebutRetireCountYearly(r.Context())
+	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+}

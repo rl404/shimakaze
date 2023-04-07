@@ -29,6 +29,7 @@ type Service interface {
 	GetVtuberAverageActiveTime(ctx context.Context) (float64, int, error)
 	GetVtuberStatusCount(ctx context.Context) (*vtuberStatusCount, int, error)
 	GetVtuberDebutRetireCountMonthly(ctx context.Context) ([]vtuberDebutRetireCount, int, error)
+	GetVtuberDebutRetireCountYearly(ctx context.Context) ([]vtuberDebutRetireCount, int, error)
 
 	GetAgencies(ctx context.Context) ([]agency, int, error)
 	GetAgencyByID(ctx context.Context, id int64) (*agency, int, error)
