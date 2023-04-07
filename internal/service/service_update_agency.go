@@ -29,15 +29,20 @@ func (s *service) updateAgency(ctx context.Context, id int64) (int, error) {
 	}
 
 	// Get total subs.
-	subsTotal := 0
+	subsTotal, channelMap := 0, make(map[string]bool)
 	for _, vtuber := range vtubers {
-		max := 0
+		max, channelID := 0, ""
 		for _, channel := range vtuber.Channels {
 			if channel.Subscriber > max {
-				max = channel.Subscriber
+				max, channelID = channel.Subscriber, channel.ID
 			}
 		}
-		subsTotal += max
+
+		if !channelMap[channelID] {
+			subsTotal += max
+		}
+
+		channelMap[channelID] = true
 	}
 
 	// Update data.
