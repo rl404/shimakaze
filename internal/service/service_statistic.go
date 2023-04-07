@@ -34,3 +34,47 @@ func (s *service) GetVtuberAverageActiveTime(ctx context.Context) (float64, int,
 	}
 	return math.Round(avg*100) / 100, http.StatusOK, nil
 }
+
+type vtuberStatusCount struct {
+	Active  int `json:"active"`
+	Retired int `json:"retired"`
+}
+
+// GetVtuberStatusCount to get vtuber status count.
+func (s *service) GetVtuberStatusCount(ctx context.Context) (*vtuberStatusCount, int, error) {
+	cnt, code, err := s.vtuber.GetStatusCount(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+	return &vtuberStatusCount{
+		Active:  cnt.Active,
+		Retired: cnt.Retired,
+	}, http.StatusOK, nil
+}
+
+type vtuberDebutRetireCount struct {
+	Year   int `json:"year"`
+	Month  int `json:"month"`
+	Debut  int `json:"debut"`
+	Retire int `json:"retire"`
+}
+
+// GetVtuberDebutRetireCountMonthly to get vtuber debut & retire count monthly.
+func (s *service) GetVtuberDebutRetireCountMonthly(ctx context.Context) ([]vtuberDebutRetireCount, int, error) {
+	cnt, code, err := s.vtuber.GetDebutRetireCountMonthly(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	res := make([]vtuberDebutRetireCount, len(cnt))
+	for i, c := range cnt {
+		res[i] = vtuberDebutRetireCount{
+			Year:   c.Year,
+			Month:  c.Month,
+			Debut:  c.Debut,
+			Retire: c.Retire,
+		}
+	}
+
+	return res, http.StatusOK, nil
+}

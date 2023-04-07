@@ -279,3 +279,41 @@ func (c *Cache) GetAverageActiveTime(ctx context.Context) (data float64, code in
 
 	return data, code, nil
 }
+
+// GetStatusCount to get status count.
+func (c *Cache) GetStatusCount(ctx context.Context) (data *entity.StatusCount, code int, err error) {
+	key := utils.GetKey("vtuber", "stats", "status-count")
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.GetStatusCount(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
+}
+
+// GetDebutRetireCountMonthly to get debut & retire count monthly.
+func (c *Cache) GetDebutRetireCountMonthly(ctx context.Context) (data []entity.DebutRetireCount, code int, err error) {
+	key := utils.GetKey("vtuber", "stats", "debut-retire-count-monthly")
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.GetDebutRetireCountMonthly(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
+}

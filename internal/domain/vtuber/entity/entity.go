@@ -120,3 +120,17 @@ type GetAllRequest struct {
 	Page               int
 	Limit              int
 }
+
+// StatusCount is entity for status count.
+type StatusCount struct {
+	Active  int
+	Retired int
+}
+
+// DebutRetireCount is entity for debut & retire count.
+type DebutRetireCount struct {
+	Month  int
+	Year   int
+	Debut  int
+	Retire int
+}

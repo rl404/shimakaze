@@ -39,3 +39,25 @@ func (api *API) handleGetVtuberAverageActiveTime(w http.ResponseWriter, r *http.
 	avg, code, err := api.service.GetVtuberAverageActiveTime(r.Context())
 	utils.ResponseWithJSON(w, code, avg, errors.Wrap(r.Context(), err))
 }
+
+// @summary Get vtuber status count.
+// @tags Statistic
+// @produce json
+// @success 200 {object} utils.Response{data=service.vtuberStatusCount}
+// @failure 500 {object} utils.Response
+// @router /statistics/vtubers/count-by-status [get]
+func (api *API) handleGetVtuberStatusCount(w http.ResponseWriter, r *http.Request) {
+	cnt, code, err := api.service.GetVtuberStatusCount(r.Context())
+	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+}
+
+// @summary Get vtuber debut & retire count monthly.
+// @tags Statistic
+// @produce json
+// @success 200 {object} utils.Response{data=[]service.vtuberDebutRetireCount}
+// @failure 500 {object} utils.Response
+// @router /statistics/vtubers/debut-retire-count-monthly [get]
+func (api *API) handleGetVtuberDebutRetireCountMonthly(w http.ResponseWriter, r *http.Request) {
+	cnt, code, err := api.service.GetVtuberDebutRetireCountMonthly(r.Context())
+	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+}

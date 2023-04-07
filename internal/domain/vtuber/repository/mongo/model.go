@@ -299,3 +299,65 @@ func (m *Mongo) addMatch(matchStage bson.D, key string, value interface{}) bson.
 func (m *Mongo) addField(projStage bson.D, key string, value interface{}) bson.D {
 	return m.addStage("$addFields", projStage, key, value)
 }
+
+type statusCountMonthly struct {
+	Month int `bson:"month"`
+	Year  int `bson:"year"`
+	Count int `bson:"count"`
+}
+
+func (m *Mongo) mergeDebutRetiredMonthly(debut, retired []statusCountMonthly) []entity.DebutRetireCount {
+	debutMap := make(map[int]map[int]int)
+	retiredMap := make(map[int]map[int]int)
+
+	minMonth := 1
+	maxMonth := 12
+	minYear := time.Now().Year()
+	maxYear := time.Now().Year()
+
+	for _, d := range debut {
+		if d.Year == 0 || d.Month == 0 {
+			continue
+		}
+
+		if debutMap[d.Year] == nil {
+			debutMap[d.Year] = make(map[int]int)
+		}
+
+		debutMap[d.Year][d.Month] = d.Count
+
+		if d.Year < minYear {
+			minYear = d.Year
+		}
+	}
+
+	for _, r := range retired {
+		if r.Year == 0 || r.Month == 0 {
+			continue
+		}
+
+		if retiredMap[r.Year] == nil {
+			retiredMap[r.Year] = make(map[int]int)
+		}
+
+		retiredMap[r.Year][r.Month] = r.Count
+
+		if r.Year < minYear {
+			minYear = r.Year
+		}
+	}
+
+	var data []entity.DebutRetireCount
+	for y := minYear; y <= maxYear; y++ {
+		for m := minMonth; m <= maxMonth; m++ {
+			data = append(data, entity.DebutRetireCount{
+				Year:   y,
+				Month:  m,
+				Debut:  debutMap[y][m],
+				Retire: retiredMap[y][m],
+			})
+		}
+	}
+
+	return data
+}

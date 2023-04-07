@@ -23,4 +23,6 @@ type Repository interface {
 	GetCharacter3DModelers(ctx context.Context) ([]string, int, error)
 	GetCount(ctx context.Context) (int, int, error)
 	GetAverageActiveTime(ctx context.Context) (float64, int, error)
+	GetStatusCount(ctx context.Context) (*entity.StatusCount, int, error)
+	GetDebutRetireCountMonthly(ctx context.Context) ([]entity.DebutRetireCount, int, error)
 }
