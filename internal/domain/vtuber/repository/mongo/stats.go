@@ -22,7 +22,7 @@ func (m *Mongo) GetCount(ctx context.Context) (int, int, error) {
 
 // GetAverageActiveTime to get average active time.
 func (m *Mongo) GetAverageActiveTime(ctx context.Context) (float64, int, error) {
-	replaceFieldStage := bson.D{{Key: "$addFields", Value: bson.M{"new_retirement_date": bson.M{"$ifNull": []interface{}{"$retirement_date", primitive.NewDateTimeFromTime(time.Now())}}}}}
+	replaceFieldStage := bson.D{{Key: "$addFields", Value: bson.M{"new_retirement_date": bson.M{"$ifNull": bson.A{"$retirement_date", primitive.NewDateTimeFromTime(time.Now())}}}}}
 	matchStage := bson.D{{Key: "$match", Value: bson.M{"debut_date": bson.M{"$ne": nil}}}}
 	avgStage := bson.D{{Key: "$group", Value: bson.M{"_id": nil, "avg": bson.M{"$avg": bson.M{"$dateDiff": bson.M{"startDate": "$debut_date", "endDate": "$new_retirement_date", "unit": "day"}}}}}}
 
@@ -42,8 +42,8 @@ func (m *Mongo) GetAverageActiveTime(ctx context.Context) (float64, int, error) 
 // GetStatusCount to get status count.
 func (m *Mongo) GetStatusCount(ctx context.Context) (*entity.StatusCount, int, error) {
 	projectStage := bson.D{{Key: "$project", Value: bson.M{
-		"active":  bson.M{"$cond": []interface{}{bson.M{"$eq": []interface{}{"$retirement_date", nil}}, 1, 0}},
-		"retired": bson.M{"$cond": []interface{}{bson.M{"$ne": []interface{}{"$retirement_date", nil}}, 1, 0}}}}}
+		"active":  bson.M{"$cond": bson.A{bson.M{"$eq": bson.A{"$retirement_date", nil}}, 1, 0}},
+		"retired": bson.M{"$cond": bson.A{bson.M{"$ne": bson.A{"$retirement_date", nil}}, 1, 0}}}}}
 
 	groupStage := bson.D{{Key: "$group", Value: bson.M{
 		"_id":     nil,
@@ -158,10 +158,10 @@ type modelCount struct {
 // GetModelCount to get 2d & 3d model count.
 func (m *Mongo) GetModelCount(ctx context.Context) (*entity.ModelCount, int, error) {
 	projectStage := bson.D{{Key: "$project", Value: bson.M{
-		"none":        bson.M{"$cond": []interface{}{bson.M{"$and": []bson.M{{"$eq": []interface{}{"$has_2d", false}}, {"$eq": []interface{}{"$has_3d", false}}}}, 1, 0}},
-		"has_2d_only": bson.M{"$cond": []interface{}{bson.M{"$and": []bson.M{{"$eq": []interface{}{"$has_2d", true}}, {"$eq": []interface{}{"$has_3d", false}}}}, 1, 0}},
-		"has_3d_only": bson.M{"$cond": []interface{}{bson.M{"$and": []bson.M{{"$eq": []interface{}{"$has_2d", false}}, {"$eq": []interface{}{"$has_3d", true}}}}, 1, 0}},
-		"both":        bson.M{"$cond": []interface{}{bson.M{"$and": []bson.M{{"$eq": []interface{}{"$has_2d", true}}, {"$eq": []interface{}{"$has_3d", true}}}}, 1, 0}},
+		"none":        bson.M{"$cond": bson.A{bson.M{"$and": []bson.M{{"$eq": bson.A{"$has_2d", false}}, {"$eq": bson.A{"$has_3d", false}}}}, 1, 0}},
+		"has_2d_only": bson.M{"$cond": bson.A{bson.M{"$and": []bson.M{{"$eq": bson.A{"$has_2d", true}}, {"$eq": bson.A{"$has_3d", false}}}}, 1, 0}},
+		"has_3d_only": bson.M{"$cond": bson.A{bson.M{"$and": []bson.M{{"$eq": bson.A{"$has_2d", false}}, {"$eq": bson.A{"$has_3d", true}}}}, 1, 0}},
+		"both":        bson.M{"$cond": bson.A{bson.M{"$and": []bson.M{{"$eq": bson.A{"$has_2d", true}}, {"$eq": bson.A{"$has_3d", true}}}}, 1, 0}},
 	}}}
 
 	groupStage := bson.D{{Key: "$group", Value: bson.M{
@@ -198,11 +198,11 @@ type inAgencyCount struct {
 // GetInAgencyCount to get in agency count.
 func (m *Mongo) GetInAgencyCount(ctx context.Context) (*entity.InAgencyCount, int, error) {
 	projectStage := bson.D{{Key: "$project", Value: bson.M{
-		"in_agency": bson.M{"$cond": []interface{}{bson.M{"$eq": []interface{}{"array", bson.M{"$type": "$agencies"}}},
-			bson.M{"$cond": []interface{}{bson.M{"$gt": []interface{}{bson.M{"$size": "$agencies"}, 0}}, 1, 0}},
+		"in_agency": bson.M{"$cond": bson.A{bson.M{"$eq": bson.A{"array", bson.M{"$type": "$agencies"}}},
+			bson.M{"$cond": bson.A{bson.M{"$gt": bson.A{bson.M{"$size": "$agencies"}, 0}}, 1, 0}},
 			0}},
-		"not_in_agency": bson.M{"$cond": []interface{}{bson.M{"$eq": []interface{}{"array", bson.M{"$type": "$agencies"}}},
-			bson.M{"$cond": []interface{}{bson.M{"$gt": []interface{}{bson.M{"$size": "$agencies"}, 0}}, 0, 1}},
+		"not_in_agency": bson.M{"$cond": bson.A{bson.M{"$eq": bson.A{"array", bson.M{"$type": "$agencies"}}},
+			bson.M{"$cond": bson.A{bson.M{"$gt": bson.A{bson.M{"$size": "$agencies"}, 0}}, 0, 1}},
 			1}},
 	}}}
 
@@ -226,4 +226,61 @@ func (m *Mongo) GetInAgencyCount(ctx context.Context) (*entity.InAgencyCount, in
 		InAgency:    cnt[0].InAgency,
 		NotInAgency: cnt[0].NotInAgency,
 	}, http.StatusOK, nil
+}
+
+type subscriberCount struct {
+	Min   int `bson:"min"`
+	Max   int `bson:"max"`
+	Count int `bson:"count"`
+}
+
+// GetSubscriberCount to get subscriber count.
+func (m *Mongo) GetSubscriberCount(ctx context.Context, interval, max int) ([]entity.SubscriberCount, int, error) {
+	boundaries := []int{}
+	for i := 0; i <= max; i += interval {
+		boundaries = append(boundaries, i)
+	}
+
+	newFieldStage := bson.D{{Key: "$addFields", Value: bson.M{"subscriber": bson.M{"$max": "$channels.subscriber"}}}}
+
+	projectStage := bson.D{{Key: "$project", Value: bson.M{"subscriber": bson.M{"$ifNull": bson.A{"$subscriber", 0}}}}}
+
+	bucketStage := bson.D{{Key: "$bucket", Value: bson.M{
+		"groupBy":    "$subscriber",
+		"boundaries": boundaries,
+		"default":    max,
+		"output":     bson.M{"count": bson.M{"$sum": 1}},
+	}}}
+
+	projectStage2 := bson.D{{Key: "$project", Value: bson.M{
+		"min":   "$_id",
+		"max":   bson.M{"$add": bson.A{"$_id", interval}},
+		"count": "$count",
+	}}}
+
+	countCursor, err := m.db.Aggregate(ctx, m.getPipeline(newFieldStage, projectStage, bucketStage, projectStage2))
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	var cnt []subscriberCount
+	if err := countCursor.All(ctx, &cnt); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	res := make([]entity.SubscriberCount, len(cnt))
+	for i, c := range cnt {
+		max := c.Max
+		if i == len(cnt)-1 {
+			max = 0
+		}
+
+		res[i] = entity.SubscriberCount{
+			Min:   c.Min,
+			Max:   max,
+			Count: c.Count,
+		}
+	}
+
+	return res, http.StatusOK, nil
 }

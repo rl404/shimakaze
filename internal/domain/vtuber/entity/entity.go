@@ -148,3 +148,10 @@ type InAgencyCount struct {
 	InAgency    int
 	NotInAgency int
 }
+
+// SubscriberCount is entity for subscriber count.
+type SubscriberCount struct {
+	Min   int
+	Max   int
+	Count int
+}

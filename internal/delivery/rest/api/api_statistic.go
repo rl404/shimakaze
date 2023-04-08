@@ -2,8 +2,10 @@ package api
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/rl404/shimakaze/internal/errors"
+	"github.com/rl404/shimakaze/internal/service"
 	"github.com/rl404/shimakaze/internal/utils"
 )
 
@@ -92,5 +94,23 @@ func (api *API) handleGetVtuberModelCount(w http.ResponseWriter, r *http.Request
 // @router /statistics/vtubers/in-agency-count [get]
 func (api *API) handleGetVtuberInAgencyCount(w http.ResponseWriter, r *http.Request) {
 	cnt, code, err := api.service.GetVtuberInAgencyCount(r.Context())
+	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+}
+
+// @summary Get vtuber susbcriber count.
+// @tags Statistic
+// @produce json
+// @param interval query integer false "interval" default(100000)
+// @param max query integer false "max" default(5000000)
+// @success 200 {object} utils.Response{data=[]service.vtuberSubscriberCount}
+// @failure 500 {object} utils.Response
+// @router /statistics/vtubers/subscriber-count [get]
+func (api *API) handleGetVtuberSubscriberCount(w http.ResponseWriter, r *http.Request) {
+	interval, _ := strconv.Atoi(r.URL.Query().Get("interval"))
+	max, _ := strconv.Atoi(r.URL.Query().Get("max"))
+	cnt, code, err := api.service.GetVtuberSubscriberCount(r.Context(), service.GetVtuberSubscriberCountRequest{
+		Interval: interval,
+		Max:      max,
+	})
 	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
 }

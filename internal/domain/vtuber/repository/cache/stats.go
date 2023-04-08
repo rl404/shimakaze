@@ -141,3 +141,22 @@ func (c *Cache) GetInAgencyCount(ctx context.Context) (data *entity.InAgencyCoun
 
 	return data, code, nil
 }
+
+// GetSubscriberCount to get subscriber count.
+func (c *Cache) GetSubscriberCount(ctx context.Context, interval, max int) (data []entity.SubscriberCount, code int, err error) {
+	key := utils.GetKey("vtuber", "stats", "subscriber-count", interval, max)
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.GetSubscriberCount(ctx, interval, max)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
+}

@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/rl404/shimakaze/internal/errors"
+	"github.com/rl404/shimakaze/internal/utils"
 )
 
 // GetVtuberCount to get vtuber count.
@@ -134,4 +135,39 @@ func (s *service) GetVtuberInAgencyCount(ctx context.Context) (*vtuberInAgencyCo
 		InAgency:    cnt.InAgency,
 		NotInAgency: cnt.NotInAgency,
 	}, http.StatusOK, nil
+}
+
+type vtuberSubscriberCount struct {
+	Min   int `json:"min"`
+	Max   int `json:"max"`
+	Count int `json:"count"`
+}
+
+// GetVtuberSubscriberCountRequest is get vtuber subscriber count request.
+type GetVtuberSubscriberCountRequest struct {
+	Interval int `validate:"required,gte=10000" mod:"default=100000"`
+	Max      int `validate:"required,lte=5000000" mod:"default=5000000"`
+}
+
+// GetVtuberSubscriberCount to get vtuber subscriber count.
+func (s *service) GetVtuberSubscriberCount(ctx context.Context, data GetVtuberSubscriberCountRequest) ([]vtuberSubscriberCount, int, error) {
+	if err := utils.Validate(&data); err != nil {
+		return nil, http.StatusBadRequest, errors.Wrap(ctx, err)
+	}
+
+	cnt, code, err := s.vtuber.GetSubscriberCount(ctx, data.Interval, data.Max)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	res := make([]vtuberSubscriberCount, len(cnt))
+	for i, c := range cnt {
+		res[i] = vtuberSubscriberCount{
+			Min:   c.Min,
+			Max:   c.Max,
+			Count: c.Count,
+		}
+	}
+
+	return res, http.StatusOK, nil
 }
