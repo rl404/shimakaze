@@ -122,3 +122,22 @@ func (c *Cache) GetModelCount(ctx context.Context) (data *entity.ModelCount, cod
 
 	return data, code, nil
 }
+
+// GetInAgencyCount to get in agency count.
+func (c *Cache) GetInAgencyCount(ctx context.Context) (data *entity.InAgencyCount, code int, err error) {
+	key := utils.GetKey("vtuber", "stats", "in-agency-count")
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.GetInAgencyCount(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
+}

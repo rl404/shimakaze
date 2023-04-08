@@ -189,3 +189,41 @@ func (m *Mongo) GetModelCount(ctx context.Context) (*entity.ModelCount, int, err
 		Both:      cnt[0].Both,
 	}, http.StatusOK, nil
 }
+
+type inAgencyCount struct {
+	InAgency    int `bson:"in_agency"`
+	NotInAgency int `bson:"not_in_agency"`
+}
+
+// GetInAgencyCount to get in agency count.
+func (m *Mongo) GetInAgencyCount(ctx context.Context) (*entity.InAgencyCount, int, error) {
+	projectStage := bson.D{{Key: "$project", Value: bson.M{
+		"in_agency": bson.M{"$cond": []interface{}{bson.M{"$eq": []interface{}{"array", bson.M{"$type": "$agencies"}}},
+			bson.M{"$cond": []interface{}{bson.M{"$gt": []interface{}{bson.M{"$size": "$agencies"}, 0}}, 1, 0}},
+			0}},
+		"not_in_agency": bson.M{"$cond": []interface{}{bson.M{"$eq": []interface{}{"array", bson.M{"$type": "$agencies"}}},
+			bson.M{"$cond": []interface{}{bson.M{"$gt": []interface{}{bson.M{"$size": "$agencies"}, 0}}, 0, 1}},
+			1}},
+	}}}
+
+	groupStage := bson.D{{Key: "$group", Value: bson.M{
+		"_id":           nil,
+		"in_agency":     bson.M{"$sum": "$in_agency"},
+		"not_in_agency": bson.M{"$sum": "$not_in_agency"},
+	}}}
+
+	countCursor, err := m.db.Aggregate(ctx, m.getPipeline(projectStage, groupStage))
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	var cnt []inAgencyCount
+	if err := countCursor.All(ctx, &cnt); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	return &entity.InAgencyCount{
+		InAgency:    cnt[0].InAgency,
+		NotInAgency: cnt[0].NotInAgency,
+	}, http.StatusOK, nil
+}

@@ -142,3 +142,9 @@ type ModelCount struct {
 	Has3DOnly int
 	Both      int
 }
+
+// InAgencyCount is entity for in agency count.
+type InAgencyCount struct {
+	InAgency    int
+	NotInAgency int
+}

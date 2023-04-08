@@ -83,3 +83,14 @@ func (api *API) handleGetVtuberModelCount(w http.ResponseWriter, r *http.Request
 	cnt, code, err := api.service.GetVtuberModelCount(r.Context())
 	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
 }
+
+// @summary Get vtuber in agency count.
+// @tags Statistic
+// @produce json
+// @success 200 {object} utils.Response{data=service.vtuberInAgencyCount}
+// @failure 500 {object} utils.Response
+// @router /statistics/vtubers/in-agency-count [get]
+func (api *API) handleGetVtuberInAgencyCount(w http.ResponseWriter, r *http.Request) {
+	cnt, code, err := api.service.GetVtuberInAgencyCount(r.Context())
+	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+}

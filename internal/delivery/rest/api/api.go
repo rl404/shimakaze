@@ -56,6 +56,7 @@ func (api *API) Register(r chi.Router, nrApp *newrelic.Application) {
 		r.Get("/statistics/vtubers/debut-retire-count-monthly", api.handleGetVtuberDebutRetireCountMonthly)
 		r.Get("/statistics/vtubers/debut-retire-count-yearly", api.handleGetVtuberDebutRetireCountYearly)
 		r.Get("/statistics/vtubers/model-count", api.handleGetVtuberModelCount)
+		r.Get("/statistics/vtubers/in-agency-count", api.handleGetVtuberInAgencyCount)
 
 		r.Get("/statistics/agencies/count", api.handleGetAgencyCount)
 	})

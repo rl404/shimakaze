@@ -118,3 +118,20 @@ func (s *service) GetVtuberModelCount(ctx context.Context) (*vtuberModelCount, i
 		Both:      cnt.Both,
 	}, http.StatusOK, nil
 }
+
+type vtuberInAgencyCount struct {
+	InAgency    int `json:"in_agency"`
+	NotInAgency int `json:"not_in_agency"`
+}
+
+// GetVtuberInAgencyCount to get vtuber in agency count.
+func (s *service) GetVtuberInAgencyCount(ctx context.Context) (*vtuberInAgencyCount, int, error) {
+	cnt, code, err := s.vtuber.GetInAgencyCount(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+	return &vtuberInAgencyCount{
+		InAgency:    cnt.InAgency,
+		NotInAgency: cnt.NotInAgency,
+	}, http.StatusOK, nil
+}

@@ -27,4 +27,5 @@ type Repository interface {
 	GetDebutRetireCountMonthly(ctx context.Context) ([]entity.DebutRetireCount, int, error)
 	GetDebutRetireCountYearly(ctx context.Context) ([]entity.DebutRetireCount, int, error)
 	GetModelCount(ctx context.Context) (*entity.ModelCount, int, error)
+	GetInAgencyCount(ctx context.Context) (*entity.InAgencyCount, int, error)
 }
