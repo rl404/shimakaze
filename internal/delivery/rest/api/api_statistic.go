@@ -97,7 +97,7 @@ func (api *API) handleGetVtuberInAgencyCount(w http.ResponseWriter, r *http.Requ
 	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
 }
 
-// @summary Get vtuber susbcriber count.
+// @summary Get vtuber subscriber count.
 // @tags Statistic
 // @produce json
 // @param interval query integer false "interval" default(100000)
@@ -112,5 +112,44 @@ func (api *API) handleGetVtuberSubscriberCount(w http.ResponseWriter, r *http.Re
 		Interval: interval,
 		Max:      max,
 	})
+	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+}
+
+// @summary Get vtuber character designer count.
+// @tags Statistic
+// @produce json
+// @param top query integer false "top count" default(10)
+// @success 200 {object} utils.Response{data=[]service.vtuberDesignerCount}
+// @failure 500 {object} utils.Response
+// @router /statistics/vtubers/designer-count [get]
+func (api *API) handleGetVtuberDesignerCount(w http.ResponseWriter, r *http.Request) {
+	top, _ := strconv.Atoi(r.URL.Query().Get("top"))
+	cnt, code, err := api.service.GetVtuberDesignerCount(r.Context(), service.GetVtuberDesignerCountRequest{Top: top})
+	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+}
+
+// @summary Get vtuber character 2d modeler count.
+// @tags Statistic
+// @produce json
+// @param top query integer false "top count" default(10)
+// @success 200 {object} utils.Response{data=[]service.vtuberDesignerCount}
+// @failure 500 {object} utils.Response
+// @router /statistics/vtubers/2d-modeler-count [get]
+func (api *API) handleGetVtuber2DModelerCount(w http.ResponseWriter, r *http.Request) {
+	top, _ := strconv.Atoi(r.URL.Query().Get("top"))
+	cnt, code, err := api.service.GetVtuber2DModelerCount(r.Context(), service.GetVtuberDesignerCountRequest{Top: top})
+	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+}
+
+// @summary Get vtuber character 3d modeler count.
+// @tags Statistic
+// @produce json
+// @param top query integer false "top count" default(10)
+// @success 200 {object} utils.Response{data=[]service.vtuberDesignerCount}
+// @failure 500 {object} utils.Response
+// @router /statistics/vtubers/3d-modeler-count [get]
+func (api *API) handleGetVtuber3DModelerCount(w http.ResponseWriter, r *http.Request) {
+	top, _ := strconv.Atoi(r.URL.Query().Get("top"))
+	cnt, code, err := api.service.GetVtuber3DModelerCount(r.Context(), service.GetVtuberDesignerCountRequest{Top: top})
 	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
 }

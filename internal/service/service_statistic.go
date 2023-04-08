@@ -171,3 +171,79 @@ func (s *service) GetVtuberSubscriberCount(ctx context.Context, data GetVtuberSu
 
 	return res, http.StatusOK, nil
 }
+
+// GetVtuberDesignerCountRequest is get vtuber designer count request.
+type GetVtuberDesignerCountRequest struct {
+	Top int `validate:"required,gte=-1" mod:"default=10"`
+}
+
+type vtuberDesignerCount struct {
+	Name  string `json:"name"`
+	Count int    `json:"count"`
+}
+
+// GetVtuberDesignerCount to get vtuber character designer count.
+func (s *service) GetVtuberDesignerCount(ctx context.Context, data GetVtuberDesignerCountRequest) ([]vtuberDesignerCount, int, error) {
+	if err := utils.Validate(&data); err != nil {
+		return nil, http.StatusBadRequest, errors.Wrap(ctx, err)
+	}
+
+	cnt, code, err := s.vtuber.GetDesignerCount(ctx, data.Top)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	res := make([]vtuberDesignerCount, len(cnt))
+	for i, c := range cnt {
+		res[i] = vtuberDesignerCount{
+			Name:  c.Name,
+			Count: c.Count,
+		}
+	}
+
+	return res, http.StatusOK, nil
+}
+
+// GetVtuber2DModelerCount to get vtuber character 2d modeler count.
+func (s *service) GetVtuber2DModelerCount(ctx context.Context, data GetVtuberDesignerCountRequest) ([]vtuberDesignerCount, int, error) {
+	if err := utils.Validate(&data); err != nil {
+		return nil, http.StatusBadRequest, errors.Wrap(ctx, err)
+	}
+
+	cnt, code, err := s.vtuber.Get2DModelerCount(ctx, data.Top)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	res := make([]vtuberDesignerCount, len(cnt))
+	for i, c := range cnt {
+		res[i] = vtuberDesignerCount{
+			Name:  c.Name,
+			Count: c.Count,
+		}
+	}
+
+	return res, http.StatusOK, nil
+}
+
+// GetVtuber3DModelerCount to get vtuber character 3d modeler count.
+func (s *service) GetVtuber3DModelerCount(ctx context.Context, data GetVtuberDesignerCountRequest) ([]vtuberDesignerCount, int, error) {
+	if err := utils.Validate(&data); err != nil {
+		return nil, http.StatusBadRequest, errors.Wrap(ctx, err)
+	}
+
+	cnt, code, err := s.vtuber.Get3DModelerCount(ctx, data.Top)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	res := make([]vtuberDesignerCount, len(cnt))
+	for i, c := range cnt {
+		res[i] = vtuberDesignerCount{
+			Name:  c.Name,
+			Count: c.Count,
+		}
+	}
+
+	return res, http.StatusOK, nil
+}

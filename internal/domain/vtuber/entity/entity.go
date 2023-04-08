@@ -155,3 +155,9 @@ type SubscriberCount struct {
 	Max   int
 	Count int
 }
+
+// DesignerCount is entity for designer count.
+type DesignerCount struct {
+	Name  string
+	Count int
+}

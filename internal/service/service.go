@@ -33,6 +33,9 @@ type Service interface {
 	GetVtuberModelCount(ctx context.Context) (*vtuberModelCount, int, error)
 	GetVtuberInAgencyCount(ctx context.Context) (*vtuberInAgencyCount, int, error)
 	GetVtuberSubscriberCount(ctx context.Context, params GetVtuberSubscriberCountRequest) ([]vtuberSubscriberCount, int, error)
+	GetVtuberDesignerCount(ctx context.Context, params GetVtuberDesignerCountRequest) ([]vtuberDesignerCount, int, error)
+	GetVtuber2DModelerCount(ctx context.Context, params GetVtuberDesignerCountRequest) ([]vtuberDesignerCount, int, error)
+	GetVtuber3DModelerCount(ctx context.Context, params GetVtuberDesignerCountRequest) ([]vtuberDesignerCount, int, error)
 
 	GetAgencies(ctx context.Context, params GetAgenciesRequest) ([]agency, *pagination, int, error)
 	GetAgencyByID(ctx context.Context, id int64) (*agency, int, error)

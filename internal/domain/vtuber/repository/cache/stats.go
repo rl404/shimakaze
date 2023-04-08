@@ -160,3 +160,60 @@ func (c *Cache) GetSubscriberCount(ctx context.Context, interval, max int) (data
 
 	return data, code, nil
 }
+
+// GetDesignerCount to get character designer count.
+func (c *Cache) GetDesignerCount(ctx context.Context, top int) (data []entity.DesignerCount, code int, err error) {
+	key := utils.GetKey("vtuber", "stats", "designer-count", top)
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.GetDesignerCount(ctx, top)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
+}
+
+// Get2DModelerCount to get character 2d modeler count.
+func (c *Cache) Get2DModelerCount(ctx context.Context, top int) (data []entity.DesignerCount, code int, err error) {
+	key := utils.GetKey("vtuber", "stats", "2d-modeler-count", top)
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.Get2DModelerCount(ctx, top)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
+}
+
+// Get3DModelerCount to get character 3d modeler count.
+func (c *Cache) Get3DModelerCount(ctx context.Context, top int) (data []entity.DesignerCount, code int, err error) {
+	key := utils.GetKey("vtuber", "stats", "3d-modeler-count", top)
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.Get3DModelerCount(ctx, top)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
+}

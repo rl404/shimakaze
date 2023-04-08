@@ -29,4 +29,7 @@ type Repository interface {
 	GetModelCount(ctx context.Context) (*entity.ModelCount, int, error)
 	GetInAgencyCount(ctx context.Context) (*entity.InAgencyCount, int, error)
 	GetSubscriberCount(ctx context.Context, interval, max int) ([]entity.SubscriberCount, int, error)
+	GetDesignerCount(ctx context.Context, top int) ([]entity.DesignerCount, int, error)
+	Get2DModelerCount(ctx context.Context, top int) ([]entity.DesignerCount, int, error)
+	Get3DModelerCount(ctx context.Context, top int) ([]entity.DesignerCount, int, error)
 }

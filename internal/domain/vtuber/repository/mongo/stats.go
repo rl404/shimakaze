@@ -284,3 +284,51 @@ func (m *Mongo) GetSubscriberCount(ctx context.Context, interval, max int) ([]en
 
 	return res, http.StatusOK, nil
 }
+
+type designerCount struct {
+	Name  string `bson:"name"`
+	Count int    `bson:"count"`
+}
+
+func (m *Mongo) getdesignerCount(ctx context.Context, top int, field string) ([]entity.DesignerCount, int, error) {
+	unwindStage := bson.D{{Key: "$unwind", Value: "$" + field}}
+	groupStage := bson.D{{Key: "$group", Value: bson.M{"_id": bson.M{"name": "$" + field}, "count": bson.M{"$sum": 1}}}}
+	projectStage := bson.D{{Key: "$project", Value: bson.M{"name": "$_id.name", "count": "$count"}}}
+	sortStage := bson.D{{Key: "$sort", Value: bson.M{"count": -1}}}
+	limitStage := bson.D{{Key: "$limit", Value: top}}
+
+	countCursor, err := m.db.Aggregate(ctx, m.getPipeline(unwindStage, groupStage, projectStage, sortStage, limitStage))
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	var cnt []designerCount
+	if err := countCursor.All(ctx, &cnt); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	res := make([]entity.DesignerCount, len(cnt))
+	for i, c := range cnt {
+		res[i] = entity.DesignerCount{
+			Name:  c.Name,
+			Count: c.Count,
+		}
+	}
+
+	return res, http.StatusOK, nil
+}
+
+// GetDesignerCount to get character designer count.
+func (m *Mongo) GetDesignerCount(ctx context.Context, top int) ([]entity.DesignerCount, int, error) {
+	return m.getdesignerCount(ctx, top, "character_designers")
+}
+
+// Get2DModelerCount to get character 2d modeler count.
+func (m *Mongo) Get2DModelerCount(ctx context.Context, top int) ([]entity.DesignerCount, int, error) {
+	return m.getdesignerCount(ctx, top, "character_2d_modelers")
+}
+
+// Get2DModelerCount to get character 3d modeler count.
+func (m *Mongo) Get3DModelerCount(ctx context.Context, top int) ([]entity.DesignerCount, int, error) {
+	return m.getdesignerCount(ctx, top, "character_3d_modelers")
+}
