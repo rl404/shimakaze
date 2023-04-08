@@ -49,23 +49,30 @@ func (c *Cache) GetAllIDs(ctx context.Context) (data []int64, code int, err erro
 	return c.repo.GetAllIDs(ctx)
 }
 
+type getAllCache struct {
+	Data  []entity.Agency
+	Total int
+}
+
 // GetAll to get all.
-func (c *Cache) GetAll(ctx context.Context) (data []entity.Agency, code int, err error) {
-	key := utils.GetKey("agency")
+func (c *Cache) GetAll(ctx context.Context, req entity.GetAllRequest) (_ []entity.Agency, _ int, code int, err error) {
+	key := utils.GetKey("agency", utils.QueryToKey(req))
+
+	var data getAllCache
 	if c.cacher.Get(ctx, key, &data) == nil {
-		return data, http.StatusOK, nil
+		return data.Data, data.Total, http.StatusOK, nil
 	}
 
-	data, code, err = c.repo.GetAll(ctx)
+	data.Data, data.Total, code, err = c.repo.GetAll(ctx, req)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, 0, code, errors.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
 	}
 
-	return data, code, nil
+	return data.Data, data.Total, code, nil
 }
 
 // IsOld to check if old.

@@ -61,23 +61,34 @@ func (m *Mongo) GetAllIDs(ctx context.Context) ([]int64, int, error) {
 }
 
 // GetAll to get all.
-func (m *Mongo) GetAll(ctx context.Context) ([]entity.Agency, int, error) {
-	var agencies []entity.Agency
-	c, err := m.db.Find(ctx, bson.M{}, options.Find().SetSort(bson.M{"name": 1}))
+func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity.Agency, int, int, error) {
+	opt := options.Find().SetSort(m.convertSort(data.Sort)).SetSkip(int64((data.Page - 1) * data.Limit)).SetLimit(int64(data.Limit))
+
+	if data.Limit < 0 {
+		opt.SetLimit(0)
+	}
+
+	c, err := m.db.Find(ctx, bson.M{}, opt)
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
 	}
 	defer c.Close(ctx)
 
+	var agencies []entity.Agency
 	for c.Next(ctx) {
 		var agency agency
 		if err := c.Decode(&agency); err != nil {
-			return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+			return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
 		}
 		agencies = append(agencies, *agency.toEntity())
 	}
 
-	return agencies, http.StatusOK, nil
+	total, err := m.db.CountDocuments(ctx, bson.M{}, options.Count())
+	if err != nil {
+		return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	return agencies, int(total), http.StatusOK, nil
 }
 
 // IsOld to check if old data.

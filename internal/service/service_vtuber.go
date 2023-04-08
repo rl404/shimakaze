@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	agencyEntity "github.com/rl404/shimakaze/internal/domain/agency/entity"
 	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	"github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/utils"
@@ -287,7 +288,7 @@ func (s *service) GetVtuberAgencyTrees(ctx context.Context) (*vtuberAgencyTree, 
 		return nil, code, errors.Wrap(ctx, err)
 	}
 
-	agencies, code, err := s.agency.GetAll(ctx)
+	agencies, _, code, err := s.agency.GetAll(ctx, agencyEntity.GetAllRequest{Page: 1, Limit: -1})
 	if err != nil {
 		return nil, code, errors.Wrap(ctx, err)
 	}

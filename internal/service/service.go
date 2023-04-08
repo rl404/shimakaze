@@ -33,7 +33,7 @@ type Service interface {
 	GetVtuberModelCount(ctx context.Context) (*vtuberModelCount, int, error)
 	GetVtuberInAgencyCount(ctx context.Context) (*vtuberInAgencyCount, int, error)
 
-	GetAgencies(ctx context.Context) ([]agency, int, error)
+	GetAgencies(ctx context.Context, params GetAgenciesRequest) ([]agency, *pagination, int, error)
 	GetAgencyByID(ctx context.Context, id int64) (*agency, int, error)
 	GetAgencyCount(ctx context.Context) (int, int, error)
 

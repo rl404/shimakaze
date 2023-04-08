@@ -50,3 +50,15 @@ func (m *Mongo) agencyFromEntity(a entity.Agency) *agency {
 		UpdatedAt:  a.UpdatedAt,
 	}
 }
+
+func (m *Mongo) convertSort(sort string) bson.D {
+	if sort == "" {
+		sort = "name"
+	}
+
+	if sort[0] == '-' {
+		return bson.D{{Key: sort[1:], Value: -1}}
+	}
+
+	return bson.D{{Key: sort, Value: 1}}
+}

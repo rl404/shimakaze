@@ -25,6 +25,37 @@ const docTemplate = `{
                     "Agency"
                 ],
                 "summary": "Get agency data.",
+                "parameters": [
+                    {
+                        "enum": [
+                            "name",
+                            "-name",
+                            "member",
+                            "-member",
+                            "subscriber",
+                            "-subscriber"
+                        ],
+                        "type": "string",
+                        "default": "name",
+                        "description": "sort",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -333,6 +364,43 @@ const docTemplate = `{
                                             "items": {
                                                 "$ref": "#/definitions/service.vtuberDebutRetireCount"
                                             }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/statistics/vtubers/in-agency-count": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Statistic"
+                ],
+                "summary": "Get vtuber in agency count.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/service.vtuberInAgencyCount"
                                         }
                                     }
                                 }
@@ -1324,6 +1392,17 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "service.vtuberInAgencyCount": {
+            "type": "object",
+            "properties": {
+                "in_agency": {
+                    "type": "integer"
+                },
+                "not_in_agency": {
+                    "type": "integer"
                 }
             }
         },

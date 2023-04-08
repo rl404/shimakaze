@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/rl404/shimakaze/internal/domain/agency/entity"
 	vtuberEntity "github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	wikiaEntity "github.com/rl404/shimakaze/internal/domain/wikia/entity"
 	"github.com/rl404/shimakaze/internal/errors"
@@ -89,7 +90,7 @@ func (s *service) getVtuberImage(ctx context.Context, id int64) string {
 }
 
 func (s *service) getAgencyMap(ctx context.Context) map[string]vtuberEntity.Agency {
-	agencies, _, err := s.agency.GetAll(ctx)
+	agencies, _, _, err := s.agency.GetAll(ctx, entity.GetAllRequest{Page: 1, Limit: -1})
 	if err != nil {
 		errors.Wrap(ctx, err)
 		return nil
