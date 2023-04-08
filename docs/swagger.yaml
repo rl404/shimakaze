@@ -526,7 +526,7 @@ paths:
         description: mode
         enum:
         - all
-        - stats
+        - simple
         in: query
         name: mode
         type: string

@@ -328,7 +328,7 @@ func (s *service) GetVtuberAgencyTrees(ctx context.Context) (*vtuberAgencyTree, 
 
 // GetVtubersRequest is get vtubers request model.
 type GetVtubersRequest struct {
-	Mode               entity.SearchMode    `validate:"oneof=all stats" mod:"default=all,trim,lcase"`
+	Mode               entity.SearchMode    `validate:"oneof=all simple" mod:"default=all,trim,lcase"`
 	Names              string               `validate:"omitempty,gte=3" mod:"trim,lcase"`
 	Name               string               `validate:"omitempty,gte=3" mod:"trim,lcase"`
 	OriginalName       string               `validate:"omitempty,gte=3" mod:"trim,lcase"`

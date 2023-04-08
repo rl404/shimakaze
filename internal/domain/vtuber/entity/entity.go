@@ -78,8 +78,8 @@ type SearchMode string
 
 // Available search mode.
 const (
-	SearchModeAll   SearchMode = "all"
-	SearchModeStats SearchMode = "stats"
+	SearchModeAll    SearchMode = "all"
+	SearchModeSimple SearchMode = "simple"
 )
 
 // GetAllRequest is get all request model.

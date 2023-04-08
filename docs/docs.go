@@ -469,7 +469,7 @@ const docTemplate = `{
                     {
                         "enum": [
                             "all",
-                            "stats"
+                            "simple"
                         ],
                         "type": "string",
                         "default": "all",
