@@ -153,3 +153,25 @@ func (api *API) handleGetVtuber3DModelerCount(w http.ResponseWriter, r *http.Req
 	cnt, code, err := api.service.GetVtuber3DModelerCount(r.Context(), service.GetVtuberDesignerCountRequest{Top: top})
 	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
 }
+
+// @summary Get vtuber average video count.
+// @tags Statistic
+// @produce json
+// @success 200 {object} utils.Response{data=float64}
+// @failure 500 {object} utils.Response
+// @router /statistics/vtubers/average-video-count [get]
+func (api *API) handleGetVtuberAverageVideoCount(w http.ResponseWriter, r *http.Request) {
+	avg, code, err := api.service.GetVtuberAverageVideoCount(r.Context())
+	utils.ResponseWithJSON(w, code, avg, errors.Wrap(r.Context(), err))
+}
+
+// @summary Get vtuber average video duration.
+// @tags Statistic
+// @produce json
+// @success 200 {object} utils.Response{data=float64}
+// @failure 500 {object} utils.Response
+// @router /statistics/vtubers/average-video-duration [get]
+func (api *API) handleGetVtuberAverageVideoDuration(w http.ResponseWriter, r *http.Request) {
+	avg, code, err := api.service.GetVtuberAverageVideoDuration(r.Context())
+	utils.ResponseWithJSON(w, code, avg, errors.Wrap(r.Context(), err))
+}

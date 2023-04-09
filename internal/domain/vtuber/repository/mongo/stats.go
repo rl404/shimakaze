@@ -332,3 +332,59 @@ func (m *Mongo) Get2DModelerCount(ctx context.Context, top int) ([]entity.Design
 func (m *Mongo) Get3DModelerCount(ctx context.Context, top int) ([]entity.DesignerCount, int, error) {
 	return m.getdesignerCount(ctx, top, "character_3d_modelers")
 }
+
+// GetAverageVideoCount to get average video count.
+func (m *Mongo) GetAverageVideoCount(ctx context.Context) (float64, int, error) {
+	newFieldStage := bson.D{{Key: "$addFields", Value: bson.M{
+		"channels": bson.M{"$map": bson.M{
+			"input": "$channels",
+			"as":    "channel",
+			"in": bson.M{
+				"$mergeObjects": bson.A{"$$channel", bson.M{
+					"video_count": bson.M{"$size": "$$channel.videos"},
+				}},
+			},
+		}}}}}
+	newFieldStage2 := bson.D{{Key: "$addFields", Value: bson.M{"video_count": bson.M{"$sum": "$channels.video_count"}}}}
+	projectStage := bson.D{{Key: "$project", Value: bson.M{"name": 1, "video_count": 1}}}
+	groupStage := bson.D{{Key: "$group", Value: bson.M{"_id": nil, "avg": bson.M{"$avg": "$video_count"}}}}
+
+	avgCursor, err := m.db.Aggregate(ctx, m.getPipeline(newFieldStage, newFieldStage2, projectStage, groupStage))
+	if err != nil {
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	var avg []map[string]float64
+	if err := avgCursor.All(ctx, &avg); err != nil {
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	return avg[0]["avg"], http.StatusOK, nil
+}
+
+// GetAverageVideoDuration to get average video duration.
+func (m *Mongo) GetAverageVideoDuration(ctx context.Context) (float64, int, error) {
+	projectStage := bson.D{{Key: "$project", Value: bson.M{"videos": "$channels.videos"}}}
+	unwindStage := bson.D{{Key: "$unwind", Value: bson.M{"path": "$videos"}}}
+	matchStage := bson.D{{Key: "$match", Value: bson.M{"videos.end_date": bson.M{"$ne": nil}}}}
+	newFieldStage := bson.D{{Key: "$addFields", Value: bson.M{"duration": bson.M{
+		"$dateDiff": bson.M{
+			"startDate": "$videos.start_date",
+			"endDate":   "$videos.end_date",
+			"unit":      "second",
+		},
+	}}}}
+	groupStage := bson.D{{Key: "$group", Value: bson.M{"_id": nil, "avg": bson.M{"$avg": "$duration"}}}}
+
+	avgCursor, err := m.db.Aggregate(ctx, m.getPipeline(projectStage, unwindStage, unwindStage, matchStage, newFieldStage, groupStage))
+	if err != nil {
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	var avg []map[string]float64
+	if err := avgCursor.All(ctx, &avg); err != nil {
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	return avg[0]["avg"], http.StatusOK, nil
+}

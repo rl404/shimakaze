@@ -188,6 +188,104 @@ const docTemplate = `{
                 }
             }
         },
+        "/statistics/vtubers/2d-modeler-count": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Statistic"
+                ],
+                "summary": "Get vtuber character 2d modeler count.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "top count",
+                        "name": "top",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/service.vtuberDesignerCount"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/statistics/vtubers/3d-modeler-count": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Statistic"
+                ],
+                "summary": "Get vtuber character 3d modeler count.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "top count",
+                        "name": "top",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/service.vtuberDesignerCount"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/statistics/vtubers/average-active-time": {
             "get": {
                 "produces": [
@@ -197,6 +295,80 @@ const docTemplate = `{
                     "Statistic"
                 ],
                 "summary": "Get vtuber average active time.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "number"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/statistics/vtubers/average-video-count": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Statistic"
+                ],
+                "summary": "Get vtuber average video count.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "number"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/statistics/vtubers/average-video-duration": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Statistic"
+                ],
+                "summary": "Get vtuber average video duration.",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -379,6 +551,55 @@ const docTemplate = `{
                 }
             }
         },
+        "/statistics/vtubers/designer-count": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Statistic"
+                ],
+                "summary": "Get vtuber character designer count.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "top count",
+                        "name": "top",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/service.vtuberDesignerCount"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/statistics/vtubers/in-agency-count": {
             "get": {
                 "produces": [
@@ -440,6 +661,62 @@ const docTemplate = `{
                                             "type": "array",
                                             "items": {
                                                 "$ref": "#/definitions/service.vtuberModelCount"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/statistics/vtubers/subscriber-count": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Statistic"
+                ],
+                "summary": "Get vtuber subscriber count.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 100000,
+                        "description": "interval",
+                        "name": "interval",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 5000000,
+                        "description": "max",
+                        "name": "max",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/service.vtuberSubscriberCount"
                                             }
                                         }
                                     }
@@ -1333,6 +1610,17 @@ const docTemplate = `{
                 }
             }
         },
+        "service.vtuberDesignerCount": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "service.vtuberFamilyTree": {
             "type": "object",
             "properties": {
@@ -1430,6 +1718,20 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "retired": {
+                    "type": "integer"
+                }
+            }
+        },
+        "service.vtuberSubscriberCount": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "max": {
+                    "type": "integer"
+                },
+                "min": {
                     "type": "integer"
                 }
             }

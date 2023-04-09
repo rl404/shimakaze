@@ -217,3 +217,41 @@ func (c *Cache) Get3DModelerCount(ctx context.Context, top int) (data []entity.D
 
 	return data, code, nil
 }
+
+// GetAverageVideoCount to get average video count.
+func (c *Cache) GetAverageVideoCount(ctx context.Context) (data float64, code int, err error) {
+	key := utils.GetKey("vtuber", "stats", "average-video-count")
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.GetAverageVideoCount(ctx)
+	if err != nil {
+		return 0, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
+}
+
+// GetAverageVideoDuration to get average video duration.
+func (c *Cache) GetAverageVideoDuration(ctx context.Context) (data float64, code int, err error) {
+	key := utils.GetKey("vtuber", "stats", "average-video-duration")
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.GetAverageVideoDuration(ctx)
+	if err != nil {
+		return 0, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
+}

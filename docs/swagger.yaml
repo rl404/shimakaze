@@ -164,6 +164,13 @@ definitions:
       year:
         type: integer
     type: object
+  service.vtuberDesignerCount:
+    properties:
+      count:
+        type: integer
+      name:
+        type: string
+    type: object
   service.vtuberFamilyTree:
     properties:
       links:
@@ -227,6 +234,15 @@ definitions:
       active:
         type: integer
       retired:
+        type: integer
+    type: object
+  service.vtuberSubscriberCount:
+    properties:
+      count:
+        type: integer
+      max:
+        type: integer
+      min:
         type: integer
     type: object
   service.vtuberVideo:
@@ -366,6 +382,64 @@ paths:
       summary: Get agency count.
       tags:
       - Statistic
+  /statistics/vtubers/2d-modeler-count:
+    get:
+      parameters:
+      - default: 10
+        description: top count
+        in: query
+        name: top
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/service.vtuberDesignerCount'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get vtuber character 2d modeler count.
+      tags:
+      - Statistic
+  /statistics/vtubers/3d-modeler-count:
+    get:
+      parameters:
+      - default: 10
+        description: top count
+        in: query
+        name: top
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/service.vtuberDesignerCount'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get vtuber character 3d modeler count.
+      tags:
+      - Statistic
   /statistics/vtubers/average-active-time:
     get:
       produces:
@@ -385,6 +459,48 @@ paths:
           schema:
             $ref: '#/definitions/utils.Response'
       summary: Get vtuber average active time.
+      tags:
+      - Statistic
+  /statistics/vtubers/average-video-count:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  type: number
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get vtuber average video count.
+      tags:
+      - Statistic
+  /statistics/vtubers/average-video-duration:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  type: number
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get vtuber average video duration.
       tags:
       - Statistic
   /statistics/vtubers/count:
@@ -475,6 +591,35 @@ paths:
       summary: Get vtuber debut & retire count yearly.
       tags:
       - Statistic
+  /statistics/vtubers/designer-count:
+    get:
+      parameters:
+      - default: 10
+        description: top count
+        in: query
+        name: top
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/service.vtuberDesignerCount'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get vtuber character designer count.
+      tags:
+      - Statistic
   /statistics/vtubers/in-agency-count:
     get:
       produces:
@@ -517,6 +662,40 @@ paths:
           schema:
             $ref: '#/definitions/utils.Response'
       summary: Get vtuber 2d & 3d model count.
+      tags:
+      - Statistic
+  /statistics/vtubers/subscriber-count:
+    get:
+      parameters:
+      - default: 100000
+        description: interval
+        in: query
+        name: interval
+        type: integer
+      - default: 5000000
+        description: max
+        in: query
+        name: max
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/service.vtuberSubscriberCount'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get vtuber subscriber count.
       tags:
       - Statistic
   /vtubers:

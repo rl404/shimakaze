@@ -247,3 +247,21 @@ func (s *service) GetVtuber3DModelerCount(ctx context.Context, data GetVtuberDes
 
 	return res, http.StatusOK, nil
 }
+
+// GetVtuberAverageVideoCount to get vtuber average video count.
+func (s *service) GetVtuberAverageVideoCount(ctx context.Context) (float64, int, error) {
+	avg, code, err := s.vtuber.GetAverageVideoCount(ctx)
+	if err != nil {
+		return 0, code, errors.Wrap(ctx, err)
+	}
+	return avg, http.StatusOK, nil
+}
+
+// GetVtuberAverageVideoDuration to get vtuber average video duration.
+func (s *service) GetVtuberAverageVideoDuration(ctx context.Context) (float64, int, error) {
+	avg, code, err := s.vtuber.GetAverageVideoDuration(ctx)
+	if err != nil {
+		return 0, code, errors.Wrap(ctx, err)
+	}
+	return avg, http.StatusOK, nil
+}
