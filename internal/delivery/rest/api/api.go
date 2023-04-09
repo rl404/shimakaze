@@ -66,6 +66,7 @@ func (api *API) Register(r chi.Router, nrApp *newrelic.Application) {
 		r.Get("/statistics/vtubers/video-count-by-date", api.handleGetVtuberVideoCountByDate)
 		r.Get("/statistics/vtubers/video-count", api.handleGetVtuberVideoCount)
 		r.Get("/statistics/vtubers/video-duration", api.handleGetVtuberVideoDuration)
+		r.Get("/statistics/vtubers/birthday-count", api.handleGetVtuberBirthdayCount)
 
 		r.Get("/statistics/agencies/count", api.handleGetAgencyCount)
 	})

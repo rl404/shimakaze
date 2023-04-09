@@ -312,3 +312,22 @@ func (c *Cache) GetVideoDuration(ctx context.Context, top int) (data []entity.Vi
 
 	return data, code, nil
 }
+
+// GetBirthdayCount to get birthday count.
+func (c *Cache) GetBirthdayCount(ctx context.Context) (data []entity.BirthdayCount, code int, err error) {
+	key := utils.GetKey("vtuber", "stats", "birthday-count")
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.GetBirthdayCount(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
+}

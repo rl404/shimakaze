@@ -223,3 +223,14 @@ func (api *API) handleGetVtuberVideoDuration(w http.ResponseWriter, r *http.Requ
 	cnt, code, err := api.service.GetVtuberVideoDuration(r.Context(), service.GetVtuberVideoDurationRequest{Top: top})
 	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
 }
+
+// @summary Get vtuber birthday count.
+// @tags Statistic
+// @produce json
+// @success 200 {object} utils.Response{data=[]service.vtuberBirthdayCount}
+// @failure 500 {object} utils.Response
+// @router /statistics/vtubers/birthday-count [get]
+func (api *API) handleGetVtuberBirthdayCount(w http.ResponseWriter, r *http.Request) {
+	cnt, code, err := api.service.GetVtuberBirthdayCount(r.Context())
+	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+}

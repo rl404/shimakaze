@@ -37,4 +37,5 @@ type Repository interface {
 	GetVideoCountByDate(ctx context.Context, hourly, daily bool) ([]entity.VideoCountByDate, int, error)
 	GetVideoCount(ctx context.Context, top int) ([]entity.VideoCount, int, error)
 	GetVideoDuration(ctx context.Context, top int) ([]entity.VideoDuration, int, error)
+	GetBirthdayCount(ctx context.Context) ([]entity.BirthdayCount, int, error)
 }

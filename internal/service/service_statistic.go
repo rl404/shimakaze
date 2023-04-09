@@ -358,3 +358,28 @@ func (s *service) GetVtuberVideoDuration(ctx context.Context, data GetVtuberVide
 
 	return res, http.StatusOK, nil
 }
+
+type vtuberBirthdayCount struct {
+	Month int `json:"month"`
+	Day   int `json:"day"`
+	Count int `json:"count"`
+}
+
+// GetVtuberBirthdayCount to get vtuber birthday count.
+func (s *service) GetVtuberBirthdayCount(ctx context.Context) ([]vtuberBirthdayCount, int, error) {
+	cnt, code, err := s.vtuber.GetBirthdayCount(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	res := make([]vtuberBirthdayCount, len(cnt))
+	for i, c := range cnt {
+		res[i] = vtuberBirthdayCount{
+			Month: c.Month,
+			Day:   c.Day,
+			Count: c.Count,
+		}
+	}
+
+	return res, http.StatusOK, nil
+}

@@ -182,3 +182,10 @@ type VideoDuration struct {
 	Name     string
 	Duration float64
 }
+
+// BirthdayCount is entity for birthday count.
+type BirthdayCount struct {
+	Month int
+	Day   int
+	Count int
+}

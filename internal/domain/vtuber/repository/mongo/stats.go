@@ -515,3 +515,41 @@ func (m *Mongo) GetVideoDuration(ctx context.Context, top int) ([]entity.VideoDu
 
 	return res, http.StatusOK, nil
 }
+
+type birthdayCount struct {
+	Month int `bson:"month"`
+	Day   int `bson:"day"`
+	Count int `bson:"count"`
+}
+
+// GetBirthdayCount to get birthday count.
+func (m *Mongo) GetBirthdayCount(ctx context.Context) ([]entity.BirthdayCount, int, error) {
+	groupStage := bson.D{{Key: "$group", Value: bson.M{"_id": bson.M{
+		"month": bson.M{"$month": "$birthday"},
+		"day":   bson.M{"$dayOfMonth": "$birthday"},
+	}, "count": bson.M{"$sum": 1}}}}
+	projectStage := bson.D{{Key: "$project", Value: bson.M{"month": "$_id.month", "day": "$_id.day", "count": "$count"}}}
+	matchStage := bson.D{{Key: "$match", Value: bson.M{"month": bson.M{"$gt": 0}, "day": bson.M{"$gt": 0}}}}
+	sortStage := bson.D{{Key: "$sort", Value: bson.M{"month": 1, "day": 1}}}
+
+	cntCursor, err := m.db.Aggregate(ctx, m.getPipeline(groupStage, projectStage, matchStage, sortStage))
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	var cnt []birthdayCount
+	if err := cntCursor.All(ctx, &cnt); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	res := make([]entity.BirthdayCount, len(cnt))
+	for i, c := range cnt {
+		res[i] = entity.BirthdayCount{
+			Month: c.Month,
+			Day:   c.Day,
+			Count: c.Count,
+		}
+	}
+
+	return res, http.StatusOK, nil
+}

@@ -404,6 +404,46 @@
                 }
             }
         },
+        "/statistics/vtubers/birthday-count": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Statistic"
+                ],
+                "summary": "Get vtuber birthday count.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/service.vtuberBirthdayCount"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/statistics/vtubers/count": {
             "get": {
                 "produces": [
@@ -1750,6 +1790,20 @@
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "service.vtuberBirthdayCount": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "day": {
+                    "type": "integer"
+                },
+                "month": {
+                    "type": "integer"
                 }
             }
         },
