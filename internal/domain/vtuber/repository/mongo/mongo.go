@@ -234,7 +234,7 @@ func (m *Mongo) GetAllForAgencyTree(ctx context.Context) ([]entity.Vtuber, int, 
 
 // GetAll to get all data.
 func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity.Vtuber, int, int, error) {
-	newFieldStage := bson.D{{Key: "$addFields", Value: bson.M{"subscriber": bson.M{"$max": "$channels.subscriber"}}}}
+	newFieldStage := bson.D{{Key: "$addFields", Value: bson.M{"subscriber": bson.M{"$ifNull": bson.A{bson.M{"$max": "$channels.subscriber"}, 0}}}}}
 	matchStage := bson.D{}
 	projectStage := bson.D{}
 	sortStage := bson.D{{Key: "$sort", Value: m.convertSort(data.Sort)}}
@@ -395,7 +395,7 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 	}
 
 	if data.EndSubscriber > 0 {
-		matchStage = m.addMatch(matchStage, "subscriber", bson.M{"$lte": data.EndSubscriber})
+		matchStage = m.addMatch(matchStage, "subscriber", bson.M{"$lt": data.EndSubscriber})
 	}
 
 	if data.Limit > 0 {
