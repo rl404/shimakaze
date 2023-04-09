@@ -389,14 +389,14 @@ func (m *Mongo) GetAverageVideoDuration(ctx context.Context) (float64, int, erro
 	return avg[0]["avg"], http.StatusOK, nil
 }
 
-type videoCount struct {
+type videoCountByDate struct {
 	Day   int `bson:"day"`
 	Hour  int `bson:"hour"`
 	Count int `bson:"count"`
 }
 
-// GetVideoCount to get video count.
-func (m *Mongo) GetVideoCount(ctx context.Context, hourly, daily bool) ([]entity.VideoCount, int, error) {
+// GetVideoCountByDate to get video count by date.
+func (m *Mongo) GetVideoCountByDate(ctx context.Context, hourly, daily bool) ([]entity.VideoCountByDate, int, error) {
 	projectStage := bson.D{{Key: "$project", Value: bson.M{"videos": "$channels.videos"}}}
 	unwindStage := bson.D{{Key: "$unwind", Value: bson.M{"path": "$videos"}}}
 	matchStage := bson.D{{Key: "$match", Value: bson.M{"videos.start_date": bson.M{"$ne": nil}}}}
@@ -417,6 +417,43 @@ func (m *Mongo) GetVideoCount(ctx context.Context, hourly, daily bool) ([]entity
 		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
 	}
 
+	var cnt []videoCountByDate
+	if err := cntCursor.All(ctx, &cnt); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	res := make([]entity.VideoCountByDate, len(cnt))
+	for i, c := range cnt {
+		res[i] = entity.VideoCountByDate{
+			Day:   c.Day,
+			Hour:  c.Hour,
+			Count: c.Count,
+		}
+	}
+
+	return res, http.StatusOK, nil
+}
+
+type videoCount struct {
+	ID    int64  `bson:"id"`
+	Name  string `bson:"name"`
+	Count int    `bson:"count"`
+}
+
+// GetVideoCount to get video count.
+func (m *Mongo) GetVideoCount(ctx context.Context, top int) ([]entity.VideoCount, int, error) {
+	projectStage := bson.D{{Key: "$project", Value: bson.M{"id": 1, "name": 1, "videos": "$channels.videos"}}}
+	unwindStage := bson.D{{Key: "$unwind", Value: bson.M{"path": "$videos"}}}
+	groupStage := bson.D{{Key: "$group", Value: bson.M{"_id": bson.M{"id": "$id", "name": "$name"}, "count": bson.M{"$sum": 1}}}}
+	projectStage2 := bson.D{{Key: "$project", Value: bson.M{"id": "$_id.id", "name": "$_id.name", "count": "$count"}}}
+	sortStage := bson.D{{Key: "$sort", Value: bson.M{"count": -1}}}
+	limitStage := bson.D{{Key: "$limit", Value: top}}
+
+	cntCursor, err := m.db.Aggregate(ctx, m.getPipeline(projectStage, unwindStage, unwindStage, groupStage, projectStage2, sortStage, limitStage))
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
 	var cnt []videoCount
 	if err := cntCursor.All(ctx, &cnt); err != nil {
 		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
@@ -425,9 +462,54 @@ func (m *Mongo) GetVideoCount(ctx context.Context, hourly, daily bool) ([]entity
 	res := make([]entity.VideoCount, len(cnt))
 	for i, c := range cnt {
 		res[i] = entity.VideoCount{
-			Day:   c.Day,
-			Hour:  c.Hour,
+			ID:    c.ID,
+			Name:  c.Name,
 			Count: c.Count,
+		}
+	}
+
+	return res, http.StatusOK, nil
+}
+
+type videoDuration struct {
+	ID       int64  `bson:"id"`
+	Name     string `bson:"name"`
+	Duration int    `bson:"duration"`
+}
+
+// GetVideoDuration to get video duration.
+func (m *Mongo) GetVideoDuration(ctx context.Context, top int) ([]entity.VideoDuration, int, error) {
+	projectStage := bson.D{{Key: "$project", Value: bson.M{"id": 1, "name": 1, "videos": "$channels.videos"}}}
+	unwindStage := bson.D{{Key: "$unwind", Value: bson.M{"path": "$videos"}}}
+	matchStage := bson.D{{Key: "$match", Value: bson.M{"videos.end_date": bson.M{"$ne": nil}}}}
+	newFieldStage := bson.D{{Key: "$addFields", Value: bson.M{"duration": bson.M{
+		"$dateDiff": bson.M{
+			"startDate": "$videos.start_date",
+			"endDate":   "$videos.end_date",
+			"unit":      "second",
+		},
+	}}}}
+	groupStage := bson.D{{Key: "$group", Value: bson.M{"_id": bson.M{"id": "$id", "name": "$name"}, "duration": bson.M{"$sum": "$duration"}}}}
+	projectStage2 := bson.D{{Key: "$project", Value: bson.M{"id": "$_id.id", "name": "$_id.name", "duration": "$duration"}}}
+	sortStage := bson.D{{Key: "$sort", Value: bson.M{"duration": -1}}}
+	limitStage := bson.D{{Key: "$limit", Value: top}}
+
+	durCursor, err := m.db.Aggregate(ctx, m.getPipeline(projectStage, unwindStage, unwindStage, matchStage, newFieldStage, groupStage, projectStage2, sortStage, limitStage))
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	var dur []videoDuration
+	if err := durCursor.All(ctx, &dur); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	res := make([]entity.VideoDuration, len(dur))
+	for i, c := range dur {
+		res[i] = entity.VideoDuration{
+			ID:       c.ID,
+			Name:     c.Name,
+			Duration: c.Duration,
 		}
 	}
 

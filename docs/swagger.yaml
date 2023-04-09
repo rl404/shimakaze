@@ -264,11 +264,30 @@ definitions:
     properties:
       count:
         type: integer
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  service.vtuberVideoCountByDate:
+    properties:
+      count:
+        type: integer
       day:
         description: 1=sunday 2=monday
         type: integer
       hour:
         type: integer
+    type: object
+  service.vtuberVideoDuration:
+    properties:
+      duration:
+        description: second
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
     type: object
   utils.Response:
     properties:
@@ -414,6 +433,10 @@ paths:
                     $ref: '#/definitions/service.vtuberDesignerCount'
                   type: array
               type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
         "500":
           description: Internal Server Error
           schema:
@@ -443,6 +466,10 @@ paths:
                     $ref: '#/definitions/service.vtuberDesignerCount'
                   type: array
               type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
         "500":
           description: Internal Server Error
           schema:
@@ -623,6 +650,10 @@ paths:
                     $ref: '#/definitions/service.vtuberDesignerCount'
                   type: array
               type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
         "500":
           description: Internal Server Error
           schema:
@@ -701,6 +732,10 @@ paths:
                     $ref: '#/definitions/service.vtuberSubscriberCount'
                   type: array
               type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
         "500":
           description: Internal Server Error
           schema:
@@ -709,6 +744,39 @@ paths:
       tags:
       - Statistic
   /statistics/vtubers/video-count:
+    get:
+      parameters:
+      - default: 10
+        description: top count
+        in: query
+        name: top
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/service.vtuberVideoCount'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get vtuber video count.
+      tags:
+      - Statistic
+  /statistics/vtubers/video-count-by-date:
     get:
       parameters:
       - description: hourly
@@ -730,14 +798,51 @@ paths:
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/service.vtuberVideoCount'
+                    $ref: '#/definitions/service.vtuberVideoCountByDate'
                   type: array
               type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.Response'
-      summary: Get vtuber video count hourly.
+      summary: Get vtuber video count by date.
+      tags:
+      - Statistic
+  /statistics/vtubers/video-duration:
+    get:
+      parameters:
+      - default: 10
+        description: top count
+        in: query
+        name: top
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/service.vtuberVideoDuration'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get vtuber video duration.
       tags:
       - Statistic
   /vtubers:

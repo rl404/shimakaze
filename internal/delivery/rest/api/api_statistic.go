@@ -103,6 +103,7 @@ func (api *API) handleGetVtuberInAgencyCount(w http.ResponseWriter, r *http.Requ
 // @param interval query integer false "interval" default(100000)
 // @param max query integer false "max" default(5000000)
 // @success 200 {object} utils.Response{data=[]service.vtuberSubscriberCount}
+// @failure 400 {object} utils.Response
 // @failure 500 {object} utils.Response
 // @router /statistics/vtubers/subscriber-count [get]
 func (api *API) handleGetVtuberSubscriberCount(w http.ResponseWriter, r *http.Request) {
@@ -120,6 +121,7 @@ func (api *API) handleGetVtuberSubscriberCount(w http.ResponseWriter, r *http.Re
 // @produce json
 // @param top query integer false "top count" default(10)
 // @success 200 {object} utils.Response{data=[]service.vtuberDesignerCount}
+// @failure 400 {object} utils.Response
 // @failure 500 {object} utils.Response
 // @router /statistics/vtubers/designer-count [get]
 func (api *API) handleGetVtuberDesignerCount(w http.ResponseWriter, r *http.Request) {
@@ -133,6 +135,7 @@ func (api *API) handleGetVtuberDesignerCount(w http.ResponseWriter, r *http.Requ
 // @produce json
 // @param top query integer false "top count" default(10)
 // @success 200 {object} utils.Response{data=[]service.vtuberDesignerCount}
+// @failure 400 {object} utils.Response
 // @failure 500 {object} utils.Response
 // @router /statistics/vtubers/2d-modeler-count [get]
 func (api *API) handleGetVtuber2DModelerCount(w http.ResponseWriter, r *http.Request) {
@@ -146,6 +149,7 @@ func (api *API) handleGetVtuber2DModelerCount(w http.ResponseWriter, r *http.Req
 // @produce json
 // @param top query integer false "top count" default(10)
 // @success 200 {object} utils.Response{data=[]service.vtuberDesignerCount}
+// @failure 400 {object} utils.Response
 // @failure 500 {object} utils.Response
 // @router /statistics/vtubers/3d-modeler-count [get]
 func (api *API) handleGetVtuber3DModelerCount(w http.ResponseWriter, r *http.Request) {
@@ -176,17 +180,46 @@ func (api *API) handleGetVtuberAverageVideoDuration(w http.ResponseWriter, r *ht
 	utils.ResponseWithJSON(w, code, avg, errors.Wrap(r.Context(), err))
 }
 
-// @summary Get vtuber video count hourly.
+// @summary Get vtuber video count by date.
 // @tags Statistic
 // @produce json
 // @param hourly query boolean false "hourly"
 // @param daily query boolean false "daily"
+// @success 200 {object} utils.Response{data=[]service.vtuberVideoCountByDate}
+// @failure 400 {object} utils.Response
+// @failure 500 {object} utils.Response
+// @router /statistics/vtubers/video-count-by-date [get]
+func (api *API) handleGetVtuberVideoCountByDate(w http.ResponseWriter, r *http.Request) {
+	hourly, _ := strconv.ParseBool(r.URL.Query().Get("hourly"))
+	daily, _ := strconv.ParseBool(r.URL.Query().Get("daily"))
+	cnt, code, err := api.service.GetVtuberVideoCountByDate(r.Context(), hourly, daily)
+	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+}
+
+// @summary Get vtuber video count.
+// @tags Statistic
+// @produce json
+// @param top query integer false "top count" default(10)
 // @success 200 {object} utils.Response{data=[]service.vtuberVideoCount}
+// @failure 400 {object} utils.Response
 // @failure 500 {object} utils.Response
 // @router /statistics/vtubers/video-count [get]
 func (api *API) handleGetVtuberVideoCount(w http.ResponseWriter, r *http.Request) {
-	hourly, _ := strconv.ParseBool(r.URL.Query().Get("hourly"))
-	daily, _ := strconv.ParseBool(r.URL.Query().Get("daily"))
-	cnt, code, err := api.service.GetVtuberVideoCount(r.Context(), hourly, daily)
+	top, _ := strconv.Atoi(r.URL.Query().Get("top"))
+	cnt, code, err := api.service.GetVtuberVideoCount(r.Context(), service.GetVtuberVideoCountRequest{Top: top})
+	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+}
+
+// @summary Get vtuber video duration.
+// @tags Statistic
+// @produce json
+// @param top query integer false "top count" default(10)
+// @success 200 {object} utils.Response{data=[]service.vtuberVideoDuration}
+// @failure 400 {object} utils.Response
+// @failure 500 {object} utils.Response
+// @router /statistics/vtubers/video-duration [get]
+func (api *API) handleGetVtuberVideoDuration(w http.ResponseWriter, r *http.Request) {
+	top, _ := strconv.Atoi(r.URL.Query().Get("top"))
+	cnt, code, err := api.service.GetVtuberVideoDuration(r.Context(), service.GetVtuberVideoDurationRequest{Top: top})
 	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
 }

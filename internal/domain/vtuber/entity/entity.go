@@ -162,9 +162,23 @@ type DesignerCount struct {
 	Count int
 }
 
-// VideoCount is entity for video count.
-type VideoCount struct {
+// VideoCountByDate is entity for video count by date.
+type VideoCountByDate struct {
 	Day   int
 	Hour  int
 	Count int
+}
+
+// VideoCount is entity for video count.
+type VideoCount struct {
+	ID    int64
+	Name  string
+	Count int
+}
+
+// VideoDuration is entity for video duration.
+type VideoDuration struct {
+	ID       int64
+	Name     string
+	Duration int
 }

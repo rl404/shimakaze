@@ -266,15 +266,49 @@ func (s *service) GetVtuberAverageVideoDuration(ctx context.Context) (float64, i
 	return avg, http.StatusOK, nil
 }
 
-type vtuberVideoCount struct {
+type vtuberVideoCountByDate struct {
 	Day   int `json:"day"` // 1=sunday 2=monday
 	Hour  int `json:"hour"`
 	Count int `json:"count"`
 }
 
+// GetVtuberVideoCountByDate to get vtuber video count by date.
+func (s *service) GetVtuberVideoCountByDate(ctx context.Context, hourly, daily bool) ([]vtuberVideoCountByDate, int, error) {
+	cnt, code, err := s.vtuber.GetVideoCountByDate(ctx, hourly, daily)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	res := make([]vtuberVideoCountByDate, len(cnt))
+	for i, c := range cnt {
+		res[i] = vtuberVideoCountByDate{
+			Day:   c.Day,
+			Hour:  c.Hour,
+			Count: c.Count,
+		}
+	}
+
+	return res, http.StatusOK, nil
+}
+
+type vtuberVideoCount struct {
+	ID    int64  `json:"id"`
+	Name  string `json:"name"`
+	Count int    `json:"count"`
+}
+
+// GetVtuberVideoCountRequest is get vtuber video count request.
+type GetVtuberVideoCountRequest struct {
+	Top int `validate:"required,gte=-1" mod:"default=10"`
+}
+
 // GetVtuberVideoCount to get vtuber video count.
-func (s *service) GetVtuberVideoCount(ctx context.Context, hourly, daily bool) ([]vtuberVideoCount, int, error) {
-	cnt, code, err := s.vtuber.GetVideoCount(ctx, hourly, daily)
+func (s *service) GetVtuberVideoCount(ctx context.Context, data GetVtuberVideoCountRequest) ([]vtuberVideoCount, int, error) {
+	if err := utils.Validate(&data); err != nil {
+		return nil, http.StatusBadRequest, errors.Wrap(ctx, err)
+	}
+
+	cnt, code, err := s.vtuber.GetVideoCount(ctx, data.Top)
 	if err != nil {
 		return nil, code, errors.Wrap(ctx, err)
 	}
@@ -282,9 +316,43 @@ func (s *service) GetVtuberVideoCount(ctx context.Context, hourly, daily bool) (
 	res := make([]vtuberVideoCount, len(cnt))
 	for i, c := range cnt {
 		res[i] = vtuberVideoCount{
-			Day:   c.Day,
-			Hour:  c.Hour,
+			ID:    c.ID,
+			Name:  c.Name,
 			Count: c.Count,
+		}
+	}
+
+	return res, http.StatusOK, nil
+}
+
+type vtuberVideoDuration struct {
+	ID       int64  `json:"id"`
+	Name     string `json:"name"`
+	Duration int    `json:"duration"` // second
+}
+
+// GetVtuberVideoDurationRequest is get vtuber video duration request.
+type GetVtuberVideoDurationRequest struct {
+	Top int `validate:"required,gte=-1" mod:"default=10"`
+}
+
+// GetVtuberVideoDuration to get vtuber video count.
+func (s *service) GetVtuberVideoDuration(ctx context.Context, data GetVtuberVideoDurationRequest) ([]vtuberVideoDuration, int, error) {
+	if err := utils.Validate(&data); err != nil {
+		return nil, http.StatusBadRequest, errors.Wrap(ctx, err)
+	}
+
+	cnt, code, err := s.vtuber.GetVideoDuration(ctx, data.Top)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	res := make([]vtuberVideoDuration, len(cnt))
+	for i, c := range cnt {
+		res[i] = vtuberVideoDuration{
+			ID:       c.ID,
+			Name:     c.Name,
+			Duration: c.Duration,
 		}
 	}
 

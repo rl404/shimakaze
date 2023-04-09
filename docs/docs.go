@@ -228,6 +228,12 @@ const docTemplate = `{
                             ]
                         }
                     },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -275,6 +281,12 @@ const docTemplate = `{
                                     }
                                 }
                             ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
                         }
                     },
                     "500": {
@@ -591,6 +603,12 @@ const docTemplate = `{
                             ]
                         }
                     },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -724,6 +742,12 @@ const docTemplate = `{
                             ]
                         }
                     },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -741,7 +765,62 @@ const docTemplate = `{
                 "tags": [
                     "Statistic"
                 ],
-                "summary": "Get vtuber video count hourly.",
+                "summary": "Get vtuber video count.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "top count",
+                        "name": "top",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/service.vtuberVideoCount"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/statistics/vtubers/video-count-by-date": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Statistic"
+                ],
+                "summary": "Get vtuber video count by date.",
                 "parameters": [
                     {
                         "type": "boolean",
@@ -770,12 +849,73 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/service.vtuberVideoCount"
+                                                "$ref": "#/definitions/service.vtuberVideoCountByDate"
                                             }
                                         }
                                     }
                                 }
                             ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/statistics/vtubers/video-duration": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Statistic"
+                ],
+                "summary": "Get vtuber video duration.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "top count",
+                        "name": "top",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/service.vtuberVideoDuration"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
                         }
                     },
                     "500": {
@@ -1819,12 +1959,41 @@ const docTemplate = `{
                 "count": {
                     "type": "integer"
                 },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.vtuberVideoCountByDate": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
                 "day": {
                     "description": "1=sunday 2=monday",
                     "type": "integer"
                 },
                 "hour": {
                     "type": "integer"
+                }
+            }
+        },
+        "service.vtuberVideoDuration": {
+            "type": "object",
+            "properties": {
+                "duration": {
+                    "description": "second",
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },
