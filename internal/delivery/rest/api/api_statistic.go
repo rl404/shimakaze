@@ -175,3 +175,18 @@ func (api *API) handleGetVtuberAverageVideoDuration(w http.ResponseWriter, r *ht
 	avg, code, err := api.service.GetVtuberAverageVideoDuration(r.Context())
 	utils.ResponseWithJSON(w, code, avg, errors.Wrap(r.Context(), err))
 }
+
+// @summary Get vtuber video count hourly.
+// @tags Statistic
+// @produce json
+// @param hourly query boolean false "hourly"
+// @param daily query boolean false "daily"
+// @success 200 {object} utils.Response{data=[]service.vtuberVideoCount}
+// @failure 500 {object} utils.Response
+// @router /statistics/vtubers/video-count [get]
+func (api *API) handleGetVtuberVideoCount(w http.ResponseWriter, r *http.Request) {
+	hourly, _ := strconv.ParseBool(r.URL.Query().Get("hourly"))
+	daily, _ := strconv.ParseBool(r.URL.Query().Get("daily"))
+	cnt, code, err := api.service.GetVtuberVideoCount(r.Context(), hourly, daily)
+	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+}

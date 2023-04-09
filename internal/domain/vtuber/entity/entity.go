@@ -161,3 +161,10 @@ type DesignerCount struct {
 	Name  string
 	Count int
 }
+
+// VideoCount is entity for video count.
+type VideoCount struct {
+	Day   int
+	Hour  int
+	Count int
+}

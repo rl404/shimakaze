@@ -265,3 +265,28 @@ func (s *service) GetVtuberAverageVideoDuration(ctx context.Context) (float64, i
 	}
 	return avg, http.StatusOK, nil
 }
+
+type vtuberVideoCount struct {
+	Day   int `json:"day"` // 1=sunday 2=monday
+	Hour  int `json:"hour"`
+	Count int `json:"count"`
+}
+
+// GetVtuberVideoCount to get vtuber video count.
+func (s *service) GetVtuberVideoCount(ctx context.Context, hourly, daily bool) ([]vtuberVideoCount, int, error) {
+	cnt, code, err := s.vtuber.GetVideoCount(ctx, hourly, daily)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	res := make([]vtuberVideoCount, len(cnt))
+	for i, c := range cnt {
+		res[i] = vtuberVideoCount{
+			Day:   c.Day,
+			Hour:  c.Hour,
+			Count: c.Count,
+		}
+	}
+
+	return res, http.StatusOK, nil
+}

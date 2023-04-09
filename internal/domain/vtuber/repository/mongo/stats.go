@@ -388,3 +388,48 @@ func (m *Mongo) GetAverageVideoDuration(ctx context.Context) (float64, int, erro
 
 	return avg[0]["avg"], http.StatusOK, nil
 }
+
+type videoCount struct {
+	Day   int `bson:"day"`
+	Hour  int `bson:"hour"`
+	Count int `bson:"count"`
+}
+
+// GetVideoCount to get video count.
+func (m *Mongo) GetVideoCount(ctx context.Context, hourly, daily bool) ([]entity.VideoCount, int, error) {
+	projectStage := bson.D{{Key: "$project", Value: bson.M{"videos": "$channels.videos"}}}
+	unwindStage := bson.D{{Key: "$unwind", Value: bson.M{"path": "$videos"}}}
+	matchStage := bson.D{{Key: "$match", Value: bson.M{"videos.start_date": bson.M{"$ne": nil}}}}
+	groupStage := bson.D{{Key: "$group", Value: bson.M{"_id": bson.M{}, "count": bson.M{"$sum": 1}}}}
+	projectStage2 := bson.D{{Key: "$project", Value: bson.M{"day": "$_id.day", "hour": "$_id.hour", "count": "$count"}}}
+	sortStage := bson.D{{Key: "$sort", Value: bson.M{"day": 1, "hour": 1}}}
+
+	if hourly {
+		groupStage[0].Value.(bson.M)["_id"].(bson.M)["hour"] = bson.M{"$hour": "$videos.start_date"}
+	}
+
+	if daily {
+		groupStage[0].Value.(bson.M)["_id"].(bson.M)["day"] = bson.M{"$dayOfWeek": "$videos.start_date"}
+	}
+
+	cntCursor, err := m.db.Aggregate(ctx, m.getPipeline(projectStage, unwindStage, unwindStage, matchStage, groupStage, projectStage2, sortStage))
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	var cnt []videoCount
+	if err := cntCursor.All(ctx, &cnt); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	res := make([]entity.VideoCount, len(cnt))
+	for i, c := range cnt {
+		res[i] = entity.VideoCount{
+			Day:   c.Day,
+			Hour:  c.Hour,
+			Count: c.Count,
+		}
+	}
+
+	return res, http.StatusOK, nil
+}

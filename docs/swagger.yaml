@@ -260,6 +260,16 @@ definitions:
       url:
         type: string
     type: object
+  service.vtuberVideoCount:
+    properties:
+      count:
+        type: integer
+      day:
+        description: 1=sunday 2=monday
+        type: integer
+      hour:
+        type: integer
+    type: object
   utils.Response:
     properties:
       data:
@@ -696,6 +706,38 @@ paths:
           schema:
             $ref: '#/definitions/utils.Response'
       summary: Get vtuber subscriber count.
+      tags:
+      - Statistic
+  /statistics/vtubers/video-count:
+    get:
+      parameters:
+      - description: hourly
+        in: query
+        name: hourly
+        type: boolean
+      - description: daily
+        in: query
+        name: daily
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/service.vtuberVideoCount'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get vtuber video count hourly.
       tags:
       - Statistic
   /vtubers:

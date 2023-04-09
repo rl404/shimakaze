@@ -34,4 +34,5 @@ type Repository interface {
 	Get3DModelerCount(ctx context.Context, top int) ([]entity.DesignerCount, int, error)
 	GetAverageVideoCount(ctx context.Context) (float64, int, error)
 	GetAverageVideoDuration(ctx context.Context) (float64, int, error)
+	GetVideoCount(ctx context.Context, hourly, daily bool) ([]entity.VideoCount, int, error)
 }

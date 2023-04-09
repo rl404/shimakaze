@@ -733,6 +733,60 @@ const docTemplate = `{
                 }
             }
         },
+        "/statistics/vtubers/video-count": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Statistic"
+                ],
+                "summary": "Get vtuber video count hourly.",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "hourly",
+                        "name": "hourly",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "daily",
+                        "name": "daily",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/service.vtuberVideoCount"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/vtubers": {
             "get": {
                 "produces": [
@@ -1756,6 +1810,21 @@ const docTemplate = `{
                 },
                 "url": {
                     "type": "string"
+                }
+            }
+        },
+        "service.vtuberVideoCount": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "day": {
+                    "description": "1=sunday 2=monday",
+                    "type": "integer"
+                },
+                "hour": {
+                    "type": "integer"
                 }
             }
         },

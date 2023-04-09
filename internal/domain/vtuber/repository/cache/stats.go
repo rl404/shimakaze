@@ -255,3 +255,22 @@ func (c *Cache) GetAverageVideoDuration(ctx context.Context) (data float64, code
 
 	return data, code, nil
 }
+
+// GetVideoCount to get video count.
+func (c *Cache) GetVideoCount(ctx context.Context, hourly, daily bool) (data []entity.VideoCount, code int, err error) {
+	key := utils.GetKey("vtuber", "stats", "video-count", hourly, daily)
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.GetVideoCount(ctx, hourly, daily)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
+}
