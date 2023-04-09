@@ -326,9 +326,9 @@ func (s *service) GetVtuberVideoCount(ctx context.Context, data GetVtuberVideoCo
 }
 
 type vtuberVideoDuration struct {
-	ID       int64  `json:"id"`
-	Name     string `json:"name"`
-	Duration int    `json:"duration"` // second
+	ID       int64   `json:"id"`
+	Name     string  `json:"name"`
+	Duration float64 `json:"duration"` // second
 }
 
 // GetVtuberVideoDurationRequest is get vtuber video duration request.

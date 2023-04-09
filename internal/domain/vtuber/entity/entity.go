@@ -180,5 +180,5 @@ type VideoCount struct {
 type VideoDuration struct {
 	ID       int64
 	Name     string
-	Duration int
+	Duration float64
 }

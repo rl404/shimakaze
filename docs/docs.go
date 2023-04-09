@@ -1987,7 +1987,7 @@ const docTemplate = `{
             "properties": {
                 "duration": {
                     "description": "second",
-                    "type": "integer"
+                    "type": "number"
                 },
                 "id": {
                     "type": "integer"

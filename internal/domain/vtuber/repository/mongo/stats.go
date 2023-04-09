@@ -472,16 +472,16 @@ func (m *Mongo) GetVideoCount(ctx context.Context, top int) ([]entity.VideoCount
 }
 
 type videoDuration struct {
-	ID       int64  `bson:"id"`
-	Name     string `bson:"name"`
-	Duration int    `bson:"duration"`
+	ID       int64   `bson:"id"`
+	Name     string  `bson:"name"`
+	Duration float64 `bson:"duration"`
 }
 
 // GetVideoDuration to get video duration.
 func (m *Mongo) GetVideoDuration(ctx context.Context, top int) ([]entity.VideoDuration, int, error) {
 	projectStage := bson.D{{Key: "$project", Value: bson.M{"id": 1, "name": 1, "videos": "$channels.videos"}}}
 	unwindStage := bson.D{{Key: "$unwind", Value: bson.M{"path": "$videos"}}}
-	matchStage := bson.D{{Key: "$match", Value: bson.M{"videos.end_date": bson.M{"$ne": nil}}}}
+	matchStage := bson.D{{Key: "$match", Value: bson.M{"videos.start_date": bson.M{"$ne": nil}, "videos.end_date": bson.M{"$ne": nil}}}}
 	newFieldStage := bson.D{{Key: "$addFields", Value: bson.M{"duration": bson.M{
 		"$dateDiff": bson.M{
 			"startDate": "$videos.start_date",
@@ -489,7 +489,7 @@ func (m *Mongo) GetVideoDuration(ctx context.Context, top int) ([]entity.VideoDu
 			"unit":      "second",
 		},
 	}}}}
-	groupStage := bson.D{{Key: "$group", Value: bson.M{"_id": bson.M{"id": "$id", "name": "$name"}, "duration": bson.M{"$sum": "$duration"}}}}
+	groupStage := bson.D{{Key: "$group", Value: bson.M{"_id": bson.M{"id": "$id", "name": "$name"}, "duration": bson.M{"$avg": "$duration"}}}}
 	projectStage2 := bson.D{{Key: "$project", Value: bson.M{"id": "$_id.id", "name": "$_id.name", "duration": "$duration"}}}
 	sortStage := bson.D{{Key: "$sort", Value: bson.M{"duration": -1}}}
 	limitStage := bson.D{{Key: "$limit", Value: top}}
