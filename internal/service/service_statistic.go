@@ -5,6 +5,7 @@ import (
 	"math"
 	"net/http"
 
+	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	"github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/utils"
 )
@@ -400,4 +401,104 @@ func (s *service) GetVtuberAverageWeight(ctx context.Context) (float64, int, err
 		return 0, code, errors.Wrap(ctx, err)
 	}
 	return weight, http.StatusOK, nil
+}
+
+// GetVtuberBloodTypeCountRequest is get vtuber blood type count request.
+type GetVtuberBloodTypeCountRequest struct {
+	Top int `validate:"required,gte=-1" mod:"default=5"`
+}
+
+type vtuberBloodTypeCount struct {
+	BloodType string `json:"blood_type"`
+	Count     int    `json:"count"`
+}
+
+func (s *service) GetVtuberBloodTypeCount(ctx context.Context, data GetVtuberBloodTypeCountRequest) ([]vtuberBloodTypeCount, int, error) {
+	if err := utils.Validate(&data); err != nil {
+		return nil, http.StatusBadRequest, errors.Wrap(ctx, err)
+	}
+
+	cnt, code, err := s.vtuber.GetBloodTypeCount(ctx, data.Top)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	res := make([]vtuberBloodTypeCount, len(cnt))
+	for i, c := range cnt {
+		res[i] = vtuberBloodTypeCount{
+			BloodType: c.BloodType,
+			Count:     c.Count,
+		}
+	}
+
+	return res, http.StatusOK, nil
+}
+
+type vtuberChannelTypeCount struct {
+	ChannelType entity.ChannelType `json:"channel_type"`
+	Count       int                `json:"count"`
+}
+
+// GetVtuberChannelTypeCount to get vtuber channel type count.
+func (s *service) GetVtuberChannelTypeCount(ctx context.Context) ([]vtuberChannelTypeCount, int, error) {
+	cnt, code, err := s.vtuber.GetChannelTypeCount(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	res := make([]vtuberChannelTypeCount, len(cnt))
+	for i, c := range cnt {
+		res[i] = vtuberChannelTypeCount{
+			ChannelType: c.ChannelType,
+			Count:       c.Count,
+		}
+	}
+
+	return res, http.StatusOK, nil
+}
+
+type vtuberGenderCount struct {
+	Gender string `json:"gender"`
+	Count  int    `json:"count"`
+}
+
+// GetVtuberGenderCount to get vtuber gender count.
+func (s *service) GetVtuberGenderCount(ctx context.Context) ([]vtuberGenderCount, int, error) {
+	cnt, code, err := s.vtuber.GetGenderCount(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	res := make([]vtuberGenderCount, len(cnt))
+	for i, c := range cnt {
+		res[i] = vtuberGenderCount{
+			Gender: c.Gender,
+			Count:  c.Count,
+		}
+	}
+
+	return res, http.StatusOK, nil
+}
+
+type vtuberZodiacCount struct {
+	Zodiac string `json:"zodiac"`
+	Count  int    `json:"count"`
+}
+
+// GetVtuberZodiacCount to get vtuber zodiac count.
+func (s *service) GetVtuberZodiacCount(ctx context.Context) ([]vtuberZodiacCount, int, error) {
+	cnt, code, err := s.vtuber.GetZodiacCount(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	res := make([]vtuberZodiacCount, len(cnt))
+	for i, c := range cnt {
+		res[i] = vtuberZodiacCount{
+			Zodiac: c.Zodiac,
+			Count:  c.Count,
+		}
+	}
+
+	return res, http.StatusOK, nil
 }

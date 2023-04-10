@@ -40,4 +40,8 @@ type Repository interface {
 	GetBirthdayCount(ctx context.Context) ([]entity.BirthdayCount, int, error)
 	GetAverageHeight(ctx context.Context) (float64, int, error)
 	GetAverageWeight(ctx context.Context) (float64, int, error)
+	GetBloodTypeCount(ctx context.Context, top int) ([]entity.BloodTypeCount, int, error)
+	GetChannelTypeCount(ctx context.Context) ([]entity.ChannelTypeCount, int, error)
+	GetGenderCount(ctx context.Context) ([]entity.GenderCount, int, error)
+	GetZodiacCount(ctx context.Context) ([]entity.ZodiacCount, int, error)
 }

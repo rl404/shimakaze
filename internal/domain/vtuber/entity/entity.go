@@ -189,3 +189,27 @@ type BirthdayCount struct {
 	Day   int
 	Count int
 }
+
+// BloodTypeCount is entity for blood type count.
+type BloodTypeCount struct {
+	BloodType string
+	Count     int
+}
+
+// ChannelTypeCount is entity for channel type count.
+type ChannelTypeCount struct {
+	ChannelType ChannelType
+	Count       int
+}
+
+// GenderCount is entity for gender count.
+type GenderCount struct {
+	Gender string
+	Count  int
+}
+
+// ZodiacCount is entity for zodiac count.
+type ZodiacCount struct {
+	Zodiac string
+	Count  int
+}

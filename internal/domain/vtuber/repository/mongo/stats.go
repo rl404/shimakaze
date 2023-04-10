@@ -589,3 +589,202 @@ func (m *Mongo) GetAverageWeight(ctx context.Context) (float64, int, error) {
 
 	return avg[0]["avg"], http.StatusOK, nil
 }
+
+type bloodTypeCount struct {
+	BloodType string `bson:"blood_type"`
+	Count     int    `bson:"count"`
+}
+
+// GetBloodTypeCount to get blood type count.
+func (m *Mongo) GetBloodTypeCount(ctx context.Context, top int) ([]entity.BloodTypeCount, int, error) {
+	matchStage := bson.D{{Key: "$match", Value: bson.M{"blood_type": bson.M{"$nin": bson.A{"", nil}}}}}
+	groupStage := bson.D{{Key: "$group", Value: bson.M{"_id": bson.M{"blood_type": "$blood_type"}, "count": bson.M{"$sum": 1}}}}
+	projectStage := bson.D{{Key: "$project", Value: bson.M{"blood_type": "$_id.blood_type", "count": "$count"}}}
+	sortStage := bson.D{{Key: "$sort", Value: bson.M{"count": -1}}}
+	limitStage := bson.D{{Key: "$limit", Value: top}}
+
+	countCursor, err := m.db.Aggregate(ctx, m.getPipeline(matchStage, groupStage, projectStage, sortStage, limitStage))
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	var cnt []bloodTypeCount
+	if err := countCursor.All(ctx, &cnt); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	topBloodTypes := make([]string, top)
+	res := make([]entity.BloodTypeCount, len(cnt)+1)
+	for i, c := range cnt {
+		res[i] = entity.BloodTypeCount{
+			BloodType: c.BloodType,
+			Count:     c.Count,
+		}
+		topBloodTypes[i] = c.BloodType
+	}
+
+	// Get other blood type.
+	otherMatchStage := bson.D{{Key: "$match", Value: bson.M{"blood_type": bson.M{"$nin": topBloodTypes}}}}
+	otherGroupStage := bson.D{{Key: "$group", Value: bson.M{"_id": nil, "count": bson.M{"$sum": 1}}}}
+
+	otherCursor, err := m.db.Aggregate(ctx, m.getPipeline(matchStage, otherMatchStage, otherGroupStage))
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	var otherCnt []bloodTypeCount
+	if err := otherCursor.All(ctx, &otherCnt); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	res[top] = entity.BloodTypeCount{
+		BloodType: "other",
+		Count:     otherCnt[0].Count,
+	}
+
+	return res, http.StatusOK, nil
+}
+
+type channelTypeCount struct {
+	ChannelType entity.ChannelType `bson:"channel_type"`
+	Count       int                `bson:"count"`
+}
+
+// GetChannelTypeCount to get channel type count.
+func (m *Mongo) GetChannelTypeCount(ctx context.Context) ([]entity.ChannelTypeCount, int, error) {
+	projectStage := bson.D{{Key: "$project", Value: bson.M{"channels.type": 1}}}
+	unwindStage := bson.D{{Key: "$unwind", Value: "$channels"}}
+	groupStage := bson.D{{Key: "$group", Value: bson.M{"_id": bson.M{"type": "$channels.type"}, "count": bson.M{"$sum": 1}}}}
+	projectStage2 := bson.D{{Key: "$project", Value: bson.M{"channel_type": "$_id.type", "count": "$count"}}}
+	sortStage := bson.D{{Key: "$sort", Value: bson.M{"count": -1}}}
+
+	countCursor, err := m.db.Aggregate(ctx, m.getPipeline(projectStage, unwindStage, groupStage, projectStage2, sortStage))
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	var cnt []channelTypeCount
+	if err := countCursor.All(ctx, &cnt); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	res := make([]entity.ChannelTypeCount, len(cnt))
+	for i, c := range cnt {
+		res[i] = entity.ChannelTypeCount{
+			ChannelType: c.ChannelType,
+			Count:       c.Count,
+		}
+	}
+
+	return res, http.StatusOK, nil
+}
+
+type genderCount struct {
+	Gender string `bson:"gender"`
+	Count  int    `bson:"count"`
+}
+
+// GetGenderCount to get gender count.
+func (m *Mongo) GetGenderCount(ctx context.Context) ([]entity.GenderCount, int, error) {
+	matchStage := bson.D{{Key: "$match", Value: bson.M{"gender": bson.M{"$nin": bson.A{"", nil}}}}}
+	groupStage := bson.D{{Key: "$group", Value: bson.M{"_id": bson.M{"gender": "$gender"}, "count": bson.M{"$sum": 1}}}}
+	projectStage := bson.D{{Key: "$project", Value: bson.M{"gender": "$_id.gender", "count": "$count"}}}
+	sortStage := bson.D{{Key: "$sort", Value: bson.M{"count": -1}}}
+	limitStage := bson.D{{Key: "$limit", Value: 2}}
+
+	countCursor, err := m.db.Aggregate(ctx, m.getPipeline(matchStage, groupStage, projectStage, sortStage, limitStage))
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	var cnt []genderCount
+	if err := countCursor.All(ctx, &cnt); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	topGenders := make([]string, 2)
+	res := make([]entity.GenderCount, 3)
+	for i, c := range cnt {
+		res[i] = entity.GenderCount{
+			Gender: c.Gender,
+			Count:  c.Count,
+		}
+		topGenders[i] = c.Gender
+	}
+
+	// Get other gender.
+	otherMatchStage := bson.D{{Key: "$match", Value: bson.M{"gender": bson.M{"$nin": topGenders}}}}
+	otherGroupStage := bson.D{{Key: "$group", Value: bson.M{"_id": nil, "count": bson.M{"$sum": 1}}}}
+
+	otherCursor, err := m.db.Aggregate(ctx, m.getPipeline(matchStage, otherMatchStage, otherGroupStage))
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	var otherCnt []genderCount
+	if err := otherCursor.All(ctx, &otherCnt); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	res[2] = entity.GenderCount{
+		Gender: "other",
+		Count:  otherCnt[0].Count,
+	}
+
+	return res, http.StatusOK, nil
+}
+
+type zodiacCount struct {
+	Zodiac string `bson:"zodiac"`
+	Count  int    `bson:"count"`
+}
+
+// GetZodiacCount to get zodiac count.
+func (m *Mongo) GetZodiacCount(ctx context.Context) ([]entity.ZodiacCount, int, error) {
+	matchStage := bson.D{{Key: "$match", Value: bson.M{"zodiac_sign": bson.M{"$nin": bson.A{"", nil}}}}}
+	groupStage := bson.D{{Key: "$group", Value: bson.M{"_id": bson.M{"zodiac": "$zodiac_sign"}, "count": bson.M{"$sum": 1}}}}
+	projectStage := bson.D{{Key: "$project", Value: bson.M{"zodiac": "$_id.zodiac", "count": "$count"}}}
+	sortStage := bson.D{{Key: "$sort", Value: bson.M{"count": -1}}}
+	limitStage := bson.D{{Key: "$limit", Value: 12}}
+
+	countCursor, err := m.db.Aggregate(ctx, m.getPipeline(matchStage, groupStage, projectStage, sortStage, limitStage))
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	var cnt []zodiacCount
+	if err := countCursor.All(ctx, &cnt); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	topZodiacs := make([]string, 12)
+	res := make([]entity.ZodiacCount, 13)
+	for i, c := range cnt {
+		res[i] = entity.ZodiacCount{
+			Zodiac: c.Zodiac,
+			Count:  c.Count,
+		}
+		topZodiacs[i] = c.Zodiac
+	}
+
+	// Get other zodiac.
+	otherMatchStage := bson.D{{Key: "$match", Value: bson.M{"zodiac_sign": bson.M{"$nin": topZodiacs}}}}
+	otherGroupStage := bson.D{{Key: "$group", Value: bson.M{"_id": nil, "count": bson.M{"$sum": 1}}}}
+
+	otherCursor, err := m.db.Aggregate(ctx, m.getPipeline(matchStage, otherMatchStage, otherGroupStage))
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	var otherCnt []genderCount
+	if err := otherCursor.All(ctx, &otherCnt); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	res[12] = entity.ZodiacCount{
+		Zodiac: "other",
+		Count:  otherCnt[0].Count,
+	}
+
+	return res, http.StatusOK, nil
+}

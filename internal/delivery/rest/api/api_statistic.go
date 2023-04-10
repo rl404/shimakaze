@@ -256,3 +256,50 @@ func (api *API) handleGetVtuberAverageWeight(w http.ResponseWriter, r *http.Requ
 	avg, code, err := api.service.GetVtuberAverageWeight(r.Context())
 	utils.ResponseWithJSON(w, code, avg, errors.Wrap(r.Context(), err))
 }
+
+// @summary Get vtuber blood type count.
+// @tags Statistic
+// @produce json
+// @param top query integer false "top count" default(5)
+// @success 200 {object} utils.Response{data=[]service.vtuberBloodTypeCount}
+// @failure 400 {object} utils.Response
+// @failure 500 {object} utils.Response
+// @router /statistics/vtubers/blood-type-count [get]
+func (api *API) handleGetVtuberBloodTypeCount(w http.ResponseWriter, r *http.Request) {
+	top, _ := strconv.Atoi(r.URL.Query().Get("top"))
+	cnt, code, err := api.service.GetVtuberBloodTypeCount(r.Context(), service.GetVtuberBloodTypeCountRequest{Top: top})
+	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+}
+
+// @summary Get vtuber channel type count.
+// @tags Statistic
+// @produce json
+// @success 200 {object} utils.Response{data=[]service.vtuberChannelTypeCount}
+// @failure 500 {object} utils.Response
+// @router /statistics/vtubers/channel-type-count [get]
+func (api *API) handleGetVtuberChannelTypeCount(w http.ResponseWriter, r *http.Request) {
+	cnt, code, err := api.service.GetVtuberChannelTypeCount(r.Context())
+	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+}
+
+// @summary Get vtuber gender count.
+// @tags Statistic
+// @produce json
+// @success 200 {object} utils.Response{data=[]service.vtuberGenderCount}
+// @failure 500 {object} utils.Response
+// @router /statistics/vtubers/gender-count [get]
+func (api *API) handleGetVtuberGenderCount(w http.ResponseWriter, r *http.Request) {
+	cnt, code, err := api.service.GetVtuberGenderCount(r.Context())
+	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+}
+
+// @summary Get vtuber zodiac count.
+// @tags Statistic
+// @produce json
+// @success 200 {object} utils.Response{data=[]service.vtuberZodiacCount}
+// @failure 500 {object} utils.Response
+// @router /statistics/vtubers/zodiac-count [get]
+func (api *API) handleGetVtuberZodiacCount(w http.ResponseWriter, r *http.Request) {
+	cnt, code, err := api.service.GetVtuberZodiacCount(r.Context())
+	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+}

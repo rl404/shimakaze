@@ -369,3 +369,79 @@ func (c *Cache) GetAverageWeight(ctx context.Context) (data float64, code int, e
 
 	return data, code, nil
 }
+
+// GetBloodTypeCount to get blood type count.
+func (c *Cache) GetBloodTypeCount(ctx context.Context, top int) (data []entity.BloodTypeCount, code int, err error) {
+	key := utils.GetKey("vtuber", "stats", "blood-type-count", top)
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.GetBloodTypeCount(ctx, top)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
+}
+
+// GetChannelTypeCount to get channel type count.
+func (c *Cache) GetChannelTypeCount(ctx context.Context) (data []entity.ChannelTypeCount, code int, err error) {
+	key := utils.GetKey("vtuber", "stats", "channel-type-count")
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.GetChannelTypeCount(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
+}
+
+// GetGenderCount to get gender count.
+func (c *Cache) GetGenderCount(ctx context.Context) (data []entity.GenderCount, code int, err error) {
+	key := utils.GetKey("vtuber", "stats", "gender-count")
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.GetGenderCount(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
+}
+
+// GetZodiacCount to get zodiac count.
+func (c *Cache) GetZodiacCount(ctx context.Context) (data []entity.ZodiacCount, code int, err error) {
+	key := utils.GetKey("vtuber", "stats", "zodiac-count")
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.GetZodiacCount(ctx)
+	if err != nil {
+		return nil, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
+}

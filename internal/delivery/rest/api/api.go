@@ -69,6 +69,10 @@ func (api *API) Register(r chi.Router, nrApp *newrelic.Application) {
 		r.Get("/statistics/vtubers/birthday-count", api.handleGetVtuberBirthdayCount)
 		r.Get("/statistics/vtubers/average-height", api.handleGetVtuberAverageHeight)
 		r.Get("/statistics/vtubers/average-weight", api.handleGetVtuberAverageWeight)
+		r.Get("/statistics/vtubers/blood-type-count", api.handleGetVtuberBloodTypeCount)
+		r.Get("/statistics/vtubers/channel-type-count", api.handleGetVtuberChannelTypeCount)
+		r.Get("/statistics/vtubers/gender-count", api.handleGetVtuberGenderCount)
+		r.Get("/statistics/vtubers/zodiac-count", api.handleGetVtuberZodiacCount)
 
 		r.Get("/statistics/agencies/count", api.handleGetAgencyCount)
 	})
