@@ -383,3 +383,21 @@ func (s *service) GetVtuberBirthdayCount(ctx context.Context) ([]vtuberBirthdayC
 
 	return res, http.StatusOK, nil
 }
+
+// GetVtuberAverageHeight to get vtuber average height.
+func (s *service) GetVtuberAverageHeight(ctx context.Context) (float64, int, error) {
+	height, code, err := s.vtuber.GetAverageHeight(ctx)
+	if err != nil {
+		return 0, code, errors.Wrap(ctx, err)
+	}
+	return height, http.StatusOK, nil
+}
+
+// GetVtuberAverageWeight to get vtuber average weight.
+func (s *service) GetVtuberAverageWeight(ctx context.Context) (float64, int, error) {
+	weight, code, err := s.vtuber.GetAverageWeight(ctx)
+	if err != nil {
+		return 0, code, errors.Wrap(ctx, err)
+	}
+	return weight, http.StatusOK, nil
+}

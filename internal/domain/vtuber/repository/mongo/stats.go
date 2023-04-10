@@ -553,3 +553,39 @@ func (m *Mongo) GetBirthdayCount(ctx context.Context) ([]entity.BirthdayCount, i
 
 	return res, http.StatusOK, nil
 }
+
+// GetAverageHeight to get average height.
+func (m *Mongo) GetAverageHeight(ctx context.Context) (float64, int, error) {
+	matchStage := bson.D{{Key: "$match", Value: bson.M{"height": bson.M{"$gte": 0}}}}
+	avgStage := bson.D{{Key: "$group", Value: bson.M{"_id": nil, "avg": bson.M{"$avg": "$height"}}}}
+
+	avgCursor, err := m.db.Aggregate(ctx, m.getPipeline(matchStage, avgStage))
+	if err != nil {
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	var avg []map[string]float64
+	if err := avgCursor.All(ctx, &avg); err != nil {
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	return avg[0]["avg"], http.StatusOK, nil
+}
+
+// GetAverageWeight to get average weight.
+func (m *Mongo) GetAverageWeight(ctx context.Context) (float64, int, error) {
+	matchStage := bson.D{{Key: "$match", Value: bson.M{"weight": bson.M{"$gte": 0, "$lte": 1000}}}}
+	avgStage := bson.D{{Key: "$group", Value: bson.M{"_id": nil, "avg": bson.M{"$avg": "$weight"}}}}
+
+	avgCursor, err := m.db.Aggregate(ctx, m.getPipeline(matchStage, avgStage))
+	if err != nil {
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	var avg []map[string]float64
+	if err := avgCursor.All(ctx, &avg); err != nil {
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+
+	return avg[0]["avg"], http.StatusOK, nil
+}

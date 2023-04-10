@@ -331,3 +331,41 @@ func (c *Cache) GetBirthdayCount(ctx context.Context) (data []entity.BirthdayCou
 
 	return data, code, nil
 }
+
+// GetAverageHeight to get average height.
+func (c *Cache) GetAverageHeight(ctx context.Context) (data float64, code int, err error) {
+	key := utils.GetKey("vtuber", "stats", "average-height")
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.GetAverageHeight(ctx)
+	if err != nil {
+		return 0, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
+}
+
+// GetAverageWeight to get average height.
+func (c *Cache) GetAverageWeight(ctx context.Context) (data float64, code int, err error) {
+	key := utils.GetKey("vtuber", "stats", "average-weight")
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.GetAverageWeight(ctx)
+	if err != nil {
+		return 0, code, errors.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+	}
+
+	return data, code, nil
+}

@@ -38,4 +38,6 @@ type Repository interface {
 	GetVideoCount(ctx context.Context, top int) ([]entity.VideoCount, int, error)
 	GetVideoDuration(ctx context.Context, top int) ([]entity.VideoDuration, int, error)
 	GetBirthdayCount(ctx context.Context) ([]entity.BirthdayCount, int, error)
+	GetAverageHeight(ctx context.Context) (float64, int, error)
+	GetAverageWeight(ctx context.Context) (float64, int, error)
 }

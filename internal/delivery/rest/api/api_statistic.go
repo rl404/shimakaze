@@ -234,3 +234,25 @@ func (api *API) handleGetVtuberBirthdayCount(w http.ResponseWriter, r *http.Requ
 	cnt, code, err := api.service.GetVtuberBirthdayCount(r.Context())
 	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
 }
+
+// @summary Get vtuber average height.
+// @tags Statistic
+// @produce json
+// @success 200 {object} utils.Response{data=float64}
+// @failure 500 {object} utils.Response
+// @router /statistics/vtubers/average-height [get]
+func (api *API) handleGetVtuberAverageHeight(w http.ResponseWriter, r *http.Request) {
+	avg, code, err := api.service.GetVtuberAverageHeight(r.Context())
+	utils.ResponseWithJSON(w, code, avg, errors.Wrap(r.Context(), err))
+}
+
+// @summary Get vtuber average weight.
+// @tags Statistic
+// @produce json
+// @success 200 {object} utils.Response{data=float64}
+// @failure 500 {object} utils.Response
+// @router /statistics/vtubers/average-weight [get]
+func (api *API) handleGetVtuberAverageWeight(w http.ResponseWriter, r *http.Request) {
+	avg, code, err := api.service.GetVtuberAverageWeight(r.Context())
+	utils.ResponseWithJSON(w, code, avg, errors.Wrap(r.Context(), err))
+}
