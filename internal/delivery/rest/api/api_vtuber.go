@@ -14,7 +14,7 @@ import (
 // @summary Get vtuber data.
 // @tags Vtuber
 // @produce json
-// @param mode query string false "mode" enums(all, stats) default(all)
+// @param mode query string false "mode" enums(all, simple) default(all)
 // @param names query string false "names"
 // @param name query string false "name"
 // @param original_name query string false "original name"

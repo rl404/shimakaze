@@ -78,8 +78,8 @@ type SearchMode string
 
 // Available search mode.
 const (
-	SearchModeAll   SearchMode = "all"
-	SearchModeStats SearchMode = "stats"
+	SearchModeAll    SearchMode = "all"
+	SearchModeSimple SearchMode = "simple"
 )
 
 // GetAllRequest is get all request model.
@@ -119,4 +119,97 @@ type GetAllRequest struct {
 	Sort               string
 	Page               int
 	Limit              int
+}
+
+// StatusCount is entity for status count.
+type StatusCount struct {
+	Active  int
+	Retired int
+}
+
+// DebutRetireCount is entity for debut & retire count.
+type DebutRetireCount struct {
+	Month  int
+	Year   int
+	Debut  int
+	Retire int
+}
+
+// ModelCount is entity for 2d & 3d model count.
+type ModelCount struct {
+	None      int
+	Has2DOnly int
+	Has3DOnly int
+	Both      int
+}
+
+// InAgencyCount is entity for in agency count.
+type InAgencyCount struct {
+	InAgency    int
+	NotInAgency int
+}
+
+// SubscriberCount is entity for subscriber count.
+type SubscriberCount struct {
+	Min   int
+	Max   int
+	Count int
+}
+
+// DesignerCount is entity for designer count.
+type DesignerCount struct {
+	Name  string
+	Count int
+}
+
+// VideoCountByDate is entity for video count by date.
+type VideoCountByDate struct {
+	Day   int
+	Hour  int
+	Count int
+}
+
+// VideoCount is entity for video count.
+type VideoCount struct {
+	ID    int64
+	Name  string
+	Count int
+}
+
+// VideoDuration is entity for video duration.
+type VideoDuration struct {
+	ID       int64
+	Name     string
+	Duration float64
+}
+
+// BirthdayCount is entity for birthday count.
+type BirthdayCount struct {
+	Month int
+	Day   int
+	Count int
+}
+
+// BloodTypeCount is entity for blood type count.
+type BloodTypeCount struct {
+	BloodType string
+	Count     int
+}
+
+// ChannelTypeCount is entity for channel type count.
+type ChannelTypeCount struct {
+	ChannelType ChannelType
+	Count       int
+}
+
+// GenderCount is entity for gender count.
+type GenderCount struct {
+	Gender string
+	Count  int
+}
+
+// ZodiacCount is entity for zodiac count.
+type ZodiacCount struct {
+	Zodiac string
+	Count  int
 }

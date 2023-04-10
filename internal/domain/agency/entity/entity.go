@@ -11,3 +11,10 @@ type Agency struct {
 	Subscriber int
 	UpdatedAt  time.Time
 }
+
+// GetAllRequest is entity for get all request.
+type GetAllRequest struct {
+	Sort  string
+	Page  int
+	Limit int
+}

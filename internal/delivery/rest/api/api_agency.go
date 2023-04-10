@@ -6,19 +6,32 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/rl404/shimakaze/internal/errors"
+	"github.com/rl404/shimakaze/internal/service"
 	"github.com/rl404/shimakaze/internal/utils"
 )
 
 // @summary Get agency data.
 // @tags Agency
 // @produce json
+// @param sort query string false "sort" enums(name,-name,member,-member,subscriber,-subscriber) default(name)
+// @param page query integer false "page" default(1)
+// @param limit query integer false "limit" default(20)
 // @success 200 {object} utils.Response{data=[]service.agency}
 // @failure 400 {object} utils.Response
 // @failure 500 {object} utils.Response
 // @router /agencies [get]
 func (api *API) handleGetAgencies(w http.ResponseWriter, r *http.Request) {
-	agencies, code, err := api.service.GetAgencies(r.Context())
-	utils.ResponseWithJSON(w, code, agencies, errors.Wrap(r.Context(), err))
+	sort := r.URL.Query().Get("sort")
+	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
+	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
+
+	agencies, pagination, code, err := api.service.GetAgencies(r.Context(), service.GetAgenciesRequest{
+		Sort:  sort,
+		Page:  page,
+		Limit: limit,
+	})
+
+	utils.ResponseWithJSON(w, code, agencies, errors.Wrap(r.Context(), err), pagination)
 }
 
 // @summary Get agency data.

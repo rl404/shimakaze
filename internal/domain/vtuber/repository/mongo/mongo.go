@@ -234,26 +234,25 @@ func (m *Mongo) GetAllForAgencyTree(ctx context.Context) ([]entity.Vtuber, int, 
 
 // GetAll to get all data.
 func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity.Vtuber, int, int, error) {
-	newFieldStage := bson.D{{Key: "$addFields", Value: bson.M{"subscriber": bson.M{"$max": "$channels.subscriber"}}}}
+	newFieldStage := bson.D{{Key: "$addFields", Value: bson.M{"subscriber": bson.M{"$ifNull": bson.A{bson.M{"$max": "$channels.subscriber"}, 0}}}}}
 	matchStage := bson.D{}
-	omitStage := bson.D{}
+	projectStage := bson.D{}
 	sortStage := bson.D{{Key: "$sort", Value: m.convertSort(data.Sort)}}
 	skipStage := bson.D{{Key: "$skip", Value: (data.Page - 1) * data.Limit}}
 	limitStage := bson.D{}
 	countStage := bson.D{{Key: "$count", Value: "count"}}
 
-	if data.Mode == entity.SearchModeStats {
-		omitStage = append(omitStage, bson.E{Key: "$unset", Value: bson.A{
-			"original_names",
-			"nicknames",
-			"caption",
-			"affiliations",
-			"official_websites",
-		}})
-	} else {
-		omitStage = append(omitStage, bson.E{Key: "$unset", Value: bson.A{
-			"channels.videos",
-		}})
+	if data.Mode == entity.SearchModeSimple {
+		projectStage = bson.D{{Key: "$project", Value: bson.M{
+			"id":              1,
+			"name":            1,
+			"image":           1,
+			"debut_date":      1,
+			"retirement_date": 1,
+			"has_2d":          1,
+			"has_3d":          1,
+			"updated_at":      1,
+		}}}
 	}
 
 	if data.Names != "" {
@@ -396,14 +395,14 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 	}
 
 	if data.EndSubscriber > 0 {
-		matchStage = m.addMatch(matchStage, "subscriber", bson.M{"$lte": data.EndSubscriber})
+		matchStage = m.addMatch(matchStage, "subscriber", bson.M{"$lt": data.EndSubscriber})
 	}
 
 	if data.Limit > 0 {
 		limitStage = append(limitStage, bson.E{Key: "$limit", Value: data.Limit})
 	}
 
-	cursor, err := m.db.Aggregate(ctx, m.getPipeline(newFieldStage, matchStage, omitStage, sortStage, skipStage, limitStage))
+	cursor, err := m.db.Aggregate(ctx, m.getPipeline(newFieldStage, matchStage, projectStage, sortStage, skipStage, limitStage))
 	if err != nil {
 		return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
 	}

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	agencyEntity "github.com/rl404/shimakaze/internal/domain/agency/entity"
 	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	"github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/utils"
@@ -287,7 +288,7 @@ func (s *service) GetVtuberAgencyTrees(ctx context.Context) (*vtuberAgencyTree, 
 		return nil, code, errors.Wrap(ctx, err)
 	}
 
-	agencies, code, err := s.agency.GetAll(ctx)
+	agencies, _, code, err := s.agency.GetAll(ctx, agencyEntity.GetAllRequest{Page: 1, Limit: -1})
 	if err != nil {
 		return nil, code, errors.Wrap(ctx, err)
 	}
@@ -327,7 +328,7 @@ func (s *service) GetVtuberAgencyTrees(ctx context.Context) (*vtuberAgencyTree, 
 
 // GetVtubersRequest is get vtubers request model.
 type GetVtubersRequest struct {
-	Mode               entity.SearchMode    `validate:"oneof=all stats" mod:"default=all,trim,lcase"`
+	Mode               entity.SearchMode    `validate:"oneof=all simple" mod:"default=all,trim,lcase"`
 	Names              string               `validate:"omitempty,gte=3" mod:"trim,lcase"`
 	Name               string               `validate:"omitempty,gte=3" mod:"trim,lcase"`
 	OriginalName       string               `validate:"omitempty,gte=3" mod:"trim,lcase"`
