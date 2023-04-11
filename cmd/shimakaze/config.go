@@ -64,7 +64,11 @@ type pubsubConfig struct {
 }
 
 type cronConfig struct {
-	UpdateAge int `envconfig:"UPDATE_AGE" validate:"required,gte=0" mod:"default=7"`
+	UpdateLimit int `envconfig:"UPDATE_LIMIT" validate:"required,gte=0" mod:"default=10"`
+	FillLimit   int `envconfig:"FILL_LIMIT" validate:"required,gte=0" mod:"default=10"`
+	AgencyAge   int `envconfig:"AGENCY_AGE" validate:"required,gte=0" mod:"default=7"`  // days
+	ActiveAge   int `envconfig:"ACTIVE_AGE" validate:"required,gte=0" mod:"default=1"`  // days
+	RetiredAge  int `envconfig:"RETIRED_AGE" validate:"required,gte=0" mod:"default=7"` // days
 }
 
 type logConfig struct {

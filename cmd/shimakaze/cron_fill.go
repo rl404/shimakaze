@@ -68,7 +68,7 @@ func cronFill() error {
 	utils.Info("repository wikia initialized")
 
 	// Init vtuber.
-	var vtuber vtuberRepository.Repository = vtuberMongo.New(db, cfg.Cron.UpdateAge)
+	var vtuber vtuberRepository.Repository = vtuberMongo.New(db, cfg.Cron.ActiveAge, cfg.Cron.RetiredAge)
 	utils.Info("repository vtuber initialized")
 
 	// Init non-vtuber.
@@ -76,7 +76,7 @@ func cronFill() error {
 	utils.Info("repository non-vtuber initialized")
 
 	// Init agency.
-	var agency agencyRepository.Repository = agencyMongo.New(db, cfg.Cron.UpdateAge)
+	var agency agencyRepository.Repository = agencyMongo.New(db, cfg.Cron.AgencyAge)
 	utils.Info("repository agency initialized")
 
 	// Init publisher.
@@ -89,7 +89,7 @@ func cronFill() error {
 
 	// Run cron.
 	utils.Info("filling missing data...")
-	if err := cron.New(service).Fill(nrApp); err != nil {
+	if err := cron.New(service).Fill(nrApp, cfg.Cron.FillLimit); err != nil {
 		return err
 	}
 
