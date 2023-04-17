@@ -99,7 +99,7 @@ func server() error {
 
 	// Init vtuber.
 	var vtuber vtuberRepository.Repository
-	vtuber = vtuberMongo.New(db, cfg.Cron.UpdateAge)
+	vtuber = vtuberMongo.New(db, cfg.Cron.ActiveAge, cfg.Cron.RetiredAge)
 	vtuber = vtuberCache.New(c, vtuber)
 	vtuber = vtuberCache.New(im, vtuber)
 	utils.Info("repository vtuber initialized")
@@ -113,7 +113,7 @@ func server() error {
 
 	// Init agency.
 	var agency agencyRepository.Repository
-	agency = agencyMongo.New(db, cfg.Cron.UpdateAge)
+	agency = agencyMongo.New(db, cfg.Cron.AgencyAge)
 	agency = agencyCache.New(c, agency)
 	agency = agencyCache.New(im, agency)
 	utils.Info("repository agency initialized")

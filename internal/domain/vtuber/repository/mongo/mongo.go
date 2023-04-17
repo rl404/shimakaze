@@ -17,15 +17,17 @@ import (
 
 // Mongo contains functions for vtuber mongodb.
 type Mongo struct {
-	db     *mongo.Collection
-	oldAge time.Duration
+	db            *mongo.Collection
+	oldActiveAge  time.Duration
+	oldRetiredAge time.Duration
 }
 
 // New to create new vtuber mongodb.
-func New(db *mongo.Database, oldAge int) *Mongo {
+func New(db *mongo.Database, oldActiveAge, oldRetiredAge int) *Mongo {
 	return &Mongo{
-		db:     db.Collection("vtuber"),
-		oldAge: time.Duration(oldAge) * 24 * time.Hour,
+		db:            db.Collection("vtuber"),
+		oldActiveAge:  time.Duration(oldActiveAge) * 24 * time.Hour,
+		oldRetiredAge: time.Duration(oldRetiredAge) * 24 * time.Hour,
 	}
 }
 
@@ -95,8 +97,11 @@ func (m *Mongo) DeleteByID(ctx context.Context, id int64) (int, error) {
 // IsOld to check if old data.
 func (m *Mongo) IsOld(ctx context.Context, id int64) (bool, int, error) {
 	filter := bson.M{
-		"id":         id,
-		"updated_at": bson.M{"$gte": primitive.NewDateTimeFromTime(time.Now().Add(-m.oldAge))},
+		"id": id,
+		"$or": bson.A{
+			bson.M{"retirement_date": bson.M{"$eq": nil}, "updated_at": bson.M{"$gte": primitive.NewDateTimeFromTime(time.Now().Add(-m.oldActiveAge))}},
+			bson.M{"retirement_date": bson.M{"$ne": nil}, "updated_at": bson.M{"$gte": primitive.NewDateTimeFromTime(time.Now().Add(-m.oldRetiredAge))}},
+		},
 	}
 
 	if err := m.db.FindOne(ctx, filter).Decode(&vtuber{}); err != nil {
@@ -109,10 +114,35 @@ func (m *Mongo) IsOld(ctx context.Context, id int64) (bool, int, error) {
 	return false, http.StatusOK, nil
 }
 
-// GetOldIDs to get old ids.
-func (m *Mongo) GetOldIDs(ctx context.Context) ([]int64, int, error) {
+// GetOldActiveIDs to get old active ids.
+func (m *Mongo) GetOldActiveIDs(ctx context.Context) ([]int64, int, error) {
 	cursor, err := m.db.Find(ctx, bson.M{
-		"updated_at": bson.M{"$lte": primitive.NewDateTimeFromTime(time.Now().Add(-m.oldAge))},
+		"retirement_date": bson.M{"$eq": nil},
+		"updated_at":      bson.M{"$lte": primitive.NewDateTimeFromTime(time.Now().Add(-m.oldActiveAge))},
+	}, options.Find().SetProjection(bson.M{"id": 1}))
+	if err != nil {
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+	defer cursor.Close(ctx)
+
+	var ids []int64
+	for cursor.Next(ctx) {
+		var vtuber vtuber
+		if err := cursor.Decode(&vtuber); err != nil {
+			return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		}
+
+		ids = append(ids, vtuber.ID)
+	}
+
+	return ids, http.StatusOK, nil
+}
+
+// GetOldRetiredIDs to get old retired ids.
+func (m *Mongo) GetOldRetiredIDs(ctx context.Context) ([]int64, int, error) {
+	cursor, err := m.db.Find(ctx, bson.M{
+		"retirement_date": bson.M{"$ne": nil},
+		"updated_at":      bson.M{"$lte": primitive.NewDateTimeFromTime(time.Now().Add(-m.oldActiveAge))},
 	}, options.Find().SetProjection(bson.M{"id": 1}))
 	if err != nil {
 		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)

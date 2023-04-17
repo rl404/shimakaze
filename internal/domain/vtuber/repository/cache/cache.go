@@ -116,9 +116,14 @@ func (c *Cache) IsOld(ctx context.Context, id int64) (bool, int, error) {
 	return c.repo.IsOld(ctx, id)
 }
 
-// GetOldIDs to get old ids.
-func (c *Cache) GetOldIDs(ctx context.Context) ([]int64, int, error) {
-	return c.repo.GetOldIDs(ctx)
+// GetOldActiveIDs to get old active ids.
+func (c *Cache) GetOldActiveIDs(ctx context.Context) ([]int64, int, error) {
+	return c.repo.GetOldActiveIDs(ctx)
+}
+
+// GetOldRetiredIDs to get old ids.
+func (c *Cache) GetOldRetiredIDs(ctx context.Context) ([]int64, int, error) {
+	return c.repo.GetOldRetiredIDs(ctx)
 }
 
 // GetAllForFamilyTree to get all for family tree.
