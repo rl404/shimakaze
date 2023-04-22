@@ -95,8 +95,7 @@ type twitchConfig struct {
 }
 
 type bilibiliConfig struct {
-	Cookie string `envconfig:"COOKIE"`
-	MaxAge int    `envconfig:"MAX_AGE" validate:"required,gte=0" mod:"default=60"`
+	MaxAge int `envconfig:"MAX_AGE" validate:"required,gte=0" mod:"default=60"`
 }
 
 type niconicoConfig struct {
