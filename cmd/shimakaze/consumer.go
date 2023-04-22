@@ -114,7 +114,7 @@ func consumer() error {
 	utils.Info("repository twitch initialized")
 
 	// Init bilibili.
-	var bilibili bilibiliRepository.Repository = bilibiliClient.New(cfg.Bilibili.Cookie, cfg.Bilibili.MaxAge)
+	var bilibili bilibiliRepository.Repository = bilibiliClient.New(cfg.Bilibili.MaxAge)
 	utils.Info("repository bilibili initialized")
 
 	// Init niconico.

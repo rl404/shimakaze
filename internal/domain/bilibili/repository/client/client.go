@@ -15,26 +15,23 @@ type Client struct {
 }
 
 // New to create new bilibili api client.
-func New(cookie string, maxAge int) *Client {
+func New(maxAge int) *Client {
 	return &Client{
 		host: "https://api.bilibili.com",
 		http: &http.Client{
-			Timeout: 10 * time.Second,
-			Transport: newrelic.NewRoundTripper(&transportWithCookie{
-				cookie: cookie,
-			}),
+			Timeout:   10 * time.Second,
+			Transport: newrelic.NewRoundTripper(&transportWithHeader{}),
 		},
 		maxAge: time.Now().Add(time.Duration(maxAge*-24) * time.Hour),
 	}
 }
 
-type transportWithCookie struct {
+type transportWithHeader struct {
 	transport http.RoundTripper
-	cookie    string
 }
 
 // RoundTrip is http roundtrip.
-func (t *transportWithCookie) RoundTrip(req *http.Request) (*http.Response, error) {
+func (t *transportWithHeader) RoundTrip(req *http.Request) (*http.Response, error) {
 	if t.transport == nil {
 		t.transport = http.DefaultTransport
 	}
@@ -42,7 +39,6 @@ func (t *transportWithCookie) RoundTrip(req *http.Request) (*http.Response, erro
 	req.Header.Add("host", "api.bilibili.com")
 	req.Header.Add("accept", "application/json")
 	req.Header.Add("user-agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/111.0")
-	req.Header.Add("cookie", t.cookie)
 
 	return t.transport.RoundTrip(req)
 }
