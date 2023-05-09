@@ -24,9 +24,10 @@ func New(db *mongo.Database) *Mongo {
 
 // Create to create non-vtuber.
 func (m *Mongo) Create(ctx context.Context, id int64) (int, error) {
-	if _, err := m.db.InsertOne(ctx, &nonVtuber{
-		ID: id,
-	}); err != nil {
+	if _, err := m.db.DeleteOne(ctx, bson.M{"id": id}); err != nil {
+		return http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+	}
+	if _, err := m.db.InsertOne(ctx, &nonVtuber{ID: id}); err != nil {
 		return http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
 	}
 	return http.StatusCreated, nil

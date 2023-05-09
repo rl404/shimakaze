@@ -19,6 +19,11 @@ func (s *service) updateVtuber(ctx context.Context, id int64) (int, error) {
 	page, code, err := s.wikia.GetPageByID(ctx, id)
 	if err != nil {
 		if code == http.StatusNotFound {
+			// Delete existing vtuber.
+			if code, err := s.vtuber.DeleteByID(ctx, id); err != nil {
+				return code, errors.Wrap(ctx, err)
+			}
+
 			// Insert to non-vtuber.
 			if code, err := s.nonVtuber.Create(ctx, id); err != nil {
 				return code, errors.Wrap(ctx, err)
