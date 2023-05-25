@@ -4,6 +4,7 @@ import (
 	"context"
 	_errors "errors"
 	"net/http"
+	_url "net/url"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/rl404/shimakaze/internal/errors"
@@ -31,7 +32,14 @@ func (c *Client) GetChannelIDByURL(ctx context.Context, url string) (string, int
 		return "", resp.StatusCode, errors.Wrap(ctx, _errors.New(http.StatusText(resp.StatusCode)))
 	}
 
-	channelID, _ := doc.Find("meta[itemprop=channelId]").Attr("content")
+	rssURLRaw := doc.Find("link[title=RSS]").AttrOr("href", "")
+
+	rssURL, err := _url.Parse(rssURLRaw)
+	if err != nil {
+		return "", http.StatusNotFound, errors.Wrap(ctx, errors.ErrChannelNotFound)
+	}
+
+	channelID := rssURL.Query().Get("channel_id")
 
 	if channelID == "" {
 		return "", http.StatusNotFound, errors.Wrap(ctx, errors.ErrChannelNotFound)
