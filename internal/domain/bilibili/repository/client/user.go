@@ -26,7 +26,16 @@ type getUserResponse struct {
 
 // GetUser to get user.
 func (c *Client) GetUser(ctx context.Context, id string) (*entity.User, int, error) {
-	url, _ := url.Parse(fmt.Sprintf("%s/x/space/wbi/acc/info?mid=%s", c.host, id))
+	url, _ := url.Parse(fmt.Sprintf("%s/x/space/wbi/acc/info?", c.host))
+
+	q := url.Query()
+	q.Add("mid", id)
+	q.Add("platform", "web")
+	q.Add("web_location", "1550101")
+	q.Add("w_rid", "10bb0e85f7ff0dc7f03d5761206eba46")
+	q.Add("wts", "1685590042")
+	q.Add("token", "")
+	url.RawQuery = q.Encode()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url.String(), nil)
 	if err != nil {
