@@ -41,9 +41,6 @@ func (c *Client) GetVideos(ctx context.Context, id string) ([]entity.Video, int,
 	q.Add("order", "pubdate")
 	q.Add("ps", "50")
 	q.Add("tid", "0")
-	q.Add("platform", "web")
-	q.Add("web_location", "1550101")
-	q.Add("w_rid", "10bb0e85f7ff0dc7f03d5761206eba46")
 
 	var res []entity.Video
 	page := 1
