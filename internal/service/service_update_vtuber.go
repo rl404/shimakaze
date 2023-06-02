@@ -213,8 +213,8 @@ func (s *service) fillChannelData(ctx context.Context, channels []vtuberEntity.C
 			channels[i] = s.fillTwitchChannel(ctx, channels[i])
 			channels[i] = s.fillTwitchVideo(ctx, channels[i])
 		case vtuberEntity.ChannelBilibili:
-			channels[i] = s.fillBilibiliChannel(ctx, channels[i])
-			channels[i] = s.fillBilibiliVideo(ctx, channels[i])
+			// channels[i] = s.fillBilibiliChannel(ctx, channels[i])
+			// channels[i] = s.fillBilibiliVideo(ctx, channels[i])
 		case vtuberEntity.ChannelNiconico:
 			channels[i] = s.fillNiconicoChannel(ctx, channels[i])
 			channels[i] = s.fillNiconicoVideo(ctx, channels[i])
