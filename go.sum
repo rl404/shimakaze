@@ -160,12 +160,12 @@ github.com/mattn/go-isatty v0.0.16/go.mod h1:kYGgaQfpe5nmfYZH+SKPsOc2e4SrIfOl2e/
 github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe/go.mod h1:wL8QJuTMNUDYhXwkmfOly8iTdp5TEcJFWZD2D7SIkUc=
 github.com/montanaflynn/stats v0.6.6 h1:Duep6KMIDpY4Yo11iFsvyqJDyfzLF9+sndUKT+v64GQ=
 github.com/montanaflynn/stats v0.6.6/go.mod h1:etXPPgVO6n31NxCd9KQUMvCM+ve0ruNzt6R8Bnaayow=
-github.com/newrelic/go-agent/v3 v3.22.1 h1:c1nPHw/LMNx+J6U5dtVb9xGywftj36cG3sxrHwOwygA=
-github.com/newrelic/go-agent/v3 v3.22.1/go.mod h1:uuvX0xe0ZuO2wAXuM30vdIjyc76z3TfG81BVkf3pclc=
+github.com/newrelic/go-agent/v3 v3.23.0 h1:50lRZCxtfnBx31nOK/GXDxnhLSBC8ZanhP0g2odcaMk=
+github.com/newrelic/go-agent/v3 v3.23.0/go.mod h1:dG7Q7yLUrqOo7SYVJADVDN9+P8c/87xp9axldPxmdHM=
 github.com/newrelic/go-agent/v3/integrations/nrgrpc v1.3.2 h1:SBtZAkWapxfAxYVZHagHxsrbRt+ULkgxi0mbn6TMRM8=
 github.com/newrelic/go-agent/v3/integrations/nrgrpc v1.3.2/go.mod h1:h5GGcju9OuzmRdKa5glKh/SrMs1HhZyvXrf0mEPv70k=
-github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.3 h1:ot8oT86p9BLc1n1tnCsT1oGls0EpnRBxzD0RkE7RaL0=
-github.com/newrelic/go-agent/v3/integrations/nrmongo v1.0.3/go.mod h1:5HzNJDNMe5772KQA6PckdY7fEF69QaJ0RytD0LuXQcE=
+github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.0 h1:o5Q7DH9Xr9pcEKk91cv8QcsWUG/tR2qCTVM6EvE5yPk=
+github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.0/go.mod h1:n9+bSS8LOiIpBJ4gclBKY4Umh2h+/EAURoFhz0Nq4fo=
 github.com/nicklaw5/helix/v2 v2.22.2 h1:LTZnK9LhUb2xV1/9h3JtIPwAJOSdIakz0qCpTJQXY74=
 github.com/nicklaw5/helix/v2 v2.22.2/go.mod h1:zZcKsyyBWDli34x3QleYsVMiiNGMXPAEU5NjsiZDtvY=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWbfPhv4DMiApHyliiK5xCTNVSPiaAs=
