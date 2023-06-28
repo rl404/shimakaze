@@ -1,5 +1,5 @@
 # Golang base image
-FROM golang:1.18 as go_builder
+FROM golang:1.20 as go_builder
 LABEL stage="shimakaze_builder"
 WORKDIR /shimakaze
 COPY . .
@@ -7,7 +7,7 @@ WORKDIR /shimakaze/cmd/shimakaze
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -mod vendor -o shimakaze
 
 # New stage from scratch
-FROM alpine:3.16
+FROM alpine:3.18
 LABEL stage="shimakaze_binary"
 RUN apk add --no-cache ca-certificates && apk add --no-cache tzdata
 COPY --from=go_builder /shimakaze/cmd/shimakaze/shimakaze /cmd/shimakaze/shimakaze
