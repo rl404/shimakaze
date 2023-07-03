@@ -173,6 +173,8 @@ github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.0 h1:o5Q7DH9Xr9pcEKk91
 github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.0/go.mod h1:n9+bSS8LOiIpBJ4gclBKY4Umh2h+/EAURoFhz0Nq4fo=
 github.com/nicklaw5/helix/v2 v2.22.2 h1:LTZnK9LhUb2xV1/9h3JtIPwAJOSdIakz0qCpTJQXY74=
 github.com/nicklaw5/helix/v2 v2.22.2/go.mod h1:zZcKsyyBWDli34x3QleYsVMiiNGMXPAEU5NjsiZDtvY=
+github.com/nicklaw5/helix/v2 v2.23.0 h1:p8DxZpR3e6k2c4tdhWyIhi9/j1Q7yiJpVWdM91B7AjE=
+github.com/nicklaw5/helix/v2 v2.23.0/go.mod h1:zZcKsyyBWDli34x3QleYsVMiiNGMXPAEU5NjsiZDtvY=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWbfPhv4DMiApHyliiK5xCTNVSPiaAs=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
 github.com/nsqio/go-nsq v1.1.0 h1:PQg+xxiUjA7V+TLdXw7nVrJ5Jbl3sN86EhGCQj4+FYE=
