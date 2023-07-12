@@ -7,7 +7,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rl404/fairy/cache"
 	_nr "github.com/rl404/fairy/log/newrelic"
