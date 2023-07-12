@@ -4,13 +4,13 @@ go 1.18
 
 require (
 	github.com/PuerkitoBio/goquery v1.8.1
-	github.com/go-chi/chi v4.1.2+incompatible
+	github.com/go-chi/chi/v5 v5.0.8
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/newrelic/go-agent/v3 v3.23.1
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.0
 	github.com/nicklaw5/helix/v2 v2.23.1
-	github.com/rl404/fairy v0.22.2
+	github.com/rl404/fairy v0.22.3
 	github.com/spf13/cobra v1.7.0
 	github.com/swaggo/http-swagger/v2 v2.0.1
 	github.com/swaggo/swag v1.16.1
