@@ -1838,6 +1838,23 @@
         }
     },
     "definitions": {
+        "entity.ChannelType": {
+            "type": "string",
+            "enum": [
+                "YOUTUBE",
+                "TWITCH",
+                "BILIBILI",
+                "NICONICO",
+                "OTHER"
+            ],
+            "x-enum-varnames": [
+                "ChannelYoutube",
+                "ChannelTwitch",
+                "ChannelBilibili",
+                "ChannelNiconico",
+                "ChannelOther"
+            ]
+        },
         "service.agency": {
             "type": "object",
             "properties": {
@@ -1860,6 +1877,19 @@
                     "type": "string"
                 }
             }
+        },
+        "service.familyTreeRole": {
+            "type": "string",
+            "enum": [
+                "DESIGNER",
+                "2D_MODELER",
+                "3D_MODELER"
+            ],
+            "x-enum-varnames": [
+                "familyTreeDesigner",
+                "familyTree2DModeler",
+                "familyTree3DModeler"
+            ]
         },
         "service.vtuber": {
             "type": "object",
@@ -2083,7 +2113,7 @@
                     "type": "integer"
                 },
                 "type": {
-                    "type": "string"
+                    "$ref": "#/definitions/entity.ChannelType"
                 },
                 "url": {
                     "type": "string"
@@ -2100,7 +2130,7 @@
             "type": "object",
             "properties": {
                 "channel_type": {
-                    "type": "string"
+                    "$ref": "#/definitions/entity.ChannelType"
                 },
                 "count": {
                     "type": "integer"
@@ -2162,7 +2192,7 @@
                     "type": "integer"
                 },
                 "role": {
-                    "type": "string"
+                    "$ref": "#/definitions/service.familyTreeRole"
                 }
             }
         },
