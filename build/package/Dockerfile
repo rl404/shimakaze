@@ -4,7 +4,7 @@ LABEL stage="shimakaze_builder"
 WORKDIR /shimakaze
 COPY . .
 WORKDIR /shimakaze/cmd/shimakaze
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -mod vendor -o shimakaze
+RUN CGO_ENABLED=0 go build -a -installsuffix cgo -o shimakaze
 
 # New stage from scratch
 FROM alpine:3.18

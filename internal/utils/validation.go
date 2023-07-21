@@ -28,7 +28,7 @@ func Validate(data interface{}) error {
 	return val.Validate(data)
 }
 
-func modNoSpace(in string) string {
+func modNoSpace(in string, _ ...string) string {
 	return strings.ReplaceAll(in, " ", "")
 }
 
