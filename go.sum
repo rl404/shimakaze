@@ -180,6 +180,8 @@ github.com/nicklaw5/helix/v2 v2.23.1 h1:Xo1tFOBIfQkNMg1jP3kf7XXSttaFKOb0SVbzNryW
 github.com/nicklaw5/helix/v2 v2.23.1/go.mod h1:zZcKsyyBWDli34x3QleYsVMiiNGMXPAEU5NjsiZDtvY=
 github.com/nicklaw5/helix/v2 v2.24.0 h1:NNMlO3lmEXe5G8+NKanI8KQSxZ0/hljJpfpdvSVimf8=
 github.com/nicklaw5/helix/v2 v2.24.0/go.mod h1:zZcKsyyBWDli34x3QleYsVMiiNGMXPAEU5NjsiZDtvY=
+github.com/nicklaw5/helix/v2 v2.24.1 h1:e/dVEm+QuDaomJ+0Z+Xp/Uj/DNbc9Ogr2FX2LPdXVVs=
+github.com/nicklaw5/helix/v2 v2.24.1/go.mod h1:zZcKsyyBWDli34x3QleYsVMiiNGMXPAEU5NjsiZDtvY=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWbfPhv4DMiApHyliiK5xCTNVSPiaAs=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
 github.com/nsqio/go-nsq v1.1.0 h1:PQg+xxiUjA7V+TLdXw7nVrJ5Jbl3sN86EhGCQj4+FYE=
