@@ -823,7 +823,7 @@ github.com/newrelic/go-agent/v3/integrations/nrgrpc
 # github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.1
 ## explicit; go 1.19
 github.com/newrelic/go-agent/v3/integrations/nrmongo
-# github.com/nicklaw5/helix/v2 v2.24.1
+# github.com/nicklaw5/helix/v2 v2.25.0
 ## explicit; go 1.19
 github.com/nicklaw5/helix/v2
 # github.com/nsqio/go-nsq v1.1.0
