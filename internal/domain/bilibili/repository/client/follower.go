@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	_errors "errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -39,7 +39,7 @@ func (c *Client) GetFollowerCount(ctx context.Context, id string) (int, int, err
 		return 0, resp.StatusCode, errors.Wrap(ctx, _errors.New(http.StatusText(resp.StatusCode)))
 	}
 
-	respBody, err := ioutil.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
 	}

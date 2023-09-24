@@ -2,7 +2,7 @@ package client
 
 import (
 	"context"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/rl404/shimakaze/internal/errors"
@@ -25,7 +25,7 @@ func (c *Client) GetImage(ctx context.Context, path string) ([]byte, int, error)
 		return nil, resp.StatusCode, errors.Wrap(ctx, err)
 	}
 
-	image, err := ioutil.ReadAll(resp.Body)
+	image, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
 	}

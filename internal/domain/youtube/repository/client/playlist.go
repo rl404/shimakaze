@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	_errors "errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"time"
@@ -59,7 +59,7 @@ func (c *Client) GetVideoIDsByChannelID(ctx context.Context, channelID string) (
 			return nil, resp.StatusCode, errors.Wrap(ctx, _errors.New(http.StatusText(resp.StatusCode)))
 		}
 
-		respBody, err := ioutil.ReadAll(resp.Body)
+		respBody, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
 		}

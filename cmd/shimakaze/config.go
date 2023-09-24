@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"io/ioutil"
 	"os"
 	"time"
 
@@ -189,7 +188,7 @@ func newDB(cfg dbConfig) (*mongo.Database, error) {
 }
 
 func generateGoogleServiceAccountJSON(filename, value string) (string, error) {
-	if err := ioutil.WriteFile(filename, []byte(value), 0644); err != nil {
+	if err := os.WriteFile(filename, []byte(value), 0644); err != nil {
 		return "", err
 	}
 	return filename, nil

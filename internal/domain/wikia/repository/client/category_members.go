@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	_errors "errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -61,7 +61,7 @@ func (c *Client) GetCategoryMembers(ctx context.Context, title string, limit int
 		return nil, "", resp.StatusCode, errors.Wrap(ctx, _errors.New(http.StatusText(resp.StatusCode)))
 	}
 
-	respBody, err := ioutil.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, "", http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
 	}

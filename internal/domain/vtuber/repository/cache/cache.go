@@ -64,8 +64,8 @@ func (c *Cache) GetAllImages(ctx context.Context, shuffle bool, limit int) (data
 	}
 
 	if shuffle {
-		rand.Seed(time.Now().UnixNano())
-		rand.Shuffle(len(data), func(i, j int) {
+		r := rand.New(rand.NewSource(time.Now().UnixNano()))
+		r.Shuffle(len(data), func(i, j int) {
 			data[i], data[j] = data[j], data[i]
 		})
 	}

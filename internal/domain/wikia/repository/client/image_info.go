@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	_errors "errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -56,7 +56,7 @@ func (c *Client) GetImageInfo(ctx context.Context, name string) (string, int, er
 		return "", resp.StatusCode, errors.Wrap(ctx, _errors.New(http.StatusText(resp.StatusCode)))
 	}
 
-	respBody, err := ioutil.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
 	}
