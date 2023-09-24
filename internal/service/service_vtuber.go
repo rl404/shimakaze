@@ -162,8 +162,8 @@ func (s *service) GetVtuberImages(ctx context.Context, shuffle bool, limit int) 
 	}
 
 	if shuffle {
-		rand.Seed(time.Now().UnixNano())
-		rand.Shuffle(len(res), func(i, j int) {
+		r := rand.New(rand.NewSource(time.Now().UnixNano()))
+		r.Shuffle(len(res), func(i, j int) {
 			res[i], res[j] = res[j], res[i]
 		})
 	}
