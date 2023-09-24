@@ -82,7 +82,7 @@ func (c *Client) GetChannelByID(ctx context.Context, id string) (*entity.Channel
 		}, http.StatusOK, nil
 	}
 
-	return nil, http.StatusNotFound, errors.Wrap(ctx, errors.ErrChannelNotFound)
+	return nil, http.StatusNotFound, errors.ErrChannelNotFound
 }
 
 func (c *Client) getChannelImage(thumbnails channelThumbnails) string {
