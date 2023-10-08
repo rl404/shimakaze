@@ -31,7 +31,15 @@ func (p *Pubsub) PublishParseVtuber(ctx context.Context, data entity.ParseVtuber
 		return errors.Wrap(ctx, err, _errors.ErrInternalServer)
 	}
 
-	if err := p.pubsub.Publish(ctx, p.topic, d); err != nil {
+	msg, err := json.Marshal(entity.Message{
+		Type: entity.TypeParseVtuber,
+		Data: d,
+	})
+	if err != nil {
+		return errors.Wrap(ctx, err, _errors.ErrInternalServer)
+	}
+
+	if err := p.pubsub.Publish(ctx, p.topic, msg); err != nil {
 		return errors.Wrap(ctx, err, _errors.ErrInternalServer)
 	}
 
@@ -45,7 +53,15 @@ func (p *Pubsub) PublishParseAgency(ctx context.Context, data entity.ParseAgency
 		return errors.Wrap(ctx, err, _errors.ErrInternalServer)
 	}
 
-	if err := p.pubsub.Publish(ctx, p.topic, d); err != nil {
+	msg, err := json.Marshal(entity.Message{
+		Type: entity.TypeParseAgency,
+		Data: d,
+	})
+	if err != nil {
+		return errors.Wrap(ctx, err, _errors.ErrInternalServer)
+	}
+
+	if err := p.pubsub.Publish(ctx, p.topic, msg); err != nil {
 		return errors.Wrap(ctx, err, _errors.ErrInternalServer)
 	}
 
