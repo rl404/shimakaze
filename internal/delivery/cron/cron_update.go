@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/newrelic/go-agent/v3/newrelic"
-	"github.com/rl404/shimakaze/internal/errors"
+	"github.com/rl404/fairy/errors"
 	"github.com/rl404/shimakaze/internal/utils"
 )
 

@@ -20,8 +20,13 @@ func New(d string, ps pubsub.PubSub) pubsub.PubSub {
 	}
 }
 
+// Use to use middelwares.
+func (c *client) Use(middlewares ...func(pubsub.HandlerFunc) pubsub.HandlerFunc) {
+	c.pubsub.Use(middlewares...)
+}
+
 // Publish to publish message.
-func (c *client) Publish(ctx context.Context, topic string, data interface{}) error {
+func (c *client) Publish(ctx context.Context, topic string, data []byte) error {
 	segment := newrelic.MessageProducerSegment{
 		StartTime:       newrelic.FromContext(ctx).StartSegmentNow(),
 		Library:         c.dialect,
@@ -34,8 +39,8 @@ func (c *client) Publish(ctx context.Context, topic string, data interface{}) er
 }
 
 // Subscribe to subscribe.
-func (c *client) Subscribe(ctx context.Context, topic string) (interface{}, error) {
-	return c.pubsub.Subscribe(ctx, topic)
+func (c *client) Subscribe(ctx context.Context, topic string, handlerFunc pubsub.HandlerFunc) error {
+	return c.pubsub.Subscribe(ctx, topic, handlerFunc)
 }
 
 // Close to close connection.

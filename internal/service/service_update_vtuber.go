@@ -2,15 +2,16 @@ package service
 
 import (
 	"context"
-	_errors "errors"
+	__errors "errors"
 	"fmt"
 	"net/http"
 	"strings"
 
+	"github.com/rl404/fairy/errors"
 	"github.com/rl404/shimakaze/internal/domain/agency/entity"
 	vtuberEntity "github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	wikiaEntity "github.com/rl404/shimakaze/internal/domain/wikia/entity"
-	"github.com/rl404/shimakaze/internal/errors"
+	_errors "github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/utils"
 )
 
@@ -240,7 +241,7 @@ func (s *service) fillYoutubeChannel(ctx context.Context, channel vtuberEntity.C
 	}
 
 	// URL not contain channel id.
-	if !_errors.Is(err, errors.ErrChannelNotFound) {
+	if !__errors.Is(err, _errors.ErrChannelNotFound) {
 		errors.Wrap(ctx, err)
 	}
 

@@ -8,10 +8,10 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/newrelic/go-agent/v3/integrations/nrmongo"
-	"github.com/rl404/fairy/cache"
-	"github.com/rl404/fairy/log"
-	"github.com/rl404/fairy/pubsub"
 	"github.com/rl404/shimakaze/internal/utils"
+	"github.com/rl404/shimakaze/pkg/cache"
+	"github.com/rl404/shimakaze/pkg/log"
+	"github.com/rl404/shimakaze/pkg/pubsub"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -71,7 +71,6 @@ type cronConfig struct {
 }
 
 type logConfig struct {
-	Type  log.LogType  `envconfig:"TYPE" default:"2"`
 	Level log.LogLevel `envconfig:"LEVEL" default:"-1"`
 	JSON  bool         `envconfig:"JSON" default:"false"`
 	Color bool         `envconfig:"COLOR" default:"true"`
@@ -109,11 +108,9 @@ var cacheType = map[string]cache.CacheType{
 	"nocache":  cache.NoCache,
 	"redis":    cache.Redis,
 	"inmemory": cache.InMemory,
-	"memcache": cache.Memcache,
 }
 
 var pubsubType = map[string]pubsub.PubsubType{
-	"nsq":      pubsub.NSQ,
 	"rabbitmq": pubsub.RabbitMQ,
 	"redis":    pubsub.Redis,
 	"google":   pubsub.Google,
@@ -150,7 +147,7 @@ func getConfig() (*config, error) {
 	}
 
 	// Init global log.
-	if err := utils.InitLog(cfg.Log.Type, cfg.Log.Level, cfg.Log.JSON, cfg.Log.Color); err != nil {
+	if err := utils.InitLog(cfg.Log.Level, cfg.Log.JSON, cfg.Log.Color); err != nil {
 		return nil, err
 	}
 

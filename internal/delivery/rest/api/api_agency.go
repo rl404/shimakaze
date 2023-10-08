@@ -5,7 +5,8 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/rl404/shimakaze/internal/errors"
+	"github.com/rl404/fairy/errors"
+	_errors "github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/service"
 	"github.com/rl404/shimakaze/internal/utils"
 )
@@ -46,7 +47,7 @@ func (api *API) handleGetAgencies(w http.ResponseWriter, r *http.Request) {
 func (api *API) handleGetAgencyByID(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
-		utils.ResponseWithJSON(w, http.StatusBadRequest, nil, errors.Wrap(r.Context(), errors.ErrInvalidID, err))
+		utils.ResponseWithJSON(w, http.StatusBadRequest, nil, errors.Wrap(r.Context(), err, _errors.ErrInvalidID))
 		return
 	}
 

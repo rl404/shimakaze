@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/rl404/fairy/validation"
+	"github.com/rl404/fairy/validation/playground"
 	"github.com/rl404/shimakaze/internal/errors"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -12,7 +13,7 @@ import (
 var val validation.Validator
 
 func init() {
-	val = validation.New(true)
+	val = playground.New(true)
 	val.RegisterModifier("no_space", modNoSpace)
 	val.RegisterValidatorError("required", valErrRequired)
 	val.RegisterValidatorError("gte", valErrGTE)

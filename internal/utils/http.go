@@ -8,7 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/rl404/shimakaze/internal/errors"
+	"github.com/rl404/fairy/errors"
+	_errors "github.com/rl404/shimakaze/internal/errors"
 )
 
 // Response is standard api response model.
@@ -72,9 +73,9 @@ func Recoverer(next http.Handler) http.Handler {
 					nil,
 					errors.Wrap(
 						r.Context(),
-						errors.ErrInternalServer,
 						fmt.Errorf("%v", rvr),
-						fmt.Errorf("%s", debug.Stack())))
+						fmt.Errorf("%s", debug.Stack()),
+						_errors.ErrInternalServer))
 			}
 		}()
 

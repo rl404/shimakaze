@@ -4,8 +4,9 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/rl404/fairy/errors"
 	"github.com/rl404/shimakaze/internal/domain/publisher/entity"
-	"github.com/rl404/shimakaze/internal/errors"
+	_errors "github.com/rl404/shimakaze/internal/errors"
 )
 
 // ConsumeMessage to consume message from queue.
@@ -17,14 +18,14 @@ func (s *service) ConsumeMessage(ctx context.Context, data entity.Message) error
 	case entity.TypeParseAgency:
 		return errors.Wrap(ctx, s.consumeParseAgency(ctx, data.Data))
 	default:
-		return errors.Wrap(ctx, errors.ErrInvalidMessageType)
+		return errors.Wrap(ctx, _errors.ErrInvalidMessageType)
 	}
 }
 
 func (s *service) consumeParseVtuber(ctx context.Context, data []byte) error {
 	var req entity.ParseVtuberRequest
 	if err := json.Unmarshal(data, &req); err != nil {
-		return errors.Wrap(ctx, errors.ErrInvalidRequestFormat)
+		return errors.Wrap(ctx, _errors.ErrInvalidRequestFormat)
 	}
 
 	if !req.Forced {
@@ -48,7 +49,7 @@ func (s *service) consumeParseVtuber(ctx context.Context, data []byte) error {
 func (s *service) consumeParseAgency(ctx context.Context, data []byte) error {
 	var req entity.ParseAgencyRequest
 	if err := json.Unmarshal(data, &req); err != nil {
-		return errors.Wrap(ctx, errors.ErrInvalidRequestFormat)
+		return errors.Wrap(ctx, _errors.ErrInvalidRequestFormat)
 	}
 
 	if !req.Forced {

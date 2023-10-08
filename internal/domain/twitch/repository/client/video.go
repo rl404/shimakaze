@@ -2,14 +2,15 @@ package client
 
 import (
 	"context"
-	_errors "errors"
+	__errors "errors"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/nicklaw5/helix/v2"
+	"github.com/rl404/fairy/errors"
 	"github.com/rl404/shimakaze/internal/domain/twitch/entity"
-	"github.com/rl404/shimakaze/internal/errors"
+	_errors "github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/utils"
 )
 
@@ -30,9 +31,9 @@ func (c *Client) GetVideos(ctx context.Context, id string) ([]entity.Video, int,
 		})
 		if err != nil {
 			if resp == nil {
-				return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+				return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalServer)
 			}
-			return nil, resp.StatusCode, errors.Wrap(ctx, _errors.New(resp.Error), _errors.New(resp.ErrorMessage))
+			return nil, resp.StatusCode, errors.Wrap(ctx, __errors.New(resp.Error), __errors.New(resp.ErrorMessage))
 		}
 
 		var done bool

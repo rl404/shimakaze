@@ -5,8 +5,8 @@ import (
 	"math"
 	"net/http"
 
+	"github.com/rl404/fairy/errors"
 	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
-	"github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/utils"
 )
 

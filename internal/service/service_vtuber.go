@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/rl404/fairy/errors"
 	agencyEntity "github.com/rl404/shimakaze/internal/domain/agency/entity"
 	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
-	"github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/utils"
 )
 

@@ -3,14 +3,15 @@ package client
 import (
 	"context"
 	"encoding/json"
-	_errors "errors"
+	__errors "errors"
 	"net/http"
 	"net/url"
 	"strconv"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/rl404/fairy/errors"
 	"github.com/rl404/shimakaze/internal/domain/niconico/entity"
-	"github.com/rl404/shimakaze/internal/errors"
+	_errors "github.com/rl404/shimakaze/internal/errors"
 )
 
 type getUserResponse struct {
@@ -37,27 +38,27 @@ func (c *Client) GetUser(ctx context.Context, userURL string) (*entity.User, int
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url.String(), nil)
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalServer)
 	}
 
 	resp, err := c.http.Do(req)
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalServer)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, resp.StatusCode, errors.Wrap(ctx, _errors.New(http.StatusText(resp.StatusCode)))
+		return nil, resp.StatusCode, errors.Wrap(ctx, __errors.New(http.StatusText(resp.StatusCode)))
 	}
 
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
-		return nil, resp.StatusCode, errors.Wrap(ctx, _errors.New(http.StatusText(resp.StatusCode)))
+		return nil, resp.StatusCode, errors.Wrap(ctx, __errors.New(http.StatusText(resp.StatusCode)))
 	}
 
 	data, err := c.parseData(ctx, doc)
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalServer)
 	}
 
 	return &entity.User{
@@ -71,7 +72,7 @@ func (c *Client) GetUser(ctx context.Context, userURL string) (*entity.User, int
 func (c *Client) parseData(ctx context.Context, doc *goquery.Document) (*getUserResponse, error) {
 	dataStr, ok := doc.Find("div#js-initial-userpage-data").Attr("data-initial-data")
 	if !ok {
-		return nil, errors.Wrap(ctx, errors.ErrChannelNotFound)
+		return nil, errors.Wrap(ctx, _errors.ErrChannelNotFound)
 	}
 
 	var data getUserResponse

@@ -3,13 +3,14 @@ package client
 import (
 	"context"
 	"encoding/json"
-	_errors "errors"
+	__errors "errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 
-	"github.com/rl404/shimakaze/internal/errors"
+	"github.com/rl404/fairy/errors"
+	_errors "github.com/rl404/shimakaze/internal/errors"
 )
 
 type getFollowerResponse struct {
@@ -26,31 +27,31 @@ func (c *Client) GetFollowerCount(ctx context.Context, id string) (int, int, err
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url.String(), nil)
 	if err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalServer)
 	}
 
 	resp, err := c.http.Do(req)
 	if err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalServer)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return 0, resp.StatusCode, errors.Wrap(ctx, _errors.New(http.StatusText(resp.StatusCode)))
+		return 0, resp.StatusCode, errors.Wrap(ctx, __errors.New(http.StatusText(resp.StatusCode)))
 	}
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalServer)
 	}
 
 	var body getFollowerResponse
 	if err := json.Unmarshal(respBody, &body); err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalServer)
 	}
 
 	if body.Code != 0 {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, fmt.Errorf("%d %s", body.Code, body.Message))
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, fmt.Errorf("%d %s", body.Code, body.Message), _errors.ErrInternalServer)
 	}
 
 	return body.Data.Follower, http.StatusOK, nil

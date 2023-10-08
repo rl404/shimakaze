@@ -9,11 +9,9 @@ import (
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/newrelic/go-agent/v3/newrelic"
-	"github.com/rl404/fairy/cache"
 	_nr "github.com/rl404/fairy/log/newrelic"
 	nrCache "github.com/rl404/fairy/monitoring/newrelic/cache"
 	nrPS "github.com/rl404/fairy/monitoring/newrelic/pubsub"
-	"github.com/rl404/fairy/pubsub"
 	"github.com/rl404/shimakaze/internal/delivery/rest/api"
 	"github.com/rl404/shimakaze/internal/delivery/rest/ping"
 	"github.com/rl404/shimakaze/internal/delivery/rest/swagger"
@@ -32,7 +30,9 @@ import (
 	wikiaClient "github.com/rl404/shimakaze/internal/domain/wikia/repository/client"
 	"github.com/rl404/shimakaze/internal/service"
 	"github.com/rl404/shimakaze/internal/utils"
+	"github.com/rl404/shimakaze/pkg/cache"
 	"github.com/rl404/shimakaze/pkg/http"
+	"github.com/rl404/shimakaze/pkg/pubsub"
 )
 
 func server() error {

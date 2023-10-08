@@ -3,15 +3,16 @@ package client
 import (
 	"context"
 	"encoding/json"
-	_errors "errors"
+	__errors "errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"strconv"
 
+	"github.com/rl404/fairy/errors"
 	"github.com/rl404/shimakaze/internal/domain/youtube/entity"
-	"github.com/rl404/shimakaze/internal/errors"
+	_errors "github.com/rl404/shimakaze/internal/errors"
 )
 
 type getChannelsByIDsResponse struct {
@@ -50,27 +51,27 @@ func (c *Client) GetChannelByID(ctx context.Context, id string) (*entity.Channel
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url.String(), nil)
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalServer)
 	}
 
 	resp, err := c.http.Do(req)
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalServer)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, resp.StatusCode, errors.Wrap(ctx, _errors.New(http.StatusText(resp.StatusCode)))
+		return nil, resp.StatusCode, errors.Wrap(ctx, __errors.New(http.StatusText(resp.StatusCode)))
 	}
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalServer)
 	}
 
 	var body getChannelsByIDsResponse
 	if err := json.Unmarshal(respBody, &body); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalServer)
 	}
 
 	for _, channel := range body.Items {
@@ -82,7 +83,8 @@ func (c *Client) GetChannelByID(ctx context.Context, id string) (*entity.Channel
 		}, http.StatusOK, nil
 	}
 
-	return nil, http.StatusNotFound, errors.ErrChannelNotFound
+	// No need to wrap the error to prevent useless error log.
+	return nil, http.StatusNotFound, _errors.ErrChannelNotFound
 }
 
 func (c *Client) getChannelImage(thumbnails channelThumbnails) string {

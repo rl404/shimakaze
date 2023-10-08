@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/rl404/fairy/errors"
 	"github.com/rl404/shimakaze/internal/domain/publisher/entity"
-	"github.com/rl404/shimakaze/internal/errors"
 )
 
 // QueueMissingVtuber to queue missing vtuber.
@@ -91,7 +91,7 @@ func (s *service) QueueMissingAgency(ctx context.Context, limit int) (int, int, 
 			existMap[agency.ID] = true
 
 			if err := s.publisher.PublishParseAgency(ctx, entity.ParseAgencyRequest{ID: agency.ID}); err != nil {
-				return cnt, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+				return cnt, http.StatusInternalServerError, errors.Wrap(ctx, err)
 			}
 
 			cnt++
@@ -118,7 +118,7 @@ func (s *service) QueueOldAgency(ctx context.Context, limit int) (int, int, erro
 
 	for _, id := range ids {
 		if err := s.publisher.PublishParseAgency(ctx, entity.ParseAgencyRequest{ID: id}); err != nil {
-			return cnt, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+			return cnt, http.StatusInternalServerError, errors.Wrap(ctx, err)
 		}
 
 		cnt++

@@ -7,9 +7,10 @@ import (
 	"time"
 
 	"github.com/rl404/fairy/cache"
+	"github.com/rl404/fairy/errors"
 	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	"github.com/rl404/shimakaze/internal/domain/vtuber/repository"
-	"github.com/rl404/shimakaze/internal/errors"
+	_errors "github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/utils"
 )
 
@@ -40,7 +41,7 @@ func (c *Cache) GetByID(ctx context.Context, id int64) (data *entity.Vtuber, cod
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -75,7 +76,7 @@ func (c *Cache) GetAllImages(ctx context.Context, shuffle bool, limit int) (data
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -89,7 +90,7 @@ func (c *Cache) UpdateByID(ctx context.Context, id int64, data entity.Vtuber) (i
 
 	key := utils.GetKey("vtuber", id)
 	if err := c.cacher.Delete(ctx, key); err != nil {
-		return http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 
 	}
 
@@ -104,7 +105,7 @@ func (c *Cache) DeleteByID(ctx context.Context, id int64) (int, error) {
 
 	key := utils.GetKey("vtuber", id)
 	if err := c.cacher.Delete(ctx, key); err != nil {
-		return http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 
 	}
 
@@ -139,7 +140,7 @@ func (c *Cache) GetAllForFamilyTree(ctx context.Context) (data []entity.Vtuber, 
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -158,7 +159,7 @@ func (c *Cache) GetAllForAgencyTree(ctx context.Context) (data []entity.Vtuber, 
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -184,7 +185,7 @@ func (c *Cache) GetAll(ctx context.Context, req entity.GetAllRequest) (_ []entit
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data.Data, data.Total, code, nil
@@ -203,7 +204,7 @@ func (c *Cache) GetCharacterDesigners(ctx context.Context) (data []string, code 
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -222,7 +223,7 @@ func (c *Cache) GetCharacter2DModelers(ctx context.Context) (data []string, code
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -241,7 +242,7 @@ func (c *Cache) GetCharacter3DModelers(ctx context.Context) (data []string, code
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil

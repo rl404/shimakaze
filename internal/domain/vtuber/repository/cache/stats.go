@@ -4,8 +4,9 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/rl404/fairy/errors"
 	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
-	"github.com/rl404/shimakaze/internal/errors"
+	_errors "github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/utils"
 )
 
@@ -22,7 +23,7 @@ func (c *Cache) GetCount(ctx context.Context) (data int, code int, err error) {
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -41,7 +42,7 @@ func (c *Cache) GetAverageActiveTime(ctx context.Context) (data float64, code in
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -60,7 +61,7 @@ func (c *Cache) GetStatusCount(ctx context.Context) (data *entity.StatusCount, c
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -79,7 +80,7 @@ func (c *Cache) GetDebutRetireCountMonthly(ctx context.Context) (data []entity.D
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -98,7 +99,7 @@ func (c *Cache) GetDebutRetireCountYearly(ctx context.Context) (data []entity.De
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -117,7 +118,7 @@ func (c *Cache) GetModelCount(ctx context.Context) (data *entity.ModelCount, cod
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -136,7 +137,7 @@ func (c *Cache) GetInAgencyCount(ctx context.Context) (data *entity.InAgencyCoun
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -155,7 +156,7 @@ func (c *Cache) GetSubscriberCount(ctx context.Context, interval, max int) (data
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -174,7 +175,7 @@ func (c *Cache) GetDesignerCount(ctx context.Context, top int) (data []entity.De
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -193,7 +194,7 @@ func (c *Cache) Get2DModelerCount(ctx context.Context, top int) (data []entity.D
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -212,7 +213,7 @@ func (c *Cache) Get3DModelerCount(ctx context.Context, top int) (data []entity.D
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -231,7 +232,7 @@ func (c *Cache) GetAverageVideoCount(ctx context.Context) (data float64, code in
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -250,7 +251,7 @@ func (c *Cache) GetAverageVideoDuration(ctx context.Context) (data float64, code
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -269,7 +270,7 @@ func (c *Cache) GetVideoCountByDate(ctx context.Context, hourly, daily bool) (da
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -288,7 +289,7 @@ func (c *Cache) GetVideoCount(ctx context.Context, top int) (data []entity.Video
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -307,7 +308,7 @@ func (c *Cache) GetVideoDuration(ctx context.Context, top int) (data []entity.Vi
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -326,7 +327,7 @@ func (c *Cache) GetBirthdayCount(ctx context.Context) (data []entity.BirthdayCou
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -345,7 +346,7 @@ func (c *Cache) GetAverageHeight(ctx context.Context) (data float64, code int, e
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -364,7 +365,7 @@ func (c *Cache) GetAverageWeight(ctx context.Context) (data float64, code int, e
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -383,7 +384,7 @@ func (c *Cache) GetBloodTypeCount(ctx context.Context, top int) (data []entity.B
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -402,7 +403,7 @@ func (c *Cache) GetChannelTypeCount(ctx context.Context) (data []entity.ChannelT
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -421,7 +422,7 @@ func (c *Cache) GetGenderCount(ctx context.Context) (data []entity.GenderCount, 
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -440,7 +441,7 @@ func (c *Cache) GetZodiacCount(ctx context.Context) (data []entity.ZodiacCount, 
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil

@@ -8,11 +8,9 @@ import (
 	"time"
 
 	"github.com/newrelic/go-agent/v3/newrelic"
-	"github.com/rl404/fairy/cache"
 	_nr "github.com/rl404/fairy/log/newrelic"
 	nrCache "github.com/rl404/fairy/monitoring/newrelic/cache"
 	nrPS "github.com/rl404/fairy/monitoring/newrelic/pubsub"
-	"github.com/rl404/fairy/pubsub"
 	_consumer "github.com/rl404/shimakaze/internal/delivery/consumer"
 	agencyRepository "github.com/rl404/shimakaze/internal/domain/agency/repository"
 	agencyMongo "github.com/rl404/shimakaze/internal/domain/agency/repository/mongo"
@@ -34,6 +32,8 @@ import (
 	youtubeClient "github.com/rl404/shimakaze/internal/domain/youtube/repository/client"
 	"github.com/rl404/shimakaze/internal/service"
 	"github.com/rl404/shimakaze/internal/utils"
+	"github.com/rl404/shimakaze/pkg/cache"
+	"github.com/rl404/shimakaze/pkg/pubsub"
 )
 
 func consumer() error {

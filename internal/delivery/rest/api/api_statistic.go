@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/rl404/shimakaze/internal/errors"
+	"github.com/rl404/fairy/errors"
 	"github.com/rl404/shimakaze/internal/service"
 	"github.com/rl404/shimakaze/internal/utils"
 )

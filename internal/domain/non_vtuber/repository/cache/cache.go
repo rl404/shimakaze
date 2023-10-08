@@ -5,8 +5,9 @@ import (
 	"net/http"
 
 	"github.com/rl404/fairy/cache"
+	"github.com/rl404/fairy/errors"
 	"github.com/rl404/shimakaze/internal/domain/non_vtuber/repository"
-	"github.com/rl404/shimakaze/internal/errors"
+	_errors "github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/utils"
 )
 
@@ -37,7 +38,7 @@ func (c *Cache) GetAllIDs(ctx context.Context) (data []int64, code int, err erro
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -52,7 +53,7 @@ func (c *Cache) Create(ctx context.Context, id int64) (int, error) {
 
 	key := utils.GetKey("non-vtuber", "ids")
 	if err := c.cacher.Delete(ctx, key); err != nil {
-		return http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
 	}
 
 	return code, nil

@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"regexp"
 
+	"github.com/rl404/fairy/errors"
 	"github.com/rl404/shimakaze/internal/domain/agency/entity"
 	vtuberEntity "github.com/rl404/shimakaze/internal/domain/vtuber/entity"
-	"github.com/rl404/shimakaze/internal/errors"
 )
 
 func (s *service) updateAgency(ctx context.Context, id int64) (int, error) {

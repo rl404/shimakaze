@@ -1,26 +1,18 @@
 package utils
 
 import (
-	"github.com/rl404/fairy/log"
+	_log "github.com/rl404/fairy/log"
+	"github.com/rl404/fairy/log/chain"
+	"github.com/rl404/shimakaze/pkg/log"
 )
 
-var l log.Logger
-var ls []log.Logger
-
-func init() {
-	l, _ = log.New(log.Config{
-		Type:       log.Zerolog,
-		Level:      log.TraceLevel,
-		JsonFormat: false,
-		Color:      true,
-	})
-	ls = []log.Logger{l}
-}
+var l _log.Logger
+var ls []_log.Logger
 
 // InitLog to init global logger.
-func InitLog(t log.LogType, lvl log.LogLevel, json, color bool) (err error) {
+func InitLog(lvl log.LogLevel, json, color bool) (err error) {
 	l, err = log.New(log.Config{
-		Type:       t,
+		Type:       log.Zerolog,
 		Level:      lvl,
 		JsonFormat: json,
 		Color:      color,
@@ -28,20 +20,18 @@ func InitLog(t log.LogType, lvl log.LogLevel, json, color bool) (err error) {
 	if err != nil {
 		return err
 	}
-	ls = []log.Logger{l}
+	ls = []_log.Logger{l}
 	return nil
 }
 
 // AddLog to add logger chain.
-func AddLog(l1 log.Logger, l2 ...log.Logger) {
-	l = log.NewChain(l, l1)
-	l = log.NewChain(l, l2...)
+func AddLog(l1 _log.Logger) {
+	l = chain.New(l, l1)
 	ls = append(ls, l1)
-	ls = append(ls, l2...)
 }
 
 // GetLogger to get logger.
-func GetLogger(i ...int) log.Logger {
+func GetLogger(i ...int) _log.Logger {
 	if len(i) > 0 {
 		if len(ls) <= i[0] {
 			tmp, _ := log.New(log.Config{Type: log.NoLog})

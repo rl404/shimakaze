@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/rl404/fairy/errors"
 	"github.com/rl404/fairy/pubsub"
 	"github.com/rl404/shimakaze/internal/domain/publisher/entity"
-	"github.com/rl404/shimakaze/internal/errors"
+	_errors "github.com/rl404/shimakaze/internal/errors"
 )
 
 // Pubsub contains functions for pubsub.
@@ -27,14 +28,11 @@ func New(ps pubsub.PubSub, topic string) *Pubsub {
 func (p *Pubsub) PublishParseVtuber(ctx context.Context, data entity.ParseVtuberRequest) error {
 	d, err := json.Marshal(data)
 	if err != nil {
-		return errors.Wrap(ctx, errors.ErrInternalServer, err)
+		return errors.Wrap(ctx, err, _errors.ErrInternalServer)
 	}
 
-	if err := p.pubsub.Publish(ctx, p.topic, entity.Message{
-		Type: entity.TypeParseVtuber,
-		Data: d,
-	}); err != nil {
-		return errors.Wrap(ctx, errors.ErrInternalServer, err)
+	if err := p.pubsub.Publish(ctx, p.topic, d); err != nil {
+		return errors.Wrap(ctx, err, _errors.ErrInternalServer)
 	}
 
 	return nil
@@ -44,14 +42,11 @@ func (p *Pubsub) PublishParseVtuber(ctx context.Context, data entity.ParseVtuber
 func (p *Pubsub) PublishParseAgency(ctx context.Context, data entity.ParseAgencyRequest) error {
 	d, err := json.Marshal(data)
 	if err != nil {
-		return errors.Wrap(ctx, errors.ErrInternalServer, err)
+		return errors.Wrap(ctx, err, _errors.ErrInternalServer)
 	}
 
-	if err := p.pubsub.Publish(ctx, p.topic, entity.Message{
-		Type: entity.TypeParseAgency,
-		Data: d,
-	}); err != nil {
-		return errors.Wrap(ctx, errors.ErrInternalServer, err)
+	if err := p.pubsub.Publish(ctx, p.topic, d); err != nil {
+		return errors.Wrap(ctx, err, _errors.ErrInternalServer)
 	}
 
 	return nil

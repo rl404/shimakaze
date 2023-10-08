@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/rl404/fairy/errors"
 	"github.com/rl404/shimakaze/internal/domain/agency/entity"
-	"github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/utils"
 )
 

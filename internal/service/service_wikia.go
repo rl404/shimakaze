@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/rl404/shimakaze/internal/errors"
+	"github.com/rl404/fairy/errors"
 )
 
 // GetWikiaImage to get wikia image.
