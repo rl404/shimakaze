@@ -102,7 +102,6 @@ type niconicoConfig struct {
 
 const envPath = "../../.env"
 const envPrefix = "SHIMAKAZE"
-const pubsubTopic = "shimakaze-pubsub"
 
 var cacheType = map[string]cache.CacheType{
 	"nocache":  cache.NoCache,

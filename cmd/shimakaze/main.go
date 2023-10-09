@@ -25,13 +25,28 @@ func main() {
 		},
 	})
 
-	cmd.AddCommand(&cobra.Command{
+	consumerCmd := cobra.Command{
 		Use:   "consumer",
 		Short: "Run message consumer",
+	}
+
+	consumerCmd.AddCommand(&cobra.Command{
+		Use:   "parse-vtuber",
+		Short: "Run message consumer parse vtuber",
 		RunE: func(*cobra.Command, []string) error {
-			return consumer()
+			return consumerParseVtuber()
 		},
 	})
+
+	consumerCmd.AddCommand(&cobra.Command{
+		Use:   "parse-agency",
+		Short: "Run message consumer parse agency",
+		RunE: func(*cobra.Command, []string) error {
+			return consumerParseAgency()
+		},
+	})
+
+	cmd.AddCommand(&consumerCmd)
 
 	cronCmd := cobra.Command{
 		Use:   "cron",

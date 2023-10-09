@@ -2,28 +2,41 @@ package main
 
 import (
 	"context"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/newrelic/go-agent/v3/newrelic"
 	_nr "github.com/rl404/fairy/log/newrelic"
+	nrCache "github.com/rl404/fairy/monitoring/newrelic/cache"
 	nrPS "github.com/rl404/fairy/monitoring/newrelic/pubsub"
-	"github.com/rl404/shimakaze/internal/delivery/cron"
+	_consumer "github.com/rl404/shimakaze/internal/delivery/consumer"
 	agencyRepository "github.com/rl404/shimakaze/internal/domain/agency/repository"
 	agencyMongo "github.com/rl404/shimakaze/internal/domain/agency/repository/mongo"
+	bilibiliRepository "github.com/rl404/shimakaze/internal/domain/bilibili/repository"
+	bilibiliClient "github.com/rl404/shimakaze/internal/domain/bilibili/repository/client"
+	niconicoRepository "github.com/rl404/shimakaze/internal/domain/niconico/repository"
+	niconicoClient "github.com/rl404/shimakaze/internal/domain/niconico/repository/client"
 	nonVtuberRepository "github.com/rl404/shimakaze/internal/domain/non_vtuber/repository"
 	nonVtuberMongo "github.com/rl404/shimakaze/internal/domain/non_vtuber/repository/mongo"
 	publisherRepository "github.com/rl404/shimakaze/internal/domain/publisher/repository"
 	publisherPubsub "github.com/rl404/shimakaze/internal/domain/publisher/repository/pubsub"
+	twitchRepository "github.com/rl404/shimakaze/internal/domain/twitch/repository"
+	twitchClient "github.com/rl404/shimakaze/internal/domain/twitch/repository/client"
 	vtuberRepository "github.com/rl404/shimakaze/internal/domain/vtuber/repository"
 	vtuberMongo "github.com/rl404/shimakaze/internal/domain/vtuber/repository/mongo"
 	wikiaRepository "github.com/rl404/shimakaze/internal/domain/wikia/repository"
 	wikiaClient "github.com/rl404/shimakaze/internal/domain/wikia/repository/client"
+	youtubeRepository "github.com/rl404/shimakaze/internal/domain/youtube/repository"
+	youtubeClient "github.com/rl404/shimakaze/internal/domain/youtube/repository/client"
 	"github.com/rl404/shimakaze/internal/service"
 	"github.com/rl404/shimakaze/internal/utils"
+	"github.com/rl404/shimakaze/pkg/cache"
 	"github.com/rl404/shimakaze/pkg/pubsub"
 )
 
-func cronUpdate() error {
+func consumerParseAgency() error {
 	// Get config.
 	cfg, err := getConfig()
 	if err != nil {
@@ -45,6 +58,15 @@ func cronUpdate() error {
 		utils.AddLog(_nr.NewFromNewrelicApp(nrApp, _nr.ErrorLevel))
 		utils.Info("newrelic initialized")
 	}
+
+	// Init in-memory.
+	im, err := cache.New(cache.InMemory, "", "", 5*time.Second)
+	if err != nil {
+		return err
+	}
+	im = nrCache.New("inmemory", "inmemory", im)
+	utils.Info("in-memory initialized")
+	defer im.Close()
 
 	// Init db.
 	db, err := newDB(cfg.DB)
@@ -83,16 +105,44 @@ func cronUpdate() error {
 	var publisher publisherRepository.Repository = publisherPubsub.New(ps)
 	utils.Info("repository publisher initialized")
 
+	// Init youtube.
+	var youtube youtubeRepository.Repository = youtubeClient.New(cfg.Youtube.Key, cfg.Youtube.MaxAge)
+	utils.Info("repository youtube initialized")
+
+	// Init twitch.
+	var twitch twitchRepository.Repository = twitchClient.New(im, cfg.Twitch.ClientID, cfg.Twitch.ClientSecret, cfg.Twitch.MaxAge)
+	utils.Info("repository twitch initialized")
+
+	// Init bilibili.
+	var bilibili bilibiliRepository.Repository = bilibiliClient.New(cfg.Bilibili.MaxAge)
+	utils.Info("repository bilibili initialized")
+
+	// Init niconico.
+	var niconico niconicoRepository.Repository = niconicoClient.New(cfg.Niconico.MaxAge)
+	utils.Info("repository niconico initialized")
+
 	// Init service.
-	service := service.New(wikia, vtuber, nonVtuber, agency, publisher, nil, nil, nil, nil)
+	service := service.New(wikia, vtuber, nonVtuber, agency, publisher, youtube, twitch, bilibili, niconico)
 	utils.Info("service initialized")
 
-	// Run cron.
-	utils.Info("updating old data...")
-	if err := cron.New(service).Update(nrApp, cfg.Cron.UpdateLimit); err != nil {
+	// Init consumer.
+	consumer, err := _consumer.New(service, ps, nrApp)
+	if err != nil {
+		return err
+	}
+	utils.Info("consumer initialized")
+	defer consumer.Close()
+
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+
+	// Start subscribe.
+	if err := consumer.SubscribeParseAgency(); err != nil {
 		return err
 	}
 
-	utils.Info("done")
+	utils.Info("consumer ready")
+	<-sigChan
+
 	return nil
 }

@@ -1,0 +1,10 @@
+version: "2.4"
+
+services:
+  shimakaze-consumer-parse-agency:
+    container_name: shimakaze-consumer-parse-agency
+    image: rl404/shimakaze:latest
+    command: ./shimakaze consumer parse-agency
+    restart: always
+    env_file: ./../.env
+    network_mode: host

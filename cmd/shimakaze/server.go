@@ -119,7 +119,7 @@ func server() error {
 	utils.Info("repository agency initialized")
 
 	// Init publisher.
-	var publisher publisherRepository.Repository = publisherPubsub.New(ps, pubsubTopic)
+	var publisher publisherRepository.Repository = publisherPubsub.New(ps)
 	utils.Info("repository publisher initialized")
 
 	// Init service.
