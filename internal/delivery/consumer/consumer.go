@@ -29,3 +29,11 @@ func New(service service.Service, ps pubsub.PubSub, nrApp *newrelic.Application)
 func (c *Consumer) Close() error {
 	return c.pubsub.Close()
 }
+
+func middlewareWithLog(topic string, handler pubsub.HandlerFunc) pubsub.HandlerFunc {
+	return log.PubSubHandlerFuncWithLog(utils.GetLogger(1), handler, log.PubSubMiddlewareConfig{
+		Topic:   topic,
+		Payload: true,
+		Error:   true,
+	})
+}
