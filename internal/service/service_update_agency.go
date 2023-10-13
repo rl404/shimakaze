@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/rl404/fairy/errors"
+	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/agency/entity"
 	vtuberEntity "github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 )
@@ -14,7 +14,7 @@ func (s *service) updateAgency(ctx context.Context, id int64) (int, error) {
 	// Call wikia api.
 	page, code, err := s.wikia.GetPageByID(ctx, id)
 	if err != nil {
-		return code, errors.Wrap(ctx, err)
+		return code, stack.Wrap(ctx, err)
 	}
 
 	// Get members.
@@ -25,7 +25,7 @@ func (s *service) updateAgency(ctx context.Context, id int64) (int, error) {
 		Limit:    -1,
 	})
 	if err != nil {
-		return code, errors.Wrap(ctx, err)
+		return code, stack.Wrap(ctx, err)
 	}
 
 	// Get total subs.
@@ -53,7 +53,7 @@ func (s *service) updateAgency(ctx context.Context, id int64) (int, error) {
 		Member:     total,
 		Subscriber: subsTotal,
 	}); err != nil {
-		return code, errors.Wrap(ctx, err)
+		return code, stack.Wrap(ctx, err)
 	}
 
 	return http.StatusOK, nil
@@ -73,7 +73,7 @@ func (s *service) getAgencyLogo(ctx context.Context, data string) string {
 
 	imageURL, _, err := s.wikia.GetImageInfo(ctx, submatch[1])
 	if err != nil {
-		errors.Wrap(ctx, err)
+		stack.Wrap(ctx, err)
 		return ""
 	}
 

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/rl404/fairy/errors"
+	"github.com/rl404/fairy/errors/stack"
 )
 
 // GetWikiaImage to get wikia image.
@@ -13,7 +13,7 @@ func (s *service) GetWikiaImage(ctx context.Context, path string) ([]byte, int, 
 	path, _ = url.QueryUnescape(path)
 	image, code, err := s.wikia.GetImage(ctx, path)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 	return image, http.StatusOK, nil
 }

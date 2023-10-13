@@ -1,6 +1,6 @@
-// Package errors is an error wrapper and put it to a stack
+// Package stack is an error wrapper and put it to a stack
 // using passed context.
-package errors
+package stack
 
 import (
 	"context"

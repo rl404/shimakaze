@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/rl404/fairy/errors"
+	"github.com/rl404/fairy/errors/stack"
 	agencyEntity "github.com/rl404/shimakaze/internal/domain/agency/entity"
 	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	"github.com/rl404/shimakaze/internal/utils"
@@ -71,7 +71,7 @@ type vtuberVideo struct {
 func (s *service) GetVtuberByID(ctx context.Context, id int64) (*vtuber, int, error) {
 	vt, code, err := s.vtuber.GetByID(ctx, id)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	agencies := make([]vtuberAgency, len(vt.Agencies))
@@ -149,7 +149,7 @@ type vtuberImage struct {
 func (s *service) GetVtuberImages(ctx context.Context, shuffle bool, limit int) ([]vtuberImage, int, error) {
 	images, code, err := s.vtuber.GetAllImages(ctx, shuffle, limit)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	res := make([]vtuberImage, len(images))
@@ -201,7 +201,7 @@ const (
 func (s *service) GetVtuberFamilyTrees(ctx context.Context) (*vtuberFamilyTree, int, error) {
 	vtubers, code, err := s.vtuber.GetAllForFamilyTree(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	var tree vtuberFamilyTree
@@ -285,12 +285,12 @@ type vtuberAgencyTreeLink struct {
 func (s *service) GetVtuberAgencyTrees(ctx context.Context) (*vtuberAgencyTree, int, error) {
 	vtubers, code, err := s.vtuber.GetAllForAgencyTree(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	agencies, _, code, err := s.agency.GetAll(ctx, agencyEntity.GetAllRequest{Page: 1, Limit: -1})
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	var tree vtuberAgencyTree
@@ -368,7 +368,7 @@ type GetVtubersRequest struct {
 // GetVtubers to get vtuber list.
 func (s *service) GetVtubers(ctx context.Context, data GetVtubersRequest) ([]vtuber, *pagination, int, error) {
 	if err := utils.Validate(&data); err != nil {
-		return nil, nil, http.StatusBadRequest, errors.Wrap(ctx, err)
+		return nil, nil, http.StatusBadRequest, stack.Wrap(ctx, err)
 	}
 
 	vtubers, total, code, err := s.vtuber.GetAll(ctx, entity.GetAllRequest{
@@ -409,7 +409,7 @@ func (s *service) GetVtubers(ctx context.Context, data GetVtubersRequest) ([]vtu
 		Limit:              data.Limit,
 	})
 	if err != nil {
-		return nil, nil, code, errors.Wrap(ctx, err)
+		return nil, nil, code, stack.Wrap(ctx, err)
 	}
 
 	res := make([]vtuber, len(vtubers))
@@ -490,7 +490,7 @@ func (s *service) GetVtubers(ctx context.Context, data GetVtubersRequest) ([]vtu
 func (s *service) GetVtuberCharacterDesigners(ctx context.Context) ([]string, int, error) {
 	designers, code, err := s.vtuber.GetCharacterDesigners(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 	return designers, http.StatusOK, nil
 }
@@ -499,7 +499,7 @@ func (s *service) GetVtuberCharacterDesigners(ctx context.Context) ([]string, in
 func (s *service) GetVtuberCharacter2DModelers(ctx context.Context) ([]string, int, error) {
 	modelers, code, err := s.vtuber.GetCharacter2DModelers(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 	return modelers, http.StatusOK, nil
 }
@@ -508,7 +508,7 @@ func (s *service) GetVtuberCharacter2DModelers(ctx context.Context) ([]string, i
 func (s *service) GetVtuberCharacter3DModelers(ctx context.Context) ([]string, int, error) {
 	modelers, code, err := s.vtuber.GetCharacter3DModelers(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 	return modelers, http.StatusOK, nil
 }

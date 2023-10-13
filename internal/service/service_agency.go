@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/rl404/fairy/errors"
+	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/agency/entity"
 	"github.com/rl404/shimakaze/internal/utils"
 )
@@ -29,7 +29,7 @@ type GetAgenciesRequest struct {
 // GetAgencies to get agency list.
 func (s *service) GetAgencies(ctx context.Context, data GetAgenciesRequest) ([]agency, *pagination, int, error) {
 	if err := utils.Validate(&data); err != nil {
-		return nil, nil, http.StatusBadRequest, errors.Wrap(ctx, err)
+		return nil, nil, http.StatusBadRequest, stack.Wrap(ctx, err)
 	}
 
 	agencies, total, code, err := s.agency.GetAll(ctx, entity.GetAllRequest{
@@ -38,7 +38,7 @@ func (s *service) GetAgencies(ctx context.Context, data GetAgenciesRequest) ([]a
 		Limit: data.Limit,
 	})
 	if err != nil {
-		return nil, nil, code, errors.Wrap(ctx, err)
+		return nil, nil, code, stack.Wrap(ctx, err)
 	}
 
 	res := make([]agency, len(agencies))
@@ -64,7 +64,7 @@ func (s *service) GetAgencies(ctx context.Context, data GetAgenciesRequest) ([]a
 func (s *service) GetAgencyByID(ctx context.Context, id int64) (*agency, int, error) {
 	a, code, err := s.agency.GetByID(ctx, id)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	return &agency{

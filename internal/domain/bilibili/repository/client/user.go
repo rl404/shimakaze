@@ -3,16 +3,16 @@ package client
 import (
 	"context"
 	"encoding/json"
-	__errors "errors"
+	_errors "errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"strconv"
 
-	"github.com/rl404/fairy/errors"
+	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/bilibili/entity"
-	_errors "github.com/rl404/shimakaze/internal/errors"
+	"github.com/rl404/shimakaze/internal/errors"
 )
 
 type getUserResponse struct {
@@ -40,31 +40,31 @@ func (c *Client) GetUser(ctx context.Context, id string) (*entity.User, int, err
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url.String(), nil)
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalServer)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalServer)
 	}
 
 	resp, err := c.http.Do(req)
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalServer)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalServer)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, resp.StatusCode, errors.Wrap(ctx, __errors.New(http.StatusText(resp.StatusCode)))
+		return nil, resp.StatusCode, stack.Wrap(ctx, _errors.New(http.StatusText(resp.StatusCode)))
 	}
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalServer)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalServer)
 	}
 
 	var body getUserResponse
 	if err := json.Unmarshal(respBody, &body); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalServer)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalServer)
 	}
 
 	if body.Code != 0 {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, fmt.Errorf("%d %s", body.Code, body.Message), _errors.ErrInternalServer)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, fmt.Errorf("%d %s", body.Code, body.Message), errors.ErrInternalServer)
 	}
 
 	return &entity.User{

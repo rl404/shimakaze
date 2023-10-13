@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/rl404/fairy/errors"
+	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/fairy/pubsub"
 )
 
@@ -41,7 +41,7 @@ func PubSubHandlerFuncWithLog(logger Logger, next pubsub.HandlerFunc, middleware
 		}
 
 		// Prepare error stack tracing.
-		ctx = errors.Init(ctx)
+		ctx = stack.Init(ctx)
 		start := time.Now()
 
 		// Call next handler.
@@ -62,7 +62,7 @@ func PubSubHandlerFuncWithLog(logger Logger, next pubsub.HandlerFunc, middleware
 		}
 
 		// Include the error stack if you use it.
-		errStack := errors.Get(ctx)
+		errStack := stack.Get(ctx)
 		if len(errStack) > 0 {
 			m["level"] = errorLevel
 

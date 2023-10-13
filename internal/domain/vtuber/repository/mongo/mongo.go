@@ -2,13 +2,13 @@ package mongo
 
 import (
 	"context"
-	__errors "errors"
+	_errors "errors"
 	"net/http"
 	"time"
 
-	"github.com/rl404/fairy/errors"
+	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
-	_errors "github.com/rl404/shimakaze/internal/errors"
+	"github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -36,10 +36,10 @@ func New(db *mongo.Database, oldActiveAge, oldRetiredAge int) *Mongo {
 func (m *Mongo) GetByID(ctx context.Context, id int64) (*entity.Vtuber, int, error) {
 	var vtuber vtuber
 	if err := m.db.FindOne(ctx, bson.M{"id": id}).Decode(&vtuber); err != nil {
-		if __errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, http.StatusNotFound, errors.Wrap(ctx, err, _errors.ErrVtuberNotFound)
+		if _errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, http.StatusNotFound, stack.Wrap(ctx, err, errors.ErrVtuberNotFound)
 		}
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 	return vtuber.toEntity(), http.StatusOK, nil
 }
@@ -48,14 +48,14 @@ func (m *Mongo) GetByID(ctx context.Context, id int64) (*entity.Vtuber, int, err
 func (m *Mongo) GetAllIDs(ctx context.Context) ([]int64, int, error) {
 	cursor, err := m.db.Find(ctx, bson.M{}, options.Find().SetProjection(bson.M{"id": 1}))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var ids []int64
 	for cursor.Next(ctx) {
 		var vtuber vtuber
 		if err := cursor.Decode(&vtuber); err != nil {
-			return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+			return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 		}
 
 		ids = append(ids, vtuber.ID)
@@ -68,20 +68,20 @@ func (m *Mongo) GetAllIDs(ctx context.Context) ([]int64, int, error) {
 func (m *Mongo) UpdateByID(ctx context.Context, id int64, data entity.Vtuber) (int, error) {
 	var vtuber vtuber
 	if err := m.db.FindOne(ctx, bson.M{"id": data.ID}).Decode(&vtuber); err != nil {
-		if __errors.Is(err, mongo.ErrNoDocuments) {
+		if _errors.Is(err, mongo.ErrNoDocuments) {
 			if _, err := m.db.InsertOne(ctx, m.vtuberFromEntity(data)); err != nil {
-				return http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+				return http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 			}
 			return http.StatusOK, nil
 		}
-		return http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	mm := m.vtuberFromEntity(data)
 	mm.CreatedAt = vtuber.CreatedAt
 
 	if _, err := m.db.UpdateOne(ctx, bson.M{"id": data.ID}, bson.M{"$set": mm}); err != nil {
-		return http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	return http.StatusOK, nil
@@ -90,7 +90,7 @@ func (m *Mongo) UpdateByID(ctx context.Context, id int64, data entity.Vtuber) (i
 // DeleteByID to delete by id.
 func (m *Mongo) DeleteByID(ctx context.Context, id int64) (int, error) {
 	if _, err := m.db.DeleteOne(ctx, bson.M{"id": id}); err != nil {
-		return http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 	return http.StatusOK, nil
 }
@@ -106,10 +106,10 @@ func (m *Mongo) IsOld(ctx context.Context, id int64) (bool, int, error) {
 	}
 
 	if err := m.db.FindOne(ctx, filter).Decode(&vtuber{}); err != nil {
-		if __errors.Is(err, mongo.ErrNoDocuments) {
+		if _errors.Is(err, mongo.ErrNoDocuments) {
 			return true, http.StatusNotFound, nil
 		}
-		return true, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return true, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	return false, http.StatusOK, nil
@@ -122,7 +122,7 @@ func (m *Mongo) GetOldActiveIDs(ctx context.Context) ([]int64, int, error) {
 		"updated_at":      bson.M{"$lte": primitive.NewDateTimeFromTime(time.Now().Add(-m.oldActiveAge))},
 	}, options.Find().SetProjection(bson.M{"id": 1}))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 	defer cursor.Close(ctx)
 
@@ -130,7 +130,7 @@ func (m *Mongo) GetOldActiveIDs(ctx context.Context) ([]int64, int, error) {
 	for cursor.Next(ctx) {
 		var vtuber vtuber
 		if err := cursor.Decode(&vtuber); err != nil {
-			return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+			return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 		}
 
 		ids = append(ids, vtuber.ID)
@@ -146,7 +146,7 @@ func (m *Mongo) GetOldRetiredIDs(ctx context.Context) ([]int64, int, error) {
 		"updated_at":      bson.M{"$lte": primitive.NewDateTimeFromTime(time.Now().Add(-m.oldActiveAge))},
 	}, options.Find().SetProjection(bson.M{"id": 1}))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 	defer cursor.Close(ctx)
 
@@ -154,7 +154,7 @@ func (m *Mongo) GetOldRetiredIDs(ctx context.Context) ([]int64, int, error) {
 	for cursor.Next(ctx) {
 		var vtuber vtuber
 		if err := cursor.Decode(&vtuber); err != nil {
-			return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+			return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 		}
 
 		ids = append(ids, vtuber.ID)
@@ -167,14 +167,14 @@ func (m *Mongo) GetOldRetiredIDs(ctx context.Context) ([]int64, int, error) {
 func (m *Mongo) GetAllImages(ctx context.Context, _ bool, _ int) ([]entity.Vtuber, int, error) {
 	cursor, err := m.db.Find(ctx, bson.M{"image": bson.M{"$ne": ""}}, options.Find().SetProjection(bson.M{"id": 1, "name": 1, "image": 1}))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var res []entity.Vtuber
 	for cursor.Next(ctx) {
 		var vtuber vtuber
 		if err := cursor.Decode(&vtuber); err != nil {
-			return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+			return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 		}
 
 		res = append(res, entity.Vtuber{
@@ -199,14 +199,14 @@ func (m *Mongo) GetAllForFamilyTree(ctx context.Context) ([]entity.Vtuber, int, 
 		"character_3d_modelers": 1,
 	}))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var res []entity.Vtuber
 	for cursor.Next(ctx) {
 		var vtuber vtuber
 		if err := cursor.Decode(&vtuber); err != nil {
-			return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+			return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 		}
 
 		res = append(res, entity.Vtuber{
@@ -233,14 +233,14 @@ func (m *Mongo) GetAllForAgencyTree(ctx context.Context) ([]entity.Vtuber, int, 
 		"agencies":        1,
 	}))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var res []entity.Vtuber
 	for cursor.Next(ctx) {
 		var vtuber vtuber
 		if err := cursor.Decode(&vtuber); err != nil {
-			return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+			return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 		}
 
 		agencies := make([]entity.Agency, len(vtuber.Agencies))
@@ -435,12 +435,12 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 
 	cursor, err := m.db.Aggregate(ctx, m.getPipeline(newFieldStage, matchStage, projectStage, sortStage, skipStage, limitStage))
 	if err != nil {
-		return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return nil, 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var vtubers []vtuber
 	if err := cursor.All(ctx, &vtubers); err != nil {
-		return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return nil, 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	res := make([]entity.Vtuber, len(vtubers))
@@ -450,12 +450,12 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 
 	cntCursor, err := m.db.Aggregate(ctx, m.getPipeline(newFieldStage, matchStage, countStage))
 	if err != nil {
-		return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return nil, 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var total []map[string]int64
 	if err := cntCursor.All(ctx, &total); err != nil {
-		return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return nil, 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	if len(total) == 0 {
@@ -469,14 +469,14 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 func (m *Mongo) GetCharacterDesigners(ctx context.Context) ([]string, int, error) {
 	designers, err := m.db.Distinct(ctx, "character_designers", bson.M{"character_designers": bson.M{"$ne": nil}})
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	res := make([]string, len(designers))
 	for i, d := range designers {
 		v, ok := d.(string)
 		if !ok {
-			return nil, http.StatusInternalServerError, errors.Wrap(ctx, __errors.New("invalid value"), _errors.ErrInternalDB)
+			return nil, http.StatusInternalServerError, stack.Wrap(ctx, _errors.New("invalid value"), errors.ErrInternalDB)
 		}
 		res[i] = v
 	}
@@ -488,14 +488,14 @@ func (m *Mongo) GetCharacterDesigners(ctx context.Context) ([]string, int, error
 func (m *Mongo) GetCharacter2DModelers(ctx context.Context) ([]string, int, error) {
 	modelers, err := m.db.Distinct(ctx, "character_2d_modelers", bson.M{"character_2d_modelers": bson.M{"$ne": nil}})
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	res := make([]string, len(modelers))
 	for i, d := range modelers {
 		v, ok := d.(string)
 		if !ok {
-			return nil, http.StatusInternalServerError, errors.Wrap(ctx, __errors.New("invalid value"), _errors.ErrInternalDB)
+			return nil, http.StatusInternalServerError, stack.Wrap(ctx, _errors.New("invalid value"), errors.ErrInternalDB)
 		}
 		res[i] = v
 	}
@@ -507,14 +507,14 @@ func (m *Mongo) GetCharacter2DModelers(ctx context.Context) ([]string, int, erro
 func (m *Mongo) GetCharacter3DModelers(ctx context.Context) ([]string, int, error) {
 	modelers, err := m.db.Distinct(ctx, "character_3d_modelers", bson.M{"character_3d_modelers": bson.M{"$ne": nil}})
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	res := make([]string, len(modelers))
 	for i, d := range modelers {
 		v, ok := d.(string)
 		if !ok {
-			return nil, http.StatusInternalServerError, errors.Wrap(ctx, __errors.New("invalid value"), _errors.ErrInternalDB)
+			return nil, http.StatusInternalServerError, stack.Wrap(ctx, _errors.New("invalid value"), errors.ErrInternalDB)
 		}
 		res[i] = v
 	}

@@ -4,9 +4,9 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/rl404/fairy/errors"
+	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
-	_errors "github.com/rl404/shimakaze/internal/errors"
+	"github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/utils"
 )
 
@@ -19,11 +19,11 @@ func (c *Cache) GetCount(ctx context.Context) (data int, code int, err error) {
 
 	data, code, err = c.repo.GetCount(ctx)
 	if err != nil {
-		return 0, code, errors.Wrap(ctx, err)
+		return 0, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
+		return 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -38,11 +38,11 @@ func (c *Cache) GetAverageActiveTime(ctx context.Context) (data float64, code in
 
 	data, code, err = c.repo.GetAverageActiveTime(ctx)
 	if err != nil {
-		return 0, code, errors.Wrap(ctx, err)
+		return 0, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
+		return 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -57,11 +57,11 @@ func (c *Cache) GetStatusCount(ctx context.Context) (data *entity.StatusCount, c
 
 	data, code, err = c.repo.GetStatusCount(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -76,11 +76,11 @@ func (c *Cache) GetDebutRetireCountMonthly(ctx context.Context) (data []entity.D
 
 	data, code, err = c.repo.GetDebutRetireCountMonthly(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -95,11 +95,11 @@ func (c *Cache) GetDebutRetireCountYearly(ctx context.Context) (data []entity.De
 
 	data, code, err = c.repo.GetDebutRetireCountYearly(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -114,11 +114,11 @@ func (c *Cache) GetModelCount(ctx context.Context) (data *entity.ModelCount, cod
 
 	data, code, err = c.repo.GetModelCount(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -133,11 +133,11 @@ func (c *Cache) GetInAgencyCount(ctx context.Context) (data *entity.InAgencyCoun
 
 	data, code, err = c.repo.GetInAgencyCount(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -152,11 +152,11 @@ func (c *Cache) GetSubscriberCount(ctx context.Context, interval, max int) (data
 
 	data, code, err = c.repo.GetSubscriberCount(ctx, interval, max)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -171,11 +171,11 @@ func (c *Cache) GetDesignerCount(ctx context.Context, top int) (data []entity.De
 
 	data, code, err = c.repo.GetDesignerCount(ctx, top)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -190,11 +190,11 @@ func (c *Cache) Get2DModelerCount(ctx context.Context, top int) (data []entity.D
 
 	data, code, err = c.repo.Get2DModelerCount(ctx, top)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -209,11 +209,11 @@ func (c *Cache) Get3DModelerCount(ctx context.Context, top int) (data []entity.D
 
 	data, code, err = c.repo.Get3DModelerCount(ctx, top)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -228,11 +228,11 @@ func (c *Cache) GetAverageVideoCount(ctx context.Context) (data float64, code in
 
 	data, code, err = c.repo.GetAverageVideoCount(ctx)
 	if err != nil {
-		return 0, code, errors.Wrap(ctx, err)
+		return 0, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
+		return 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -247,11 +247,11 @@ func (c *Cache) GetAverageVideoDuration(ctx context.Context) (data float64, code
 
 	data, code, err = c.repo.GetAverageVideoDuration(ctx)
 	if err != nil {
-		return 0, code, errors.Wrap(ctx, err)
+		return 0, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
+		return 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -266,11 +266,11 @@ func (c *Cache) GetVideoCountByDate(ctx context.Context, hourly, daily bool) (da
 
 	data, code, err = c.repo.GetVideoCountByDate(ctx, hourly, daily)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -285,11 +285,11 @@ func (c *Cache) GetVideoCount(ctx context.Context, top int) (data []entity.Video
 
 	data, code, err = c.repo.GetVideoCount(ctx, top)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -304,11 +304,11 @@ func (c *Cache) GetVideoDuration(ctx context.Context, top int) (data []entity.Vi
 
 	data, code, err = c.repo.GetVideoDuration(ctx, top)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -323,11 +323,11 @@ func (c *Cache) GetBirthdayCount(ctx context.Context) (data []entity.BirthdayCou
 
 	data, code, err = c.repo.GetBirthdayCount(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -342,11 +342,11 @@ func (c *Cache) GetAverageHeight(ctx context.Context) (data float64, code int, e
 
 	data, code, err = c.repo.GetAverageHeight(ctx)
 	if err != nil {
-		return 0, code, errors.Wrap(ctx, err)
+		return 0, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
+		return 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -361,11 +361,11 @@ func (c *Cache) GetAverageWeight(ctx context.Context) (data float64, code int, e
 
 	data, code, err = c.repo.GetAverageWeight(ctx)
 	if err != nil {
-		return 0, code, errors.Wrap(ctx, err)
+		return 0, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
+		return 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -380,11 +380,11 @@ func (c *Cache) GetBloodTypeCount(ctx context.Context, top int) (data []entity.B
 
 	data, code, err = c.repo.GetBloodTypeCount(ctx, top)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -399,11 +399,11 @@ func (c *Cache) GetChannelTypeCount(ctx context.Context) (data []entity.ChannelT
 
 	data, code, err = c.repo.GetChannelTypeCount(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -418,11 +418,11 @@ func (c *Cache) GetGenderCount(ctx context.Context) (data []entity.GenderCount, 
 
 	data, code, err = c.repo.GetGenderCount(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -437,11 +437,11 @@ func (c *Cache) GetZodiacCount(ctx context.Context) (data []entity.ZodiacCount, 
 
 	data, code, err = c.repo.GetZodiacCount(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalCache)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil

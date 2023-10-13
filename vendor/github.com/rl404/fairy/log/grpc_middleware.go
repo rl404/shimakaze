@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rl404/fairy/errors"
+	"github.com/rl404/fairy/errors/stack"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -27,7 +27,7 @@ func UnaryMiddlewareWithLog(logger Logger, middlewareConfig ...APIMiddlewareConf
 		}
 
 		// Prepare error stack tracing.
-		ctx = errors.Init(ctx)
+		ctx = stack.Init(ctx)
 		start := time.Now()
 
 		// Call handler.
@@ -64,7 +64,7 @@ func UnaryMiddlewareWithLog(logger Logger, middlewareConfig ...APIMiddlewareConf
 		}
 
 		// Include the error stack if you use it.
-		errStack := errors.Get(ctx)
+		errStack := stack.Get(ctx)
 		if len(errStack) > 0 {
 			// Copy slice to prevent reversed multiple times
 			// if using multiple middleware.

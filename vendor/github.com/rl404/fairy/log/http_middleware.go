@@ -9,7 +9,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/rl404/fairy/errors"
+	"github.com/rl404/fairy/errors/stack"
 )
 
 // APIMiddlewareConfig is log config for middleware.
@@ -56,7 +56,7 @@ func HTTPHandlerWithLog(logger Logger, next http.Handler, middlewareConfig ...AP
 		}
 
 		// Prepare error stack tracing.
-		ctx := errors.Init(r.Context())
+		ctx := stack.Init(r.Context())
 		start := time.Now()
 
 		var bw bodyWriter
@@ -68,7 +68,7 @@ func HTTPHandlerWithLog(logger Logger, next http.Handler, middlewareConfig ...AP
 		if r.Body != nil {
 			b, err := io.ReadAll(r.Body)
 			if err != nil {
-				errors.Wrap(ctx, err)
+				_ = stack.Wrap(ctx, err)
 			}
 			body, r.Body = b, io.NopCloser(bytes.NewBuffer(b))
 		}
@@ -111,7 +111,7 @@ func HTTPHandlerWithLog(logger Logger, next http.Handler, middlewareConfig ...AP
 		}
 
 		// Include the error stack if you use it.
-		errStack := errors.Get(ctx)
+		errStack := stack.Get(ctx)
 		if cfg.Error && len(errStack) > 0 {
 			// Copy slice to prevent reversed multiple times
 			// if using multiple middleware.
@@ -129,8 +129,8 @@ func HTTPHandlerWithLog(logger Logger, next http.Handler, middlewareConfig ...AP
 	})
 }
 
-func cpSlice(arr []errors.ErrStack) []errors.ErrStack {
-	a := make([]errors.ErrStack, len(arr))
+func cpSlice(arr []stack.ErrStack) []stack.ErrStack {
+	a := make([]stack.ErrStack, len(arr))
 	copy(a, arr)
 	return a
 }

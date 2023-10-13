@@ -2,13 +2,13 @@ package mongo
 
 import (
 	"context"
-	__errors "errors"
+	_errors "errors"
 	"net/http"
 	"time"
 
-	"github.com/rl404/fairy/errors"
+	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/agency/entity"
-	_errors "github.com/rl404/shimakaze/internal/errors"
+	"github.com/rl404/shimakaze/internal/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -33,10 +33,10 @@ func New(db *mongo.Database, oldAge int) *Mongo {
 func (m *Mongo) GetByID(ctx context.Context, id int64) (*entity.Agency, int, error) {
 	var agency agency
 	if err := m.db.FindOne(ctx, bson.M{"id": id}).Decode(&agency); err != nil {
-		if __errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, http.StatusNotFound, errors.Wrap(ctx, err, _errors.ErrAgencyNotFound)
+		if _errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, http.StatusNotFound, stack.Wrap(ctx, err, errors.ErrAgencyNotFound)
 		}
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 	return agency.toEntity(), http.StatusOK, nil
 }
@@ -46,14 +46,14 @@ func (m *Mongo) GetAllIDs(ctx context.Context) ([]int64, int, error) {
 	var ids []int64
 	c, err := m.db.Find(ctx, bson.M{}, options.Find().SetProjection(bson.M{"id": 1}))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 	defer c.Close(ctx)
 
 	for c.Next(ctx) {
 		var agency agency
 		if err := c.Decode(&agency); err != nil {
-			return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+			return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 		}
 		ids = append(ids, agency.ID)
 	}
@@ -71,7 +71,7 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 
 	c, err := m.db.Find(ctx, bson.M{}, opt)
 	if err != nil {
-		return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return nil, 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 	defer c.Close(ctx)
 
@@ -79,14 +79,14 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 	for c.Next(ctx) {
 		var agency agency
 		if err := c.Decode(&agency); err != nil {
-			return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+			return nil, 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 		}
 		agencies = append(agencies, *agency.toEntity())
 	}
 
 	total, err := m.db.CountDocuments(ctx, bson.M{}, options.Count())
 	if err != nil {
-		return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return nil, 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	return agencies, int(total), http.StatusOK, nil
@@ -100,10 +100,10 @@ func (m *Mongo) IsOld(ctx context.Context, id int64) (bool, int, error) {
 	}
 
 	if err := m.db.FindOne(ctx, filter).Decode(&agency{}); err != nil {
-		if __errors.Is(err, mongo.ErrNoDocuments) {
+		if _errors.Is(err, mongo.ErrNoDocuments) {
 			return true, http.StatusNotFound, nil
 		}
-		return true, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return true, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	return false, http.StatusOK, nil
@@ -113,20 +113,20 @@ func (m *Mongo) IsOld(ctx context.Context, id int64) (bool, int, error) {
 func (m *Mongo) UpdateByID(ctx context.Context, id int64, data entity.Agency) (int, error) {
 	var agency agency
 	if err := m.db.FindOne(ctx, bson.M{"id": data.ID}).Decode(&agency); err != nil {
-		if __errors.Is(err, mongo.ErrNoDocuments) {
+		if _errors.Is(err, mongo.ErrNoDocuments) {
 			if _, err := m.db.InsertOne(ctx, m.agencyFromEntity(data)); err != nil {
-				return http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+				return http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 			}
 			return http.StatusOK, nil
 		}
-		return http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	mm := m.agencyFromEntity(data)
 	mm.CreatedAt = agency.CreatedAt
 
 	if _, err := m.db.UpdateOne(ctx, bson.M{"id": data.ID}, bson.M{"$set": mm}); err != nil {
-		return http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	return http.StatusOK, nil
@@ -138,7 +138,7 @@ func (m *Mongo) GetOldIDs(ctx context.Context) ([]int64, int, error) {
 		"updated_at": bson.M{"$lte": primitive.NewDateTimeFromTime(time.Now().Add(-m.oldAge))},
 	}, options.Find().SetProjection(bson.M{"id": 1}))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 	defer cursor.Close(ctx)
 
@@ -146,7 +146,7 @@ func (m *Mongo) GetOldIDs(ctx context.Context) ([]int64, int, error) {
 	for cursor.Next(ctx) {
 		var agency agency
 		if err := cursor.Decode(&agency); err != nil {
-			return nil, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+			return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 		}
 
 		ids = append(ids, agency.ID)
@@ -159,7 +159,7 @@ func (m *Mongo) GetOldIDs(ctx context.Context) ([]int64, int, error) {
 func (m *Mongo) GetCount(ctx context.Context) (int, int, error) {
 	cnt, err := m.db.CountDocuments(ctx, bson.M{})
 	if err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, err, _errors.ErrInternalDB)
+		return 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 	return int(cnt), http.StatusOK, nil
 }

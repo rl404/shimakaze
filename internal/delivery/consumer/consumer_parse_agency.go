@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/newrelic/go-agent/v3/newrelic"
-	"github.com/rl404/fairy/errors"
+	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/fairy/log"
 	"github.com/rl404/fairy/pubsub"
 	"github.com/rl404/shimakaze/internal/domain/publisher/entity"
@@ -21,7 +21,7 @@ func (c *Consumer) subscribeParseAgency() pubsub.HandlerFunc {
 	return log.PubSubHandlerFuncWithLog(utils.GetLogger(1), func(ctx context.Context, message []byte) {
 		var msg entity.ParseAgencyRequest
 		if err := json.Unmarshal(message, &msg); err != nil {
-			_ = errors.Wrap(ctx, err)
+			_ = stack.Wrap(ctx, err)
 			return
 		}
 
@@ -31,7 +31,7 @@ func (c *Consumer) subscribeParseAgency() pubsub.HandlerFunc {
 		ctx = newrelic.NewContext(ctx, tx)
 
 		if err := c.service.ConsumeParseAgency(ctx, msg); err != nil {
-			_ = errors.Wrap(ctx, err)
+			_ = stack.Wrap(ctx, err)
 		}
 	}, log.PubSubMiddlewareConfig{
 		Topic:   entity.TopicParseAgency,

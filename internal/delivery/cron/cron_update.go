@@ -4,13 +4,13 @@ import (
 	"context"
 
 	"github.com/newrelic/go-agent/v3/newrelic"
-	"github.com/rl404/fairy/errors"
+	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/utils"
 )
 
 // Update to old data.
 func (c *Cron) Update(nrApp *newrelic.Application, limit int) error {
-	ctx := errors.Init(context.Background())
+	ctx := stack.Init(context.Background())
 	defer c.log(ctx)
 
 	tx := nrApp.StartTransaction("Cron update")
@@ -20,17 +20,17 @@ func (c *Cron) Update(nrApp *newrelic.Application, limit int) error {
 
 	if err := c.queueOldAgency(ctx, nrApp, limit); err != nil {
 		tx.NoticeError(err)
-		return errors.Wrap(ctx, err)
+		return stack.Wrap(ctx, err)
 	}
 
 	if err := c.queueOldActiveVtuber(ctx, nrApp, limit); err != nil {
 		tx.NoticeError(err)
-		return errors.Wrap(ctx, err)
+		return stack.Wrap(ctx, err)
 	}
 
 	if err := c.queueOldRetiredVtuber(ctx, nrApp, limit); err != nil {
 		tx.NoticeError(err)
-		return errors.Wrap(ctx, err)
+		return stack.Wrap(ctx, err)
 	}
 
 	return nil
@@ -41,7 +41,7 @@ func (c *Cron) queueOldAgency(ctx context.Context, nrApp *newrelic.Application, 
 
 	cnt, _, err := c.service.QueueOldAgency(ctx, limit)
 	if err != nil {
-		return errors.Wrap(ctx, err)
+		return stack.Wrap(ctx, err)
 	}
 
 	utils.Info("queued %d agency", cnt)
@@ -55,7 +55,7 @@ func (c *Cron) queueOldActiveVtuber(ctx context.Context, nrApp *newrelic.Applica
 
 	cnt, _, err := c.service.QueueOldActiveVtuber(ctx, limit)
 	if err != nil {
-		return errors.Wrap(ctx, err)
+		return stack.Wrap(ctx, err)
 	}
 
 	utils.Info("queued %d active vtuber", cnt)
@@ -69,7 +69,7 @@ func (c *Cron) queueOldRetiredVtuber(ctx context.Context, nrApp *newrelic.Applic
 
 	cnt, _, err := c.service.QueueOldRetiredVtuber(ctx, limit)
 	if err != nil {
-		return errors.Wrap(ctx, err)
+		return stack.Wrap(ctx, err)
 	}
 
 	utils.Info("queued %d retired vtuber", cnt)
