@@ -89,7 +89,7 @@ func cronUpdate() error {
 
 	// Run cron.
 	utils.Info("updating old data...")
-	if err := cron.New(service).Update(nrApp, cfg.Cron.UpdateLimit); err != nil {
+	if err := cron.New(service, nrApp).Update(cfg.Cron.UpdateLimit); err != nil {
 		return err
 	}
 

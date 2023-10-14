@@ -3,6 +3,7 @@ package cron
 import (
 	"context"
 
+	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/service"
 	"github.com/rl404/shimakaze/internal/utils"
@@ -12,12 +13,14 @@ import (
 // Cron contains functions for cron.
 type Cron struct {
 	service service.Service
+	nrApp   *newrelic.Application
 }
 
 // New to create new cron.
-func New(service service.Service) *Cron {
+func New(service service.Service, nrApp *newrelic.Application) *Cron {
 	return &Cron{
 		service: service,
+		nrApp:   nrApp,
 	}
 }
 
