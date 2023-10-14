@@ -1,5 +1,5 @@
-// Package nocache is a mock of caching.
-package nocache
+// Package nop is a no-operation caching.
+package nop
 
 import (
 	"context"
@@ -7,13 +7,13 @@ import (
 	"time"
 )
 
-// Client is nocache client.
+// Client is no-operation client.
 type Client struct{}
 
 // ErrNoCache is default Get error return.
 var ErrNoCache = errors.New("not using cache")
 
-// New to create fake cache.
+// New to create no-operation cache.
 func New() (*Client, error) {
 	return &Client{}, nil
 }

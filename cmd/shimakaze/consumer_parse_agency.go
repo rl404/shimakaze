@@ -81,7 +81,7 @@ func consumerParseAgency() error {
 	if err != nil {
 		return err
 	}
-	ps = nrPS.New(cfg.PubSub.Dialect, ps)
+	ps = nrPS.New(cfg.PubSub.Dialect, ps, nrApp)
 	utils.Info("pubsub initialized")
 	defer ps.Close()
 
@@ -126,7 +126,7 @@ func consumerParseAgency() error {
 	utils.Info("service initialized")
 
 	// Init consumer.
-	consumer, err := _consumer.New(service, ps, nrApp)
+	consumer, err := _consumer.New(service, ps)
 	if err != nil {
 		return err
 	}

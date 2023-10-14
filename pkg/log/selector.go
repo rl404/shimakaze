@@ -5,7 +5,7 @@ import (
 
 	"github.com/rl404/fairy/log"
 	"github.com/rl404/fairy/log/newrelic"
-	"github.com/rl404/fairy/log/nolog"
+	"github.com/rl404/fairy/log/nop"
 	"github.com/rl404/fairy/log/zerolog"
 )
 
@@ -31,7 +31,7 @@ type LogType int8
 
 // Available types for logging.
 const (
-	NoLog LogType = iota
+	NOP LogType = iota
 	Zerolog
 	Newrelic
 )
@@ -55,8 +55,8 @@ type Config struct {
 // Color will not work in json format.
 func New(cfg Config) (log.Logger, error) {
 	switch cfg.Type {
-	case NoLog:
-		return nolog.New(), nil
+	case NOP:
+		return nop.New(), nil
 	case Zerolog:
 		return zerolog.New(zerolog.LogLevel(cfg.Level), cfg.JsonFormat, cfg.Color), nil
 	case Newrelic:

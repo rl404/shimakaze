@@ -221,11 +221,11 @@ github.com/redis/go-redis/v9/internal/pool
 github.com/redis/go-redis/v9/internal/proto
 github.com/redis/go-redis/v9/internal/rand
 github.com/redis/go-redis/v9/internal/util
-# github.com/rl404/fairy v0.24.0-alpha.1
+# github.com/rl404/fairy v0.24.0-alpha.2
 ## explicit; go 1.21
 github.com/rl404/fairy/cache
 github.com/rl404/fairy/cache/inmemory
-github.com/rl404/fairy/cache/nocache
+github.com/rl404/fairy/cache/nop
 github.com/rl404/fairy/cache/redis
 github.com/rl404/fairy/errors/stack
 github.com/rl404/fairy/limit
@@ -233,7 +233,7 @@ github.com/rl404/fairy/limit/mutex
 github.com/rl404/fairy/log
 github.com/rl404/fairy/log/chain
 github.com/rl404/fairy/log/newrelic
-github.com/rl404/fairy/log/nolog
+github.com/rl404/fairy/log/nop
 github.com/rl404/fairy/log/zerolog
 github.com/rl404/fairy/monitoring/newrelic/cache
 github.com/rl404/fairy/monitoring/newrelic/middleware

@@ -10,13 +10,15 @@ import (
 type client struct {
 	dialect string
 	pubsub  pubsub.PubSub
+	nrApp   *newrelic.Application
 }
 
 // New to create new newrelic plugin for pubsub.
-func New(d string, ps pubsub.PubSub) pubsub.PubSub {
+func New(d string, ps pubsub.PubSub, nrApp *newrelic.Application) pubsub.PubSub {
 	return &client{
 		dialect: d,
 		pubsub:  ps,
+		nrApp:   nrApp,
 	}
 }
 
@@ -40,7 +42,14 @@ func (c *client) Publish(ctx context.Context, topic string, data []byte) error {
 
 // Subscribe to subscribe.
 func (c *client) Subscribe(ctx context.Context, topic string, handlerFunc pubsub.HandlerFunc) error {
-	return c.pubsub.Subscribe(ctx, topic, handlerFunc)
+	return c.pubsub.Subscribe(ctx, topic, func(ctx context.Context, message []byte) {
+		tx := c.nrApp.StartTransaction("Consumer " + topic)
+		defer tx.End()
+
+		ctx = newrelic.NewContext(ctx, tx)
+
+		handlerFunc(ctx, message)
+	})
 }
 
 // Close to close connection.

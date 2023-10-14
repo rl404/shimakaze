@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/newrelic/go-agent/v3/newrelic"
 	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/publisher/entity"
 )
@@ -20,11 +19,6 @@ func (c *Consumer) subscribeParseAgency(ctx context.Context, message []byte) {
 		stack.Wrap(ctx, err)
 		return
 	}
-
-	tx := c.nrApp.StartTransaction("Consumer parse agency")
-	defer tx.End()
-
-	ctx = newrelic.NewContext(ctx, tx)
 
 	if err := c.service.ConsumeParseAgency(ctx, msg); err != nil {
 		stack.Wrap(ctx, err)

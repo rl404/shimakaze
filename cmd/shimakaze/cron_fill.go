@@ -59,7 +59,7 @@ func cronFill() error {
 	if err != nil {
 		return err
 	}
-	ps = nrPS.New(cfg.PubSub.Dialect, ps)
+	ps = nrPS.New(cfg.PubSub.Dialect, ps, nrApp)
 	utils.Info("pubsub initialized")
 	defer ps.Close()
 

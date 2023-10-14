@@ -34,7 +34,7 @@ func AddLog(l1 _log.Logger) {
 func GetLogger(i ...int) _log.Logger {
 	if len(i) > 0 {
 		if len(ls) <= i[0] {
-			tmp, _ := log.New(log.Config{Type: log.NoLog})
+			tmp, _ := log.New(log.Config{Type: log.NOP})
 			return tmp
 		}
 		return ls[i[0]]

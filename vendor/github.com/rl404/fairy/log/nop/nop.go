@@ -1,10 +1,10 @@
-// Package nolog is just a mock of logging which do nothing.
-package nolog
+// Package nop is no-operation logging.
+package nop
 
-// Log is mock of logging.
+// Log is no-operation logging.
 type Log struct{}
 
-// New to create new mock logging client.
+// New to create new no-operation logging.
 func New() *Log {
 	return &Log{}
 }

@@ -104,7 +104,7 @@ const envPath = "../../.env"
 const envPrefix = "SHIMAKAZE"
 
 var cacheType = map[string]cache.CacheType{
-	"nocache":  cache.NoCache,
+	"nocache":  cache.NOP,
 	"redis":    cache.Redis,
 	"inmemory": cache.InMemory,
 }
