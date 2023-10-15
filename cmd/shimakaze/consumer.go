@@ -36,7 +36,7 @@ import (
 	"github.com/rl404/shimakaze/pkg/pubsub"
 )
 
-func consumerParseVtuber() error {
+func consumer() error {
 	// Get config.
 	cfg, err := getConfig()
 	if err != nil {
@@ -102,7 +102,7 @@ func consumerParseVtuber() error {
 	utils.Info("repository agency initialized")
 
 	// Init publisher.
-	var publisher publisherRepository.Repository = publisherPubsub.New(ps)
+	var publisher publisherRepository.Repository = publisherPubsub.New(ps, pubsubTopic)
 	utils.Info("repository publisher initialized")
 
 	// Init youtube.
@@ -126,7 +126,7 @@ func consumerParseVtuber() error {
 	utils.Info("service initialized")
 
 	// Init consumer.
-	consumer, err := _consumer.New(service, ps)
+	consumer, err := _consumer.New(service, ps, pubsubTopic)
 	if err != nil {
 		return err
 	}
@@ -137,7 +137,7 @@ func consumerParseVtuber() error {
 	signal.Notify(sigChan, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 
 	// Start subscribe.
-	if err := consumer.SubscribeParseVtuber(); err != nil {
+	if err := consumer.Subscribe(); err != nil {
 		return err
 	}
 

@@ -38,14 +38,9 @@ variable "gcr_image_name" {
   description = "GCR image name"
 }
 
-variable "gke_deployment_consumer_parse_vtuber_name" {
+variable "gke_deployment_consumer_name" {
   type        = string
-  description = "GKE deployment consumer parse-vtuber name"
-}
-
-variable "gke_deployment_consumer_parse_agency_name" {
-  type        = string
-  description = "GKE deployment consumer parse-agency name"
+  description = "GKE deployment consumer name"
 }
 
 variable "gke_cron_fill_name" {

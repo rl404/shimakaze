@@ -5,12 +5,24 @@ import (
 
 	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/publisher/entity"
+	"github.com/rl404/shimakaze/internal/errors"
 )
 
-// ConsumeParseVtuber to consume parse vtuber message.
-func (s *service) ConsumeParseVtuber(ctx context.Context, data entity.ParseVtuberRequest) error {
-	if !data.Forced {
-		isOld, _, err := s.vtuber.IsOld(ctx, data.ID)
+// ConsumeMessage to consume pubsub message.
+func (s *service) ConsumeMessage(ctx context.Context, msg entity.Message) error {
+	switch msg.Type {
+	case entity.TypeParseVtuber:
+		return stack.Wrap(ctx, s.consumeParseVtuber(ctx, msg.ID, msg.Forced))
+	case entity.TypeParseAgency:
+		return stack.Wrap(ctx, s.consumeParseAgency(ctx, msg.ID, msg.Forced))
+	default:
+		return stack.Wrap(ctx, errors.ErrInvalidMessageType)
+	}
+}
+
+func (s *service) consumeParseVtuber(ctx context.Context, id int64, forced bool) error {
+	if !forced {
+		isOld, _, err := s.vtuber.IsOld(ctx, id)
 		if err != nil {
 			return stack.Wrap(ctx, err)
 		}
@@ -20,17 +32,16 @@ func (s *service) ConsumeParseVtuber(ctx context.Context, data entity.ParseVtube
 		}
 	}
 
-	if _, err := s.updateVtuber(ctx, data.ID); err != nil {
+	if _, err := s.updateVtuber(ctx, id); err != nil {
 		return stack.Wrap(ctx, err)
 	}
 
 	return nil
 }
 
-// ConsumeParseAgency to consume parse agency message.
-func (s *service) ConsumeParseAgency(ctx context.Context, data entity.ParseAgencyRequest) error {
-	if !data.Forced {
-		isOld, _, err := s.agency.IsOld(ctx, data.ID)
+func (s *service) consumeParseAgency(ctx context.Context, id int64, forced bool) error {
+	if !forced {
+		isOld, _, err := s.agency.IsOld(ctx, id)
 		if err != nil {
 			return stack.Wrap(ctx, err)
 		}
@@ -40,7 +51,7 @@ func (s *service) ConsumeParseAgency(ctx context.Context, data entity.ParseAgenc
 		}
 	}
 
-	if _, err := s.updateAgency(ctx, data.ID); err != nil {
+	if _, err := s.updateAgency(ctx, id); err != nil {
 		return stack.Wrap(ctx, err)
 	}
 

@@ -13,23 +13,29 @@ import (
 // Pubsub contains functions for pubsub.
 type Pubsub struct {
 	pubsub pubsub.PubSub
+	topic  string
 }
 
 // New to create new pubsub.
-func New(ps pubsub.PubSub) *Pubsub {
+func New(ps pubsub.PubSub, topic string) *Pubsub {
 	return &Pubsub{
 		pubsub: ps,
+		topic:  topic,
 	}
 }
 
 // PublishParseVtuber to publish parse vtuber.
-func (p *Pubsub) PublishParseVtuber(ctx context.Context, data entity.ParseVtuberRequest) error {
-	msg, err := json.Marshal(data)
+func (p *Pubsub) PublishParseVtuber(ctx context.Context, id int64, forced bool) error {
+	msg, err := json.Marshal(entity.Message{
+		Type:   entity.TypeParseVtuber,
+		ID:     id,
+		Forced: forced,
+	})
 	if err != nil {
 		return stack.Wrap(ctx, err, errors.ErrInternalServer)
 	}
 
-	if err := p.pubsub.Publish(ctx, entity.TopicParseVtuber, msg); err != nil {
+	if err := p.pubsub.Publish(ctx, p.topic, msg); err != nil {
 		return stack.Wrap(ctx, err, errors.ErrInternalServer)
 	}
 
@@ -37,13 +43,17 @@ func (p *Pubsub) PublishParseVtuber(ctx context.Context, data entity.ParseVtuber
 }
 
 // PublishParseAgency to publish parse agency.
-func (p *Pubsub) PublishParseAgency(ctx context.Context, data entity.ParseAgencyRequest) error {
-	msg, err := json.Marshal(data)
+func (p *Pubsub) PublishParseAgency(ctx context.Context, id int64, forced bool) error {
+	msg, err := json.Marshal(entity.Message{
+		Type:   entity.TypeParseAgency,
+		ID:     id,
+		Forced: forced,
+	})
 	if err != nil {
 		return stack.Wrap(ctx, err, errors.ErrInternalServer)
 	}
 
-	if err := p.pubsub.Publish(ctx, entity.TopicParseAgency, msg); err != nil {
+	if err := p.pubsub.Publish(ctx, p.topic, msg); err != nil {
 		return stack.Wrap(ctx, err, errors.ErrInternalServer)
 	}
 

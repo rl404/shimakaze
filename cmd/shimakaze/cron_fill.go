@@ -80,7 +80,7 @@ func cronFill() error {
 	utils.Info("repository agency initialized")
 
 	// Init publisher.
-	var publisher publisherRepository.Repository = publisherPubsub.New(ps)
+	var publisher publisherRepository.Repository = publisherPubsub.New(ps, pubsubTopic)
 	utils.Info("repository publisher initialized")
 
 	// Init service.

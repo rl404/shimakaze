@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/rl404/fairy/errors/stack"
-	"github.com/rl404/shimakaze/internal/domain/publisher/entity"
 )
 
 // QueueMissingVtuber to queue missing vtuber.
@@ -43,7 +42,7 @@ func (s *service) QueueMissingVtuber(ctx context.Context, limit int) (int, int, 
 
 			existMap[page.ID] = true
 
-			if err := s.publisher.PublishParseVtuber(ctx, entity.ParseVtuberRequest{ID: page.ID}); err != nil {
+			if err := s.publisher.PublishParseVtuber(ctx, page.ID, false); err != nil {
 				return cnt, http.StatusInternalServerError, stack.Wrap(ctx, err)
 			}
 
@@ -90,7 +89,7 @@ func (s *service) QueueMissingAgency(ctx context.Context, limit int) (int, int, 
 
 			existMap[agency.ID] = true
 
-			if err := s.publisher.PublishParseAgency(ctx, entity.ParseAgencyRequest{ID: agency.ID}); err != nil {
+			if err := s.publisher.PublishParseAgency(ctx, agency.ID, false); err != nil {
 				return cnt, http.StatusInternalServerError, stack.Wrap(ctx, err)
 			}
 
@@ -117,7 +116,7 @@ func (s *service) QueueOldAgency(ctx context.Context, limit int) (int, int, erro
 	}
 
 	for _, id := range ids {
-		if err := s.publisher.PublishParseAgency(ctx, entity.ParseAgencyRequest{ID: id}); err != nil {
+		if err := s.publisher.PublishParseAgency(ctx, id, false); err != nil {
 			return cnt, http.StatusInternalServerError, stack.Wrap(ctx, err)
 		}
 
@@ -141,7 +140,7 @@ func (s *service) QueueOldActiveVtuber(ctx context.Context, limit int) (int, int
 	}
 
 	for _, id := range ids {
-		if err := s.publisher.PublishParseVtuber(ctx, entity.ParseVtuberRequest{ID: id}); err != nil {
+		if err := s.publisher.PublishParseVtuber(ctx, id, false); err != nil {
 			return cnt, http.StatusInternalServerError, stack.Wrap(ctx, err)
 		}
 
@@ -165,7 +164,7 @@ func (s *service) QueueOldRetiredVtuber(ctx context.Context, limit int) (int, in
 	}
 
 	for _, id := range ids {
-		if err := s.publisher.PublishParseVtuber(ctx, entity.ParseVtuberRequest{ID: id}); err != nil {
+		if err := s.publisher.PublishParseVtuber(ctx, id, false); err != nil {
 			return cnt, http.StatusInternalServerError, stack.Wrap(ctx, err)
 		}
 

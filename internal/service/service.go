@@ -55,8 +55,7 @@ type Service interface {
 
 	GetWikiaImage(ctx context.Context, path string) ([]byte, int, error)
 
-	ConsumeParseVtuber(ctx context.Context, msg entity.ParseVtuberRequest) error
-	ConsumeParseAgency(ctx context.Context, msg entity.ParseAgencyRequest) error
+	ConsumeMessage(ctx context.Context, msg entity.Message) error
 
 	QueueMissingAgency(ctx context.Context, limit int) (int, int, error)
 	QueueMissingVtuber(ctx context.Context, limit int) (int, int, error)

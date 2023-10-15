@@ -66,17 +66,11 @@ run: build
 	@cd $(CMD_PATH); \
 	./$(BINARY_NAME) server
 
-# Build and run message consumer parse vtuber.
-.PHONY: consumer-parse-vtuber
-consumer-parse-vtuber: build
+# Build and run message consumer.
+.PHONY: consumer
+consumer: build
 	@cd $(CMD_PATH); \
-	./$(BINARY_NAME) consumer parse-vtuber
-
-# Build and run message consumer parse agency.
-.PHONY: consumer-parse-agency
-consumer-parse-agency: build
-	@cd $(CMD_PATH); \
-	./$(BINARY_NAME) consumer parse-agency
+	./$(BINARY_NAME) consumer
 
 # Build and run cron update anime.
 .PHONY: cron-update
@@ -95,14 +89,13 @@ DOCKER_CMD   := docker
 DOCKER_IMAGE := $(DOCKER_CMD) image
 
 # Docker-compose base command and docker-compose.yml path.
-COMPOSE_CMD                   := docker-compose
-COMPOSE_BUILD                 := deployment/build.yml
-COMPOSE_API                   := deployment/api.yml
-COMPOSE_CONSUMER_PARSE_VTUBER := deployment/consumer-parse-vtuber.yml
-COMPOSE_CONSUMER_PARSE_AGENCY := deployment/consumer-parse-agency.yml
-COMPOSE_CRON_UPDATE           := deployment/cron-update.yml
-COMPOSE_CRON_FILL             := deployment/cron-fill.yml
-COMPOSE_LINT                  := deployment/lint.yml
+COMPOSE_CMD         := docker-compose
+COMPOSE_BUILD       := deployment/build.yml
+COMPOSE_API         := deployment/api.yml
+COMPOSE_CONSUMER    := deployment/consumer.yml
+COMPOSE_CRON_UPDATE := deployment/cron-update.yml
+COMPOSE_CRON_FILL   := deployment/cron-fill.yml
+COMPOSE_LINT        := deployment/lint.yml
 
 # Build docker images and container for the project
 # then delete builder image.
@@ -117,17 +110,11 @@ docker-api:
 	@$(COMPOSE_CMD) -f $(COMPOSE_API) -p shimakaze-api up -d
 	@$(COMPOSE_CMD) -f $(COMPOSE_API) -p shimakaze-api logs --follow --tail 20
 
-# Start built docker containers for consumer parse vtuber.
-.PHONY: docker-consumer-parse-vtuber
-docker-consumer-parse-vtuber:
-	@$(COMPOSE_CMD) -f $(COMPOSE_CONSUMER_PARSE_VTUBER) -p shimakaze-consumer-parse-vtuber up -d
-	@$(COMPOSE_CMD) -f $(COMPOSE_CONSUMER_PARSE_VTUBER) -p shimakaze-consumer-parse-vtuber logs --follow --tail 20
-
-# Start built docker containers for consumer parse agency.
-.PHONY: docker-consumer-parse-agency
-docker-consumer-parse-agency:
-	@$(COMPOSE_CMD) -f $(COMPOSE_CONSUMER_PARSE_AGENCY) -p shimakaze-consumer-parse-agency up -d
-	@$(COMPOSE_CMD) -f $(COMPOSE_CONSUMER_PARSE_AGENCY) -p shimakaze-consumer-parse-agency logs --follow --tail 20
+# Start built docker containers for consumer.
+.PHONY: docker-consumer
+docker-consumer:
+	@$(COMPOSE_CMD) -f $(COMPOSE_CONSUMER) -p shimakaze-consumer up -d
+	@$(COMPOSE_CMD) -f $(COMPOSE_CONSUMER) -p shimakaze-consumer logs --follow --tail 20
 
 # Start built docker containers for cron update anime.
 .PHONY: docker-cron-update
