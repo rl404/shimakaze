@@ -126,10 +126,7 @@ func consumer() error {
 	utils.Info("service initialized")
 
 	// Init consumer.
-	consumer, err := _consumer.New(service, ps, pubsubTopic)
-	if err != nil {
-		return err
-	}
+	consumer := _consumer.New(service, ps, pubsubTopic)
 	utils.Info("consumer initialized")
 	defer consumer.Close()
 

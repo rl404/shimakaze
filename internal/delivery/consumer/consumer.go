@@ -20,7 +20,7 @@ type Consumer struct {
 }
 
 // New to create new consumer.
-func New(service service.Service, ps pubsub.PubSub, topic string) (*Consumer, error) {
+func New(service service.Service, ps pubsub.PubSub, topic string) *Consumer {
 	ps.Use(log.PubSubMiddlewareWithLog(utils.GetLogger(0), log.PubSubMiddlewareConfig{Error: true}))
 	ps.Use(log.PubSubMiddlewareWithLog(utils.GetLogger(1), log.PubSubMiddlewareConfig{
 		Topic:   topic,
@@ -32,7 +32,7 @@ func New(service service.Service, ps pubsub.PubSub, topic string) (*Consumer, er
 		service: service,
 		pubsub:  ps,
 		topic:   topic,
-	}, nil
+	}
 }
 
 // Subscribe to subscribe.
