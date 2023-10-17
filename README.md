@@ -23,9 +23,7 @@ Shimakaze is [Vtuber Wikia](https://virtualyoutuber.fandom.com/wiki/Virtual_YouT
   - no cache
   - inmemory
   - [Redis](https://redis.io/)
-  - [Memcache](https://memcached.org/)
 - Interchangeable pubsub
-  - [NSQ](https://nsq.io/)
   - [RabbitMQ](https://www.rabbitmq.com/)
   - [Redis](https://redis.io/)
   - [Google PubSub](https://cloud.google.com/pubsub)
@@ -47,8 +45,8 @@ _More will be coming soon..._
 - [MongoDB](https://www.mongodb.com/)
 - [Youtube API key](https://cloud.google.com/docs/authentication/api-keys)
 - [Twitch Client id & secret](https://dev.twitch.tv/docs/authentication/register-app/)
-- PubSub ([NSQ](https://nsq.io/)/[RabbitMQ](https://www.rabbitmq.com/)/[Redis](https://redis.io/)/[Google PubSub](https://cloud.google.com/pubsub))
-- (optional) Cache ([Redis](https://redis.io/)/[Memcache](https://memcached.org/))
+- PubSub ([RabbitMQ](https://www.rabbitmq.com/)/[Redis](https://redis.io/)/[Google PubSub](https://cloud.google.com/pubsub))
+- (optional) Cache ([Redis](https://redis.io/))
 - (optional) [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/)
 - (optional) [Newrelic](https://newrelic.com/) license key
 
@@ -138,7 +136,7 @@ make docker-stop
 | `SHIMAKAZE_HTTP_READ_TIMEOUT`     |            `5s`             | HTTP read timeout.                                                                                         |
 | `SHIMAKAZE_HTTP_WRITE_TIMEOUT`    |            `5s`             | HTTP write timeout.                                                                                        |
 | `SHIMAKAZE_HTTP_GRACEFUL_TIMEOUT` |            `10s`            | HTTP graceful timeout.                                                                                     |
-| `SHIMAKAZE_CACHE_DIALECT`         |         `inmemory`          | Cache type (`nocache`/`redis`/`inmemory`)                                                       |
+| `SHIMAKAZE_CACHE_DIALECT`         |         `inmemory`          | Cache type (`nocache`/`redis`/`inmemory`)                                                                  |
 | `SHIMAKAZE_CACHE_ADDRESS`         |                             | Cache address.                                                                                             |
 | `SHIMAKAZE_CACHE_PASSWORD`        |                             | Cache password.                                                                                            |
 | `SHIMAKAZE_CACHE_TIME`            |            `24h`            | Cache time.                                                                                                |
@@ -146,7 +144,7 @@ make docker-stop
 | `SHIMAKAZE_DB_NAME`               |         `shimakaze`         | Database name.                                                                                             |
 | `SHIMAKAZE_DB_USER`               |                             | Database username.                                                                                         |
 | `SHIMAKAZE_DB_PASSWORD`           |                             | Database password.                                                                                         |
-| `SHIMAKAZE_PUBSUB_DIALECT`        |         `rabbitmq`          | Pubsub type (`rabbitmq`/`redis`/`google`)                                                            |
+| `SHIMAKAZE_PUBSUB_DIALECT`        |         `rabbitmq`          | Pubsub type (`rabbitmq`/`redis`/`google`)                                                                  |
 | `SHIMAKAZE_PUBSUB_ADDRESS`        |                             | Pubsub address (if you are using `google`, this will be your google project id).                           |
 | `SHIMAKAZE_PUBSUB_PASSWORD`       |                             | Pubsub password (if you are using `google`, this will be the content of your google service account json). |
 | `SHIMAKAZE_CRON_UPDATE_LIMIT`     |            `10`             | Vtuber & agency count limit when updating old data.                                                        |
