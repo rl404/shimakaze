@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/rl404/shimakaze/internal/errors"
+	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/service"
 	"github.com/rl404/shimakaze/internal/utils"
 )
@@ -17,7 +17,7 @@ import (
 // @router /statistics/vtubers/count [get]
 func (api *API) handleGetVtuberCount(w http.ResponseWriter, r *http.Request) {
 	count, code, err := api.service.GetVtuberCount(r.Context())
-	utils.ResponseWithJSON(w, code, count, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, count, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get agency count.
@@ -28,7 +28,7 @@ func (api *API) handleGetVtuberCount(w http.ResponseWriter, r *http.Request) {
 // @router /statistics/agencies/count [get]
 func (api *API) handleGetAgencyCount(w http.ResponseWriter, r *http.Request) {
 	count, code, err := api.service.GetAgencyCount(r.Context())
-	utils.ResponseWithJSON(w, code, count, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, count, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber average active time.
@@ -39,7 +39,7 @@ func (api *API) handleGetAgencyCount(w http.ResponseWriter, r *http.Request) {
 // @router /statistics/vtubers/average-active-time [get]
 func (api *API) handleGetVtuberAverageActiveTime(w http.ResponseWriter, r *http.Request) {
 	avg, code, err := api.service.GetVtuberAverageActiveTime(r.Context())
-	utils.ResponseWithJSON(w, code, avg, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, avg, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber status count.
@@ -50,7 +50,7 @@ func (api *API) handleGetVtuberAverageActiveTime(w http.ResponseWriter, r *http.
 // @router /statistics/vtubers/count-by-status [get]
 func (api *API) handleGetVtuberStatusCount(w http.ResponseWriter, r *http.Request) {
 	cnt, code, err := api.service.GetVtuberStatusCount(r.Context())
-	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, cnt, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber debut & retire count monthly.
@@ -61,7 +61,7 @@ func (api *API) handleGetVtuberStatusCount(w http.ResponseWriter, r *http.Reques
 // @router /statistics/vtubers/debut-retire-count-monthly [get]
 func (api *API) handleGetVtuberDebutRetireCountMonthly(w http.ResponseWriter, r *http.Request) {
 	cnt, code, err := api.service.GetVtuberDebutRetireCountMonthly(r.Context())
-	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, cnt, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber debut & retire count yearly.
@@ -72,7 +72,7 @@ func (api *API) handleGetVtuberDebutRetireCountMonthly(w http.ResponseWriter, r 
 // @router /statistics/vtubers/debut-retire-count-yearly [get]
 func (api *API) handleGetVtuberDebutRetireCountYearly(w http.ResponseWriter, r *http.Request) {
 	cnt, code, err := api.service.GetVtuberDebutRetireCountYearly(r.Context())
-	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, cnt, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber 2d & 3d model count.
@@ -83,7 +83,7 @@ func (api *API) handleGetVtuberDebutRetireCountYearly(w http.ResponseWriter, r *
 // @router /statistics/vtubers/model-count [get]
 func (api *API) handleGetVtuberModelCount(w http.ResponseWriter, r *http.Request) {
 	cnt, code, err := api.service.GetVtuberModelCount(r.Context())
-	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, cnt, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber in agency count.
@@ -94,7 +94,7 @@ func (api *API) handleGetVtuberModelCount(w http.ResponseWriter, r *http.Request
 // @router /statistics/vtubers/in-agency-count [get]
 func (api *API) handleGetVtuberInAgencyCount(w http.ResponseWriter, r *http.Request) {
 	cnt, code, err := api.service.GetVtuberInAgencyCount(r.Context())
-	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, cnt, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber subscriber count.
@@ -113,7 +113,7 @@ func (api *API) handleGetVtuberSubscriberCount(w http.ResponseWriter, r *http.Re
 		Interval: interval,
 		Max:      max,
 	})
-	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, cnt, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber character designer count.
@@ -127,7 +127,7 @@ func (api *API) handleGetVtuberSubscriberCount(w http.ResponseWriter, r *http.Re
 func (api *API) handleGetVtuberDesignerCount(w http.ResponseWriter, r *http.Request) {
 	top, _ := strconv.Atoi(r.URL.Query().Get("top"))
 	cnt, code, err := api.service.GetVtuberDesignerCount(r.Context(), service.GetVtuberDesignerCountRequest{Top: top})
-	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, cnt, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber character 2d modeler count.
@@ -141,7 +141,7 @@ func (api *API) handleGetVtuberDesignerCount(w http.ResponseWriter, r *http.Requ
 func (api *API) handleGetVtuber2DModelerCount(w http.ResponseWriter, r *http.Request) {
 	top, _ := strconv.Atoi(r.URL.Query().Get("top"))
 	cnt, code, err := api.service.GetVtuber2DModelerCount(r.Context(), service.GetVtuberDesignerCountRequest{Top: top})
-	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, cnt, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber character 3d modeler count.
@@ -155,7 +155,7 @@ func (api *API) handleGetVtuber2DModelerCount(w http.ResponseWriter, r *http.Req
 func (api *API) handleGetVtuber3DModelerCount(w http.ResponseWriter, r *http.Request) {
 	top, _ := strconv.Atoi(r.URL.Query().Get("top"))
 	cnt, code, err := api.service.GetVtuber3DModelerCount(r.Context(), service.GetVtuberDesignerCountRequest{Top: top})
-	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, cnt, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber average video count.
@@ -166,7 +166,7 @@ func (api *API) handleGetVtuber3DModelerCount(w http.ResponseWriter, r *http.Req
 // @router /statistics/vtubers/average-video-count [get]
 func (api *API) handleGetVtuberAverageVideoCount(w http.ResponseWriter, r *http.Request) {
 	avg, code, err := api.service.GetVtuberAverageVideoCount(r.Context())
-	utils.ResponseWithJSON(w, code, avg, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, avg, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber average video duration.
@@ -177,7 +177,7 @@ func (api *API) handleGetVtuberAverageVideoCount(w http.ResponseWriter, r *http.
 // @router /statistics/vtubers/average-video-duration [get]
 func (api *API) handleGetVtuberAverageVideoDuration(w http.ResponseWriter, r *http.Request) {
 	avg, code, err := api.service.GetVtuberAverageVideoDuration(r.Context())
-	utils.ResponseWithJSON(w, code, avg, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, avg, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber video count by date.
@@ -193,7 +193,7 @@ func (api *API) handleGetVtuberVideoCountByDate(w http.ResponseWriter, r *http.R
 	hourly, _ := strconv.ParseBool(r.URL.Query().Get("hourly"))
 	daily, _ := strconv.ParseBool(r.URL.Query().Get("daily"))
 	cnt, code, err := api.service.GetVtuberVideoCountByDate(r.Context(), hourly, daily)
-	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, cnt, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber video count.
@@ -207,7 +207,7 @@ func (api *API) handleGetVtuberVideoCountByDate(w http.ResponseWriter, r *http.R
 func (api *API) handleGetVtuberVideoCount(w http.ResponseWriter, r *http.Request) {
 	top, _ := strconv.Atoi(r.URL.Query().Get("top"))
 	cnt, code, err := api.service.GetVtuberVideoCount(r.Context(), service.GetVtuberVideoCountRequest{Top: top})
-	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, cnt, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber video duration.
@@ -221,7 +221,7 @@ func (api *API) handleGetVtuberVideoCount(w http.ResponseWriter, r *http.Request
 func (api *API) handleGetVtuberVideoDuration(w http.ResponseWriter, r *http.Request) {
 	top, _ := strconv.Atoi(r.URL.Query().Get("top"))
 	cnt, code, err := api.service.GetVtuberVideoDuration(r.Context(), service.GetVtuberVideoDurationRequest{Top: top})
-	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, cnt, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber birthday count.
@@ -232,7 +232,7 @@ func (api *API) handleGetVtuberVideoDuration(w http.ResponseWriter, r *http.Requ
 // @router /statistics/vtubers/birthday-count [get]
 func (api *API) handleGetVtuberBirthdayCount(w http.ResponseWriter, r *http.Request) {
 	cnt, code, err := api.service.GetVtuberBirthdayCount(r.Context())
-	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, cnt, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber average height.
@@ -243,7 +243,7 @@ func (api *API) handleGetVtuberBirthdayCount(w http.ResponseWriter, r *http.Requ
 // @router /statistics/vtubers/average-height [get]
 func (api *API) handleGetVtuberAverageHeight(w http.ResponseWriter, r *http.Request) {
 	avg, code, err := api.service.GetVtuberAverageHeight(r.Context())
-	utils.ResponseWithJSON(w, code, avg, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, avg, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber average weight.
@@ -254,7 +254,7 @@ func (api *API) handleGetVtuberAverageHeight(w http.ResponseWriter, r *http.Requ
 // @router /statistics/vtubers/average-weight [get]
 func (api *API) handleGetVtuberAverageWeight(w http.ResponseWriter, r *http.Request) {
 	avg, code, err := api.service.GetVtuberAverageWeight(r.Context())
-	utils.ResponseWithJSON(w, code, avg, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, avg, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber blood type count.
@@ -268,7 +268,7 @@ func (api *API) handleGetVtuberAverageWeight(w http.ResponseWriter, r *http.Requ
 func (api *API) handleGetVtuberBloodTypeCount(w http.ResponseWriter, r *http.Request) {
 	top, _ := strconv.Atoi(r.URL.Query().Get("top"))
 	cnt, code, err := api.service.GetVtuberBloodTypeCount(r.Context(), service.GetVtuberBloodTypeCountRequest{Top: top})
-	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, cnt, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber channel type count.
@@ -279,7 +279,7 @@ func (api *API) handleGetVtuberBloodTypeCount(w http.ResponseWriter, r *http.Req
 // @router /statistics/vtubers/channel-type-count [get]
 func (api *API) handleGetVtuberChannelTypeCount(w http.ResponseWriter, r *http.Request) {
 	cnt, code, err := api.service.GetVtuberChannelTypeCount(r.Context())
-	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, cnt, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber gender count.
@@ -290,7 +290,7 @@ func (api *API) handleGetVtuberChannelTypeCount(w http.ResponseWriter, r *http.R
 // @router /statistics/vtubers/gender-count [get]
 func (api *API) handleGetVtuberGenderCount(w http.ResponseWriter, r *http.Request) {
 	cnt, code, err := api.service.GetVtuberGenderCount(r.Context())
-	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, cnt, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber zodiac count.
@@ -301,5 +301,5 @@ func (api *API) handleGetVtuberGenderCount(w http.ResponseWriter, r *http.Reques
 // @router /statistics/vtubers/zodiac-count [get]
 func (api *API) handleGetVtuberZodiacCount(w http.ResponseWriter, r *http.Request) {
 	cnt, code, err := api.service.GetVtuberZodiacCount(r.Context())
-	utils.ResponseWithJSON(w, code, cnt, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, cnt, stack.Wrap(r.Context(), err))
 }

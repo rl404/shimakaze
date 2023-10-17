@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	"github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/service"
@@ -128,7 +129,7 @@ func (api *API) handleGetVtubers(w http.ResponseWriter, r *http.Request) {
 		Limit:              limit,
 	})
 
-	utils.ResponseWithJSON(w, code, vtubers, errors.Wrap(r.Context(), err), pagination)
+	utils.ResponseWithJSON(w, code, vtubers, stack.Wrap(r.Context(), err), pagination)
 }
 
 // @summary Get vtuber data.
@@ -143,12 +144,12 @@ func (api *API) handleGetVtubers(w http.ResponseWriter, r *http.Request) {
 func (api *API) handleGetVtuberByID(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
-		utils.ResponseWithJSON(w, http.StatusBadRequest, nil, errors.Wrap(r.Context(), errors.ErrInvalidID, err))
+		utils.ResponseWithJSON(w, http.StatusBadRequest, nil, stack.Wrap(r.Context(), err, errors.ErrInvalidID))
 		return
 	}
 
 	vtuber, code, err := api.service.GetVtuberByID(r.Context(), id)
-	utils.ResponseWithJSON(w, code, vtuber, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, vtuber, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get all vtuber images.
@@ -163,7 +164,7 @@ func (api *API) handleGetVtuberImages(w http.ResponseWriter, r *http.Request) {
 	shuffle, _ := strconv.ParseBool(r.URL.Query().Get("shuffle"))
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
 	images, code, err := api.service.GetVtuberImages(r.Context(), shuffle, limit)
-	utils.ResponseWithJSON(w, code, images, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, images, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber family trees.
@@ -174,7 +175,7 @@ func (api *API) handleGetVtuberImages(w http.ResponseWriter, r *http.Request) {
 // @router /vtubers/family-trees [get]
 func (api *API) handleGetVtuberFamilyTrees(w http.ResponseWriter, r *http.Request) {
 	tree, code, err := api.service.GetVtuberFamilyTrees(r.Context())
-	utils.ResponseWithJSON(w, code, tree, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, tree, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber agency trees.
@@ -185,7 +186,7 @@ func (api *API) handleGetVtuberFamilyTrees(w http.ResponseWriter, r *http.Reques
 // @router /vtubers/agency-trees [get]
 func (api *API) handleGetVtuberAgencyTrees(w http.ResponseWriter, r *http.Request) {
 	tree, code, err := api.service.GetVtuberAgencyTrees(r.Context())
-	utils.ResponseWithJSON(w, code, tree, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, tree, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber character designers.
@@ -196,7 +197,7 @@ func (api *API) handleGetVtuberAgencyTrees(w http.ResponseWriter, r *http.Reques
 // @router /vtubers/character-designers [get]
 func (api *API) handleGetVtuberCharacterDesigners(w http.ResponseWriter, r *http.Request) {
 	designers, code, err := api.service.GetVtuberCharacterDesigners(r.Context())
-	utils.ResponseWithJSON(w, code, designers, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, designers, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber character 2D modelers.
@@ -207,7 +208,7 @@ func (api *API) handleGetVtuberCharacterDesigners(w http.ResponseWriter, r *http
 // @router /vtubers/2d-modelers [get]
 func (api *API) handleGetVtuberCharacter2DModelers(w http.ResponseWriter, r *http.Request) {
 	modelers, code, err := api.service.GetVtuberCharacter2DModelers(r.Context())
-	utils.ResponseWithJSON(w, code, modelers, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, modelers, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get vtuber character 3D modelers.
@@ -218,5 +219,5 @@ func (api *API) handleGetVtuberCharacter2DModelers(w http.ResponseWriter, r *htt
 // @router /vtubers/3d-modelers [get]
 func (api *API) handleGetVtuberCharacter3DModelers(w http.ResponseWriter, r *http.Request) {
 	modelers, code, err := api.service.GetVtuberCharacter3DModelers(r.Context())
-	utils.ResponseWithJSON(w, code, modelers, errors.Wrap(r.Context(), err))
+	utils.ResponseWithJSON(w, code, modelers, stack.Wrap(r.Context(), err))
 }

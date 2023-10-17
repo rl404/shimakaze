@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/niconico/entity"
 	"github.com/rl404/shimakaze/internal/errors"
 )
@@ -53,29 +54,29 @@ func (c *Client) GetVideos(ctx context.Context, id string) ([]entity.Video, int,
 
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, url.String(), nil)
 		if err != nil {
-			return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+			return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalServer)
 		}
 
 		req.Header.Add("X-Frontend-id", "6")
 
 		resp, err := c.http.Do(req)
 		if err != nil {
-			return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+			return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalServer)
 		}
 		defer resp.Body.Close()
 
 		if resp.StatusCode != http.StatusOK {
-			return nil, resp.StatusCode, errors.Wrap(ctx, _errors.New(http.StatusText(resp.StatusCode)))
+			return nil, resp.StatusCode, stack.Wrap(ctx, _errors.New(http.StatusText(resp.StatusCode)))
 		}
 
 		respBody, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+			return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalServer)
 		}
 
 		var body getVideosResponse
 		if err := json.Unmarshal(respBody, &body); err != nil {
-			return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+			return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalServer)
 		}
 
 		var done bool

@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/niconico/entity"
 	"github.com/rl404/shimakaze/internal/errors"
 )
@@ -37,27 +38,27 @@ func (c *Client) GetUser(ctx context.Context, userURL string) (*entity.User, int
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url.String(), nil)
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalServer)
 	}
 
 	resp, err := c.http.Do(req)
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalServer)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, resp.StatusCode, errors.Wrap(ctx, _errors.New(http.StatusText(resp.StatusCode)))
+		return nil, resp.StatusCode, stack.Wrap(ctx, _errors.New(http.StatusText(resp.StatusCode)))
 	}
 
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
-		return nil, resp.StatusCode, errors.Wrap(ctx, _errors.New(http.StatusText(resp.StatusCode)))
+		return nil, resp.StatusCode, stack.Wrap(ctx, _errors.New(http.StatusText(resp.StatusCode)))
 	}
 
 	data, err := c.parseData(ctx, doc)
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalServer)
 	}
 
 	return &entity.User{
@@ -71,12 +72,12 @@ func (c *Client) GetUser(ctx context.Context, userURL string) (*entity.User, int
 func (c *Client) parseData(ctx context.Context, doc *goquery.Document) (*getUserResponse, error) {
 	dataStr, ok := doc.Find("div#js-initial-userpage-data").Attr("data-initial-data")
 	if !ok {
-		return nil, errors.Wrap(ctx, errors.ErrChannelNotFound)
+		return nil, stack.Wrap(ctx, errors.ErrChannelNotFound)
 	}
 
 	var data getUserResponse
 	if err := json.Unmarshal([]byte(dataStr), &data); err != nil {
-		return nil, errors.Wrap(ctx, err)
+		return nil, stack.Wrap(ctx, err)
 	}
 
 	return &data, nil

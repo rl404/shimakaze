@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	"github.com/rl404/shimakaze/internal/errors"
 	"go.mongodb.org/mongo-driver/bson"
@@ -15,7 +16,7 @@ import (
 func (m *Mongo) GetCount(ctx context.Context) (int, int, error) {
 	cnt, err := m.db.CountDocuments(ctx, bson.M{})
 	if err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 	return int(cnt), http.StatusOK, nil
 }
@@ -28,12 +29,12 @@ func (m *Mongo) GetAverageActiveTime(ctx context.Context) (float64, int, error) 
 
 	avgCursor, err := m.db.Aggregate(ctx, m.getPipeline(replaceFieldStage, matchStage, avgStage))
 	if err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var avg []map[string]float64
 	if err := avgCursor.All(ctx, &avg); err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	return avg[0]["avg"], http.StatusOK, nil
@@ -53,12 +54,12 @@ func (m *Mongo) GetStatusCount(ctx context.Context) (*entity.StatusCount, int, e
 
 	cntCursor, err := m.db.Aggregate(ctx, m.getPipeline(projectStage, groupStage))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var cnt []map[string]int
 	if err := cntCursor.All(ctx, &cnt); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	return &entity.StatusCount{
@@ -87,22 +88,22 @@ func (m *Mongo) GetDebutRetireCountMonthly(ctx context.Context) ([]entity.DebutR
 
 	debutCursor, err := m.db.Aggregate(ctx, m.getPipeline(debutFilterStage, debutProjectStage, debutGroupStage, debutProjectStage2))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	retiredCursor, err := m.db.Aggregate(ctx, m.getPipeline(retiredFilterStage, retiredProjectStage, retiredGroupStage, retiredProjectStage2))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var debutCount []statusCountMonthly
 	if err := debutCursor.All(ctx, &debutCount); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var retiredCount []statusCountMonthly
 	if err := retiredCursor.All(ctx, &retiredCount); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	return m.mergeDebutRetiredMonthly(debutCount, retiredCount), http.StatusOK, nil
@@ -127,22 +128,22 @@ func (m *Mongo) GetDebutRetireCountYearly(ctx context.Context) ([]entity.DebutRe
 
 	debutCursor, err := m.db.Aggregate(ctx, m.getPipeline(debutFilterStage, debutProjectStage, debutGroupStage, debutProjectStage2))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	retiredCursor, err := m.db.Aggregate(ctx, m.getPipeline(retiredFilterStage, retiredProjectStage, retiredGroupStage, retiredProjectStage2))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var debutCount []statusCountYearly
 	if err := debutCursor.All(ctx, &debutCount); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var retiredCount []statusCountYearly
 	if err := retiredCursor.All(ctx, &retiredCount); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	return m.mergeDebutRetiredYearly(debutCount, retiredCount), http.StatusOK, nil
@@ -174,12 +175,12 @@ func (m *Mongo) GetModelCount(ctx context.Context) (*entity.ModelCount, int, err
 
 	countCursor, err := m.db.Aggregate(ctx, m.getPipeline(projectStage, groupStage))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var cnt []modelCount
 	if err := countCursor.All(ctx, &cnt); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	return &entity.ModelCount{
@@ -214,12 +215,12 @@ func (m *Mongo) GetInAgencyCount(ctx context.Context) (*entity.InAgencyCount, in
 
 	countCursor, err := m.db.Aggregate(ctx, m.getPipeline(projectStage, groupStage))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var cnt []inAgencyCount
 	if err := countCursor.All(ctx, &cnt); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	return &entity.InAgencyCount{
@@ -260,12 +261,12 @@ func (m *Mongo) GetSubscriberCount(ctx context.Context, interval, max int) ([]en
 
 	countCursor, err := m.db.Aggregate(ctx, m.getPipeline(newFieldStage, projectStage, bucketStage, projectStage2))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var cnt []subscriberCount
 	if err := countCursor.All(ctx, &cnt); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	res := make([]entity.SubscriberCount, len(cnt))
@@ -299,12 +300,12 @@ func (m *Mongo) getdesignerCount(ctx context.Context, top int, field string) ([]
 
 	countCursor, err := m.db.Aggregate(ctx, m.getPipeline(unwindStage, groupStage, projectStage, sortStage, limitStage))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var cnt []designerCount
 	if err := countCursor.All(ctx, &cnt); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	res := make([]entity.DesignerCount, len(cnt))
@@ -351,12 +352,12 @@ func (m *Mongo) GetAverageVideoCount(ctx context.Context) (float64, int, error) 
 
 	avgCursor, err := m.db.Aggregate(ctx, m.getPipeline(newFieldStage, newFieldStage2, projectStage, groupStage))
 	if err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var avg []map[string]float64
 	if err := avgCursor.All(ctx, &avg); err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	return avg[0]["avg"], http.StatusOK, nil
@@ -378,12 +379,12 @@ func (m *Mongo) GetAverageVideoDuration(ctx context.Context) (float64, int, erro
 
 	avgCursor, err := m.db.Aggregate(ctx, m.getPipeline(projectStage, unwindStage, unwindStage, matchStage, newFieldStage, groupStage))
 	if err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var avg []map[string]float64
 	if err := avgCursor.All(ctx, &avg); err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	return avg[0]["avg"], http.StatusOK, nil
@@ -414,12 +415,12 @@ func (m *Mongo) GetVideoCountByDate(ctx context.Context, hourly, daily bool) ([]
 
 	cntCursor, err := m.db.Aggregate(ctx, m.getPipeline(projectStage, unwindStage, unwindStage, matchStage, groupStage, projectStage2, sortStage))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var cnt []videoCountByDate
 	if err := cntCursor.All(ctx, &cnt); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	res := make([]entity.VideoCountByDate, len(cnt))
@@ -451,12 +452,12 @@ func (m *Mongo) GetVideoCount(ctx context.Context, top int) ([]entity.VideoCount
 
 	cntCursor, err := m.db.Aggregate(ctx, m.getPipeline(projectStage, unwindStage, unwindStage, groupStage, projectStage2, sortStage, limitStage))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var cnt []videoCount
 	if err := cntCursor.All(ctx, &cnt); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	res := make([]entity.VideoCount, len(cnt))
@@ -496,12 +497,12 @@ func (m *Mongo) GetVideoDuration(ctx context.Context, top int) ([]entity.VideoDu
 
 	durCursor, err := m.db.Aggregate(ctx, m.getPipeline(projectStage, unwindStage, unwindStage, matchStage, newFieldStage, groupStage, projectStage2, sortStage, limitStage))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var dur []videoDuration
 	if err := durCursor.All(ctx, &dur); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	res := make([]entity.VideoDuration, len(dur))
@@ -534,12 +535,12 @@ func (m *Mongo) GetBirthdayCount(ctx context.Context) ([]entity.BirthdayCount, i
 
 	cntCursor, err := m.db.Aggregate(ctx, m.getPipeline(groupStage, projectStage, matchStage, sortStage))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var cnt []birthdayCount
 	if err := cntCursor.All(ctx, &cnt); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	res := make([]entity.BirthdayCount, len(cnt))
@@ -561,12 +562,12 @@ func (m *Mongo) GetAverageHeight(ctx context.Context) (float64, int, error) {
 
 	avgCursor, err := m.db.Aggregate(ctx, m.getPipeline(matchStage, avgStage))
 	if err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var avg []map[string]float64
 	if err := avgCursor.All(ctx, &avg); err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	return avg[0]["avg"], http.StatusOK, nil
@@ -579,12 +580,12 @@ func (m *Mongo) GetAverageWeight(ctx context.Context) (float64, int, error) {
 
 	avgCursor, err := m.db.Aggregate(ctx, m.getPipeline(matchStage, avgStage))
 	if err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var avg []map[string]float64
 	if err := avgCursor.All(ctx, &avg); err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	return avg[0]["avg"], http.StatusOK, nil
@@ -605,12 +606,12 @@ func (m *Mongo) GetBloodTypeCount(ctx context.Context, top int) ([]entity.BloodT
 
 	countCursor, err := m.db.Aggregate(ctx, m.getPipeline(matchStage, groupStage, projectStage, sortStage, limitStage))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var cnt []bloodTypeCount
 	if err := countCursor.All(ctx, &cnt); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	topBloodTypes := make([]string, top)
@@ -629,12 +630,12 @@ func (m *Mongo) GetBloodTypeCount(ctx context.Context, top int) ([]entity.BloodT
 
 	otherCursor, err := m.db.Aggregate(ctx, m.getPipeline(matchStage, otherMatchStage, otherGroupStage))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var otherCnt []bloodTypeCount
 	if err := otherCursor.All(ctx, &otherCnt); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	res[top] = entity.BloodTypeCount{
@@ -660,12 +661,12 @@ func (m *Mongo) GetChannelTypeCount(ctx context.Context) ([]entity.ChannelTypeCo
 
 	countCursor, err := m.db.Aggregate(ctx, m.getPipeline(projectStage, unwindStage, groupStage, projectStage2, sortStage))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var cnt []channelTypeCount
 	if err := countCursor.All(ctx, &cnt); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	res := make([]entity.ChannelTypeCount, len(cnt))
@@ -694,12 +695,12 @@ func (m *Mongo) GetGenderCount(ctx context.Context) ([]entity.GenderCount, int, 
 
 	countCursor, err := m.db.Aggregate(ctx, m.getPipeline(matchStage, groupStage, projectStage, sortStage, limitStage))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var cnt []genderCount
 	if err := countCursor.All(ctx, &cnt); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	topGenders := make([]string, 2)
@@ -718,12 +719,12 @@ func (m *Mongo) GetGenderCount(ctx context.Context) ([]entity.GenderCount, int, 
 
 	otherCursor, err := m.db.Aggregate(ctx, m.getPipeline(matchStage, otherMatchStage, otherGroupStage))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var otherCnt []genderCount
 	if err := otherCursor.All(ctx, &otherCnt); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	res[2] = entity.GenderCount{
@@ -749,12 +750,12 @@ func (m *Mongo) GetZodiacCount(ctx context.Context) ([]entity.ZodiacCount, int, 
 
 	countCursor, err := m.db.Aggregate(ctx, m.getPipeline(matchStage, groupStage, projectStage, sortStage, limitStage))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var cnt []zodiacCount
 	if err := countCursor.All(ctx, &cnt); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	topZodiacs := make([]string, 12)
@@ -773,12 +774,12 @@ func (m *Mongo) GetZodiacCount(ctx context.Context) ([]entity.ZodiacCount, int, 
 
 	otherCursor, err := m.db.Aggregate(ctx, m.getPipeline(matchStage, otherMatchStage, otherGroupStage))
 	if err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	var otherCnt []genderCount
 	if err := otherCursor.All(ctx, &otherCnt); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalDB, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
 	res[12] = entity.ZodiacCount{

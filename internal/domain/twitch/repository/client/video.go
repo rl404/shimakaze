@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/nicklaw5/helix/v2"
+	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/twitch/entity"
 	"github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/utils"
@@ -16,7 +17,7 @@ import (
 // GetVideos to get videos.
 func (c *Client) GetVideos(ctx context.Context, id string) ([]entity.Video, int, error) {
 	if code, err := c.setToken(ctx); err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	var res []entity.Video
@@ -30,9 +31,9 @@ func (c *Client) GetVideos(ctx context.Context, id string) ([]entity.Video, int,
 		})
 		if err != nil {
 			if resp == nil {
-				return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+				return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalServer)
 			}
-			return nil, resp.StatusCode, errors.Wrap(ctx, _errors.New(resp.Error), _errors.New(resp.ErrorMessage))
+			return nil, resp.StatusCode, stack.Wrap(ctx, _errors.New(resp.Error), _errors.New(resp.ErrorMessage))
 		}
 
 		var done bool

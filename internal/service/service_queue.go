@@ -4,20 +4,19 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/rl404/shimakaze/internal/domain/publisher/entity"
-	"github.com/rl404/shimakaze/internal/errors"
+	"github.com/rl404/fairy/errors/stack"
 )
 
 // QueueMissingVtuber to queue missing vtuber.
 func (s *service) QueueMissingVtuber(ctx context.Context, limit int) (int, int, error) {
 	vtuberIDs, code, err := s.vtuber.GetAllIDs(ctx)
 	if err != nil {
-		return 0, code, errors.Wrap(ctx, err)
+		return 0, code, stack.Wrap(ctx, err)
 	}
 
 	nonVtuberIDs, code, err := s.nonVtuber.GetAllIDs(ctx)
 	if err != nil {
-		return 0, code, errors.Wrap(ctx, err)
+		return 0, code, stack.Wrap(ctx, err)
 	}
 
 	existMap := make(map[int64]bool)
@@ -31,7 +30,7 @@ func (s *service) QueueMissingVtuber(ctx context.Context, limit int) (int, int, 
 	for {
 		pages, nextName, code, err := s.wikia.GetPages(ctx, limitPerPage, lastName)
 		if err != nil {
-			return cnt, code, errors.Wrap(ctx, err)
+			return cnt, code, stack.Wrap(ctx, err)
 		}
 
 		lastName = nextName
@@ -43,8 +42,8 @@ func (s *service) QueueMissingVtuber(ctx context.Context, limit int) (int, int, 
 
 			existMap[page.ID] = true
 
-			if err := s.publisher.PublishParseVtuber(ctx, entity.ParseVtuberRequest{ID: page.ID}); err != nil {
-				return cnt, http.StatusInternalServerError, errors.Wrap(ctx, err)
+			if err := s.publisher.PublishParseVtuber(ctx, page.ID, false); err != nil {
+				return cnt, http.StatusInternalServerError, stack.Wrap(ctx, err)
 			}
 
 			cnt++
@@ -64,7 +63,7 @@ func (s *service) QueueMissingVtuber(ctx context.Context, limit int) (int, int, 
 func (s *service) QueueMissingAgency(ctx context.Context, limit int) (int, int, error) {
 	agencyIDs, code, err := s.agency.GetAllIDs(ctx)
 	if err != nil {
-		return 0, code, errors.Wrap(ctx, err)
+		return 0, code, stack.Wrap(ctx, err)
 	}
 
 	existMap := make(map[int64]bool)
@@ -78,7 +77,7 @@ func (s *service) QueueMissingAgency(ctx context.Context, limit int) (int, int, 
 	for {
 		agencies, nextTitle, code, err := s.wikia.GetCategoryMembers(ctx, "Category:Agency", limitPerPage, lastTitle)
 		if err != nil {
-			return cnt, code, errors.Wrap(ctx, err)
+			return cnt, code, stack.Wrap(ctx, err)
 		}
 
 		lastTitle = nextTitle
@@ -90,8 +89,8 @@ func (s *service) QueueMissingAgency(ctx context.Context, limit int) (int, int, 
 
 			existMap[agency.ID] = true
 
-			if err := s.publisher.PublishParseAgency(ctx, entity.ParseAgencyRequest{ID: agency.ID}); err != nil {
-				return cnt, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+			if err := s.publisher.PublishParseAgency(ctx, agency.ID, false); err != nil {
+				return cnt, http.StatusInternalServerError, stack.Wrap(ctx, err)
 			}
 
 			cnt++
@@ -113,12 +112,12 @@ func (s *service) QueueOldAgency(ctx context.Context, limit int) (int, int, erro
 
 	ids, code, err := s.agency.GetOldIDs(ctx)
 	if err != nil {
-		return cnt, code, errors.Wrap(ctx, err)
+		return cnt, code, stack.Wrap(ctx, err)
 	}
 
 	for _, id := range ids {
-		if err := s.publisher.PublishParseAgency(ctx, entity.ParseAgencyRequest{ID: id}); err != nil {
-			return cnt, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+		if err := s.publisher.PublishParseAgency(ctx, id, false); err != nil {
+			return cnt, http.StatusInternalServerError, stack.Wrap(ctx, err)
 		}
 
 		cnt++
@@ -137,12 +136,12 @@ func (s *service) QueueOldActiveVtuber(ctx context.Context, limit int) (int, int
 
 	ids, code, err := s.vtuber.GetOldActiveIDs(ctx)
 	if err != nil {
-		return cnt, code, errors.Wrap(ctx, err)
+		return cnt, code, stack.Wrap(ctx, err)
 	}
 
 	for _, id := range ids {
-		if err := s.publisher.PublishParseVtuber(ctx, entity.ParseVtuberRequest{ID: id}); err != nil {
-			return cnt, http.StatusInternalServerError, errors.Wrap(ctx, err)
+		if err := s.publisher.PublishParseVtuber(ctx, id, false); err != nil {
+			return cnt, http.StatusInternalServerError, stack.Wrap(ctx, err)
 		}
 
 		cnt++
@@ -161,12 +160,12 @@ func (s *service) QueueOldRetiredVtuber(ctx context.Context, limit int) (int, in
 
 	ids, code, err := s.vtuber.GetOldRetiredIDs(ctx)
 	if err != nil {
-		return cnt, code, errors.Wrap(ctx, err)
+		return cnt, code, stack.Wrap(ctx, err)
 	}
 
 	for _, id := range ids {
-		if err := s.publisher.PublishParseVtuber(ctx, entity.ParseVtuberRequest{ID: id}); err != nil {
-			return cnt, http.StatusInternalServerError, errors.Wrap(ctx, err)
+		if err := s.publisher.PublishParseVtuber(ctx, id, false); err != nil {
+			return cnt, http.StatusInternalServerError, stack.Wrap(ctx, err)
 		}
 
 		cnt++

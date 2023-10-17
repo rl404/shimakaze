@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/rl404/fairy/cache"
+	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/agency/entity"
 	"github.com/rl404/shimakaze/internal/domain/agency/repository"
 	"github.com/rl404/shimakaze/internal/errors"
@@ -34,11 +35,11 @@ func (c *Cache) GetByID(ctx context.Context, id int64) (data *entity.Agency, cod
 
 	data, code, err = c.repo.GetByID(ctx, id)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -65,11 +66,11 @@ func (c *Cache) GetAll(ctx context.Context, req entity.GetAllRequest) (_ []entit
 
 	data.Data, data.Total, code, err = c.repo.GetAll(ctx, req)
 	if err != nil {
-		return nil, 0, code, errors.Wrap(ctx, err)
+		return nil, 0, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data.Data, data.Total, code, nil
@@ -84,12 +85,12 @@ func (c *Cache) IsOld(ctx context.Context, id int64) (bool, int, error) {
 func (c *Cache) UpdateByID(ctx context.Context, id int64, data entity.Agency) (int, error) {
 	code, err := c.repo.UpdateByID(ctx, id, data)
 	if err != nil {
-		return code, errors.Wrap(ctx, err)
+		return code, stack.Wrap(ctx, err)
 	}
 
 	key := utils.GetKey("agency", id)
 	if err := c.cacher.Delete(ctx, key); err != nil {
-		return http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return code, nil
@@ -109,11 +110,11 @@ func (c *Cache) GetCount(ctx context.Context) (data int, code int, err error) {
 
 	data, code, err = c.repo.GetCount(ctx)
 	if err != nil {
-		return 0, code, errors.Wrap(ctx, err)
+		return 0, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil

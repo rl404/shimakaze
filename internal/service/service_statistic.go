@@ -5,8 +5,8 @@ import (
 	"math"
 	"net/http"
 
+	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
-	"github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/utils"
 )
 
@@ -14,7 +14,7 @@ import (
 func (s *service) GetVtuberCount(ctx context.Context) (int, int, error) {
 	cnt, code, err := s.vtuber.GetCount(ctx)
 	if err != nil {
-		return 0, code, errors.Wrap(ctx, err)
+		return 0, code, stack.Wrap(ctx, err)
 	}
 	return cnt, http.StatusOK, nil
 }
@@ -23,7 +23,7 @@ func (s *service) GetVtuberCount(ctx context.Context) (int, int, error) {
 func (s *service) GetAgencyCount(ctx context.Context) (int, int, error) {
 	cnt, code, err := s.agency.GetCount(ctx)
 	if err != nil {
-		return 0, code, errors.Wrap(ctx, err)
+		return 0, code, stack.Wrap(ctx, err)
 	}
 	return cnt, http.StatusOK, nil
 }
@@ -32,7 +32,7 @@ func (s *service) GetAgencyCount(ctx context.Context) (int, int, error) {
 func (s *service) GetVtuberAverageActiveTime(ctx context.Context) (float64, int, error) {
 	avg, code, err := s.vtuber.GetAverageActiveTime(ctx)
 	if err != nil {
-		return 0, code, errors.Wrap(ctx, err)
+		return 0, code, stack.Wrap(ctx, err)
 	}
 	return math.Round(avg*100) / 100, http.StatusOK, nil
 }
@@ -46,7 +46,7 @@ type vtuberStatusCount struct {
 func (s *service) GetVtuberStatusCount(ctx context.Context) (*vtuberStatusCount, int, error) {
 	cnt, code, err := s.vtuber.GetStatusCount(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 	return &vtuberStatusCount{
 		Active:  cnt.Active,
@@ -65,7 +65,7 @@ type vtuberDebutRetireCount struct {
 func (s *service) GetVtuberDebutRetireCountMonthly(ctx context.Context) ([]vtuberDebutRetireCount, int, error) {
 	cnt, code, err := s.vtuber.GetDebutRetireCountMonthly(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	res := make([]vtuberDebutRetireCount, len(cnt))
@@ -85,7 +85,7 @@ func (s *service) GetVtuberDebutRetireCountMonthly(ctx context.Context) ([]vtube
 func (s *service) GetVtuberDebutRetireCountYearly(ctx context.Context) ([]vtuberDebutRetireCount, int, error) {
 	cnt, code, err := s.vtuber.GetDebutRetireCountYearly(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	res := make([]vtuberDebutRetireCount, len(cnt))
@@ -111,7 +111,7 @@ type vtuberModelCount struct {
 func (s *service) GetVtuberModelCount(ctx context.Context) (*vtuberModelCount, int, error) {
 	cnt, code, err := s.vtuber.GetModelCount(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 	return &vtuberModelCount{
 		None:      cnt.None,
@@ -130,7 +130,7 @@ type vtuberInAgencyCount struct {
 func (s *service) GetVtuberInAgencyCount(ctx context.Context) (*vtuberInAgencyCount, int, error) {
 	cnt, code, err := s.vtuber.GetInAgencyCount(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 	return &vtuberInAgencyCount{
 		InAgency:    cnt.InAgency,
@@ -153,12 +153,12 @@ type GetVtuberSubscriberCountRequest struct {
 // GetVtuberSubscriberCount to get vtuber subscriber count.
 func (s *service) GetVtuberSubscriberCount(ctx context.Context, data GetVtuberSubscriberCountRequest) ([]vtuberSubscriberCount, int, error) {
 	if err := utils.Validate(&data); err != nil {
-		return nil, http.StatusBadRequest, errors.Wrap(ctx, err)
+		return nil, http.StatusBadRequest, stack.Wrap(ctx, err)
 	}
 
 	cnt, code, err := s.vtuber.GetSubscriberCount(ctx, data.Interval, data.Max)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	res := make([]vtuberSubscriberCount, len(cnt))
@@ -186,12 +186,12 @@ type vtuberDesignerCount struct {
 // GetVtuberDesignerCount to get vtuber character designer count.
 func (s *service) GetVtuberDesignerCount(ctx context.Context, data GetVtuberDesignerCountRequest) ([]vtuberDesignerCount, int, error) {
 	if err := utils.Validate(&data); err != nil {
-		return nil, http.StatusBadRequest, errors.Wrap(ctx, err)
+		return nil, http.StatusBadRequest, stack.Wrap(ctx, err)
 	}
 
 	cnt, code, err := s.vtuber.GetDesignerCount(ctx, data.Top)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	res := make([]vtuberDesignerCount, len(cnt))
@@ -208,12 +208,12 @@ func (s *service) GetVtuberDesignerCount(ctx context.Context, data GetVtuberDesi
 // GetVtuber2DModelerCount to get vtuber character 2d modeler count.
 func (s *service) GetVtuber2DModelerCount(ctx context.Context, data GetVtuberDesignerCountRequest) ([]vtuberDesignerCount, int, error) {
 	if err := utils.Validate(&data); err != nil {
-		return nil, http.StatusBadRequest, errors.Wrap(ctx, err)
+		return nil, http.StatusBadRequest, stack.Wrap(ctx, err)
 	}
 
 	cnt, code, err := s.vtuber.Get2DModelerCount(ctx, data.Top)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	res := make([]vtuberDesignerCount, len(cnt))
@@ -230,12 +230,12 @@ func (s *service) GetVtuber2DModelerCount(ctx context.Context, data GetVtuberDes
 // GetVtuber3DModelerCount to get vtuber character 3d modeler count.
 func (s *service) GetVtuber3DModelerCount(ctx context.Context, data GetVtuberDesignerCountRequest) ([]vtuberDesignerCount, int, error) {
 	if err := utils.Validate(&data); err != nil {
-		return nil, http.StatusBadRequest, errors.Wrap(ctx, err)
+		return nil, http.StatusBadRequest, stack.Wrap(ctx, err)
 	}
 
 	cnt, code, err := s.vtuber.Get3DModelerCount(ctx, data.Top)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	res := make([]vtuberDesignerCount, len(cnt))
@@ -253,7 +253,7 @@ func (s *service) GetVtuber3DModelerCount(ctx context.Context, data GetVtuberDes
 func (s *service) GetVtuberAverageVideoCount(ctx context.Context) (float64, int, error) {
 	avg, code, err := s.vtuber.GetAverageVideoCount(ctx)
 	if err != nil {
-		return 0, code, errors.Wrap(ctx, err)
+		return 0, code, stack.Wrap(ctx, err)
 	}
 	return avg, http.StatusOK, nil
 }
@@ -262,7 +262,7 @@ func (s *service) GetVtuberAverageVideoCount(ctx context.Context) (float64, int,
 func (s *service) GetVtuberAverageVideoDuration(ctx context.Context) (float64, int, error) {
 	avg, code, err := s.vtuber.GetAverageVideoDuration(ctx)
 	if err != nil {
-		return 0, code, errors.Wrap(ctx, err)
+		return 0, code, stack.Wrap(ctx, err)
 	}
 	return avg, http.StatusOK, nil
 }
@@ -277,7 +277,7 @@ type vtuberVideoCountByDate struct {
 func (s *service) GetVtuberVideoCountByDate(ctx context.Context, hourly, daily bool) ([]vtuberVideoCountByDate, int, error) {
 	cnt, code, err := s.vtuber.GetVideoCountByDate(ctx, hourly, daily)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	res := make([]vtuberVideoCountByDate, len(cnt))
@@ -306,12 +306,12 @@ type GetVtuberVideoCountRequest struct {
 // GetVtuberVideoCount to get vtuber video count.
 func (s *service) GetVtuberVideoCount(ctx context.Context, data GetVtuberVideoCountRequest) ([]vtuberVideoCount, int, error) {
 	if err := utils.Validate(&data); err != nil {
-		return nil, http.StatusBadRequest, errors.Wrap(ctx, err)
+		return nil, http.StatusBadRequest, stack.Wrap(ctx, err)
 	}
 
 	cnt, code, err := s.vtuber.GetVideoCount(ctx, data.Top)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	res := make([]vtuberVideoCount, len(cnt))
@@ -340,12 +340,12 @@ type GetVtuberVideoDurationRequest struct {
 // GetVtuberVideoDuration to get vtuber video count.
 func (s *service) GetVtuberVideoDuration(ctx context.Context, data GetVtuberVideoDurationRequest) ([]vtuberVideoDuration, int, error) {
 	if err := utils.Validate(&data); err != nil {
-		return nil, http.StatusBadRequest, errors.Wrap(ctx, err)
+		return nil, http.StatusBadRequest, stack.Wrap(ctx, err)
 	}
 
 	cnt, code, err := s.vtuber.GetVideoDuration(ctx, data.Top)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	res := make([]vtuberVideoDuration, len(cnt))
@@ -370,7 +370,7 @@ type vtuberBirthdayCount struct {
 func (s *service) GetVtuberBirthdayCount(ctx context.Context) ([]vtuberBirthdayCount, int, error) {
 	cnt, code, err := s.vtuber.GetBirthdayCount(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	res := make([]vtuberBirthdayCount, len(cnt))
@@ -389,7 +389,7 @@ func (s *service) GetVtuberBirthdayCount(ctx context.Context) ([]vtuberBirthdayC
 func (s *service) GetVtuberAverageHeight(ctx context.Context) (float64, int, error) {
 	height, code, err := s.vtuber.GetAverageHeight(ctx)
 	if err != nil {
-		return 0, code, errors.Wrap(ctx, err)
+		return 0, code, stack.Wrap(ctx, err)
 	}
 	return height, http.StatusOK, nil
 }
@@ -398,7 +398,7 @@ func (s *service) GetVtuberAverageHeight(ctx context.Context) (float64, int, err
 func (s *service) GetVtuberAverageWeight(ctx context.Context) (float64, int, error) {
 	weight, code, err := s.vtuber.GetAverageWeight(ctx)
 	if err != nil {
-		return 0, code, errors.Wrap(ctx, err)
+		return 0, code, stack.Wrap(ctx, err)
 	}
 	return weight, http.StatusOK, nil
 }
@@ -415,12 +415,12 @@ type vtuberBloodTypeCount struct {
 
 func (s *service) GetVtuberBloodTypeCount(ctx context.Context, data GetVtuberBloodTypeCountRequest) ([]vtuberBloodTypeCount, int, error) {
 	if err := utils.Validate(&data); err != nil {
-		return nil, http.StatusBadRequest, errors.Wrap(ctx, err)
+		return nil, http.StatusBadRequest, stack.Wrap(ctx, err)
 	}
 
 	cnt, code, err := s.vtuber.GetBloodTypeCount(ctx, data.Top)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	res := make([]vtuberBloodTypeCount, len(cnt))
@@ -443,7 +443,7 @@ type vtuberChannelTypeCount struct {
 func (s *service) GetVtuberChannelTypeCount(ctx context.Context) ([]vtuberChannelTypeCount, int, error) {
 	cnt, code, err := s.vtuber.GetChannelTypeCount(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	res := make([]vtuberChannelTypeCount, len(cnt))
@@ -466,7 +466,7 @@ type vtuberGenderCount struct {
 func (s *service) GetVtuberGenderCount(ctx context.Context) ([]vtuberGenderCount, int, error) {
 	cnt, code, err := s.vtuber.GetGenderCount(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	res := make([]vtuberGenderCount, len(cnt))
@@ -489,7 +489,7 @@ type vtuberZodiacCount struct {
 func (s *service) GetVtuberZodiacCount(ctx context.Context) ([]vtuberZodiacCount, int, error) {
 	cnt, code, err := s.vtuber.GetZodiacCount(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	res := make([]vtuberZodiacCount, len(cnt))

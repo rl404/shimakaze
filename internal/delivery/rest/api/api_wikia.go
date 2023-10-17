@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/utils"
 )
@@ -20,10 +21,10 @@ import (
 func (api *API) handleGetWikiaImage(w http.ResponseWriter, r *http.Request) {
 	path := chi.URLParam(r, "*")
 	if path == "" {
-		utils.ResponseWithJSON(w, http.StatusBadRequest, nil, errors.Wrap(r.Context(), errors.ErrInvalidRequestFormat))
+		utils.ResponseWithJSON(w, http.StatusBadRequest, nil, stack.Wrap(r.Context(), errors.ErrInvalidRequestFormat))
 		return
 	}
 
 	image, code, err := api.service.GetWikiaImage(r.Context(), path)
-	utils.ResponseWithPNG(w, code, image, errors.Wrap(r.Context(), err))
+	utils.ResponseWithPNG(w, code, image, stack.Wrap(r.Context(), err))
 }

@@ -2,35 +2,29 @@ package service
 
 import (
 	"context"
-	"encoding/json"
 
+	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/publisher/entity"
 	"github.com/rl404/shimakaze/internal/errors"
 )
 
-// ConsumeMessage to consume message from queue.
-// Each message type will be handled differently.
-func (s *service) ConsumeMessage(ctx context.Context, data entity.Message) error {
-	switch data.Type {
+// ConsumeMessage to consume pubsub message.
+func (s *service) ConsumeMessage(ctx context.Context, msg entity.Message) error {
+	switch msg.Type {
 	case entity.TypeParseVtuber:
-		return errors.Wrap(ctx, s.consumeParseVtuber(ctx, data.Data))
+		return stack.Wrap(ctx, s.consumeParseVtuber(ctx, msg.ID, msg.Forced))
 	case entity.TypeParseAgency:
-		return errors.Wrap(ctx, s.consumeParseAgency(ctx, data.Data))
+		return stack.Wrap(ctx, s.consumeParseAgency(ctx, msg.ID, msg.Forced))
 	default:
-		return errors.Wrap(ctx, errors.ErrInvalidMessageType)
+		return stack.Wrap(ctx, errors.ErrInvalidMessageType)
 	}
 }
 
-func (s *service) consumeParseVtuber(ctx context.Context, data []byte) error {
-	var req entity.ParseVtuberRequest
-	if err := json.Unmarshal(data, &req); err != nil {
-		return errors.Wrap(ctx, errors.ErrInvalidRequestFormat)
-	}
-
-	if !req.Forced {
-		isOld, _, err := s.vtuber.IsOld(ctx, req.ID)
+func (s *service) consumeParseVtuber(ctx context.Context, id int64, forced bool) error {
+	if !forced {
+		isOld, _, err := s.vtuber.IsOld(ctx, id)
 		if err != nil {
-			return errors.Wrap(ctx, err)
+			return stack.Wrap(ctx, err)
 		}
 
 		if !isOld {
@@ -38,23 +32,18 @@ func (s *service) consumeParseVtuber(ctx context.Context, data []byte) error {
 		}
 	}
 
-	if _, err := s.updateVtuber(ctx, req.ID); err != nil {
-		return errors.Wrap(ctx, err)
+	if _, err := s.updateVtuber(ctx, id); err != nil {
+		return stack.Wrap(ctx, err)
 	}
 
 	return nil
 }
 
-func (s *service) consumeParseAgency(ctx context.Context, data []byte) error {
-	var req entity.ParseAgencyRequest
-	if err := json.Unmarshal(data, &req); err != nil {
-		return errors.Wrap(ctx, errors.ErrInvalidRequestFormat)
-	}
-
-	if !req.Forced {
-		isOld, _, err := s.agency.IsOld(ctx, req.ID)
+func (s *service) consumeParseAgency(ctx context.Context, id int64, forced bool) error {
+	if !forced {
+		isOld, _, err := s.agency.IsOld(ctx, id)
 		if err != nil {
-			return errors.Wrap(ctx, err)
+			return stack.Wrap(ctx, err)
 		}
 
 		if !isOld {
@@ -62,8 +51,8 @@ func (s *service) consumeParseAgency(ctx context.Context, data []byte) error {
 		}
 	}
 
-	if _, err := s.updateAgency(ctx, req.ID); err != nil {
-		return errors.Wrap(ctx, err)
+	if _, err := s.updateAgency(ctx, id); err != nil {
+		return stack.Wrap(ctx, err)
 	}
 
 	return nil

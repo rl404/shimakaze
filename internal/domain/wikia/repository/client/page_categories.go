@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"strconv"
 
+	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/wikia/entity"
 	"github.com/rl404/shimakaze/internal/errors"
 )
@@ -53,40 +54,40 @@ func (c *Client) GetPageCategories(ctx context.Context, id int64, limit int, las
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url.String(), nil)
 	if err != nil {
-		return nil, "", http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+		return nil, "", http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalServer)
 	}
 
 	resp, err := c.http.Do(req)
 	if err != nil {
-		return nil, "", http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+		return nil, "", http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalServer)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, "", resp.StatusCode, errors.Wrap(ctx, _errors.New(http.StatusText(resp.StatusCode)))
+		return nil, "", resp.StatusCode, stack.Wrap(ctx, _errors.New(http.StatusText(resp.StatusCode)))
 	}
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, "", http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+		return nil, "", http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalServer)
 	}
 
 	var body getPageCategoriesResponse
 	if err := json.Unmarshal(respBody, &body); err != nil {
-		return nil, "", http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalServer, err)
+		return nil, "", http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalServer)
 	}
 
 	if body.Error.Info != "" {
-		return nil, "", http.StatusBadRequest, errors.Wrap(ctx, _errors.New(body.Error.Info))
+		return nil, "", http.StatusBadRequest, stack.Wrap(ctx, _errors.New(body.Error.Info))
 	}
 
 	data, ok := body.Query.Pages[strconv.FormatInt(id, 10)]
 	if !ok {
-		return nil, "", http.StatusNotFound, errors.Wrap(ctx, errors.ErrWikiaPageNotFound)
+		return nil, "", http.StatusNotFound, stack.Wrap(ctx, errors.ErrWikiaPageNotFound)
 	}
 
 	if data.Title == "" {
-		return nil, "", http.StatusNotFound, errors.Wrap(ctx, errors.ErrWikiaPageNotFound)
+		return nil, "", http.StatusNotFound, stack.Wrap(ctx, errors.ErrWikiaPageNotFound)
 	}
 
 	categories := make([]entity.PageCategory, len(data.Categories))

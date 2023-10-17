@@ -7,7 +7,6 @@ import (
 	"github.com/newrelic/go-agent/v3/newrelic"
 	_nr "github.com/rl404/fairy/log/newrelic"
 	nrPS "github.com/rl404/fairy/monitoring/newrelic/pubsub"
-	"github.com/rl404/fairy/pubsub"
 	"github.com/rl404/shimakaze/internal/delivery/cron"
 	agencyRepository "github.com/rl404/shimakaze/internal/domain/agency/repository"
 	agencyMongo "github.com/rl404/shimakaze/internal/domain/agency/repository/mongo"
@@ -21,6 +20,7 @@ import (
 	wikiaClient "github.com/rl404/shimakaze/internal/domain/wikia/repository/client"
 	"github.com/rl404/shimakaze/internal/service"
 	"github.com/rl404/shimakaze/internal/utils"
+	"github.com/rl404/shimakaze/pkg/pubsub"
 )
 
 func cronFill() error {
@@ -59,7 +59,7 @@ func cronFill() error {
 	if err != nil {
 		return err
 	}
-	ps = nrPS.New(cfg.PubSub.Dialect, ps)
+	ps = nrPS.New(cfg.PubSub.Dialect, ps, nrApp)
 	utils.Info("pubsub initialized")
 	defer ps.Close()
 
@@ -89,7 +89,7 @@ func cronFill() error {
 
 	// Run cron.
 	utils.Info("filling missing data...")
-	if err := cron.New(service).Fill(nrApp, cfg.Cron.FillLimit); err != nil {
+	if err := cron.New(service, nrApp).Fill(cfg.Cron.FillLimit); err != nil {
 		return err
 	}
 

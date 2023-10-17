@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/fairy/pubsub"
 	"github.com/rl404/shimakaze/internal/domain/publisher/entity"
 	"github.com/rl404/shimakaze/internal/errors"
@@ -24,34 +25,36 @@ func New(ps pubsub.PubSub, topic string) *Pubsub {
 }
 
 // PublishParseVtuber to publish parse vtuber.
-func (p *Pubsub) PublishParseVtuber(ctx context.Context, data entity.ParseVtuberRequest) error {
-	d, err := json.Marshal(data)
+func (p *Pubsub) PublishParseVtuber(ctx context.Context, id int64, forced bool) error {
+	msg, err := json.Marshal(entity.Message{
+		Type:   entity.TypeParseVtuber,
+		ID:     id,
+		Forced: forced,
+	})
 	if err != nil {
-		return errors.Wrap(ctx, errors.ErrInternalServer, err)
+		return stack.Wrap(ctx, err, errors.ErrInternalServer)
 	}
 
-	if err := p.pubsub.Publish(ctx, p.topic, entity.Message{
-		Type: entity.TypeParseVtuber,
-		Data: d,
-	}); err != nil {
-		return errors.Wrap(ctx, errors.ErrInternalServer, err)
+	if err := p.pubsub.Publish(ctx, p.topic, msg); err != nil {
+		return stack.Wrap(ctx, err, errors.ErrInternalServer)
 	}
 
 	return nil
 }
 
 // PublishParseAgency to publish parse agency.
-func (p *Pubsub) PublishParseAgency(ctx context.Context, data entity.ParseAgencyRequest) error {
-	d, err := json.Marshal(data)
+func (p *Pubsub) PublishParseAgency(ctx context.Context, id int64, forced bool) error {
+	msg, err := json.Marshal(entity.Message{
+		Type:   entity.TypeParseAgency,
+		ID:     id,
+		Forced: forced,
+	})
 	if err != nil {
-		return errors.Wrap(ctx, errors.ErrInternalServer, err)
+		return stack.Wrap(ctx, err, errors.ErrInternalServer)
 	}
 
-	if err := p.pubsub.Publish(ctx, p.topic, entity.Message{
-		Type: entity.TypeParseAgency,
-		Data: d,
-	}); err != nil {
-		return errors.Wrap(ctx, errors.ErrInternalServer, err)
+	if err := p.pubsub.Publish(ctx, p.topic, msg); err != nil {
+		return stack.Wrap(ctx, err, errors.ErrInternalServer)
 	}
 
 	return nil

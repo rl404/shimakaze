@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/agency/entity"
 	vtuberEntity "github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	wikiaEntity "github.com/rl404/shimakaze/internal/domain/wikia/entity"
@@ -21,28 +22,28 @@ func (s *service) updateVtuber(ctx context.Context, id int64) (int, error) {
 		if code == http.StatusNotFound {
 			// Delete existing vtuber.
 			if code, err := s.vtuber.DeleteByID(ctx, id); err != nil {
-				return code, errors.Wrap(ctx, err)
+				return code, stack.Wrap(ctx, err)
 			}
 
 			// Insert to non-vtuber.
 			if code, err := s.nonVtuber.Create(ctx, id); err != nil {
-				return code, errors.Wrap(ctx, err)
+				return code, stack.Wrap(ctx, err)
 			}
 			return http.StatusOK, nil
 		}
-		return code, errors.Wrap(ctx, err)
+		return code, stack.Wrap(ctx, err)
 	}
 
 	// Non-vtuber page.
 	if s.isNonVtuberPage(*page) {
 		// Delete existing vtuber.
 		if code, err := s.vtuber.DeleteByID(ctx, id); err != nil {
-			return code, errors.Wrap(ctx, err)
+			return code, stack.Wrap(ctx, err)
 		}
 
 		// Insert to non-vtuber.
 		if code, err := s.nonVtuber.Create(ctx, id); err != nil {
-			return code, errors.Wrap(ctx, err)
+			return code, stack.Wrap(ctx, err)
 		}
 
 		return http.StatusOK, nil
@@ -72,7 +73,7 @@ func (s *service) updateVtuber(ctx context.Context, id int64) (int, error) {
 
 	// Update data.
 	if code, err := s.vtuber.UpdateByID(ctx, id, vtuber); err != nil {
-		return code, errors.Wrap(ctx, err)
+		return code, stack.Wrap(ctx, err)
 	}
 
 	return http.StatusOK, nil
@@ -88,7 +89,7 @@ func (s *service) isNonVtuberPage(page wikiaEntity.Page) bool {
 func (s *service) getVtuberImage(ctx context.Context, id int64) string {
 	pageImage, _, err := s.wikia.GetPageImageByID(ctx, id)
 	if err != nil {
-		errors.Wrap(ctx, err)
+		stack.Wrap(ctx, err)
 		return ""
 	}
 	return pageImage.Image
@@ -97,7 +98,7 @@ func (s *service) getVtuberImage(ctx context.Context, id int64) string {
 func (s *service) getAgencyMap(ctx context.Context) map[string]vtuberEntity.Agency {
 	agencies, _, _, err := s.agency.GetAll(ctx, entity.GetAllRequest{Page: 1, Limit: -1})
 	if err != nil {
-		errors.Wrap(ctx, err)
+		stack.Wrap(ctx, err)
 		return nil
 	}
 
@@ -129,7 +130,7 @@ func (s *service) getVtuberCategory(ctx context.Context, id int64, agencyMap map
 	for {
 		pageCategories, nextTitle, _, err := s.wikia.GetPageCategories(ctx, id, limitPerPage, lastTitle)
 		if err != nil {
-			errors.Wrap(ctx, err)
+			stack.Wrap(ctx, err)
 			return
 		}
 
@@ -241,18 +242,18 @@ func (s *service) fillYoutubeChannel(ctx context.Context, channel vtuberEntity.C
 
 	// URL not contain channel id.
 	if !_errors.Is(err, errors.ErrChannelNotFound) {
-		errors.Wrap(ctx, err)
+		stack.Wrap(ctx, err)
 	}
 
 	channelID, _, err = s.youtube.GetChannelIDByURL(ctx, channel.URL)
 	if err != nil {
-		errors.Wrap(ctx, err)
+		stack.Wrap(ctx, err)
 		return channel
 	}
 
 	ch, _, err = s.youtube.GetChannelByID(ctx, channelID)
 	if err != nil {
-		errors.Wrap(ctx, err)
+		stack.Wrap(ctx, err)
 		return channel
 	}
 
@@ -271,13 +272,13 @@ func (s *service) fillYoutubeVideos(ctx context.Context, channel vtuberEntity.Ch
 
 	videoIDs, _, err := s.youtube.GetVideoIDsByChannelID(ctx, channel.ID)
 	if err != nil {
-		errors.Wrap(ctx, err)
+		stack.Wrap(ctx, err)
 		return channel
 	}
 
 	videos, _, err := s.youtube.GetVideosByIDs(ctx, videoIDs)
 	if err != nil {
-		errors.Wrap(ctx, err)
+		stack.Wrap(ctx, err)
 		return channel
 	}
 
@@ -306,7 +307,7 @@ func (s *service) fillTwitchChannel(ctx context.Context, channel vtuberEntity.Ch
 
 	user, _, err := s.twitch.GetUser(ctx, username)
 	if err != nil {
-		errors.Wrap(ctx, err)
+		stack.Wrap(ctx, err)
 		return channel
 	}
 
@@ -316,7 +317,7 @@ func (s *service) fillTwitchChannel(ctx context.Context, channel vtuberEntity.Ch
 
 	follower, _, err := s.twitch.GetFollowerCount(ctx, user.ID)
 	if err != nil {
-		errors.Wrap(ctx, err)
+		stack.Wrap(ctx, err)
 		return channel
 	}
 
@@ -332,7 +333,7 @@ func (s *service) fillTwitchVideo(ctx context.Context, channel vtuberEntity.Chan
 
 	videos, _, err := s.twitch.GetVideos(ctx, channel.ID)
 	if err != nil {
-		errors.Wrap(ctx, err)
+		stack.Wrap(ctx, err)
 		return channel
 	}
 
@@ -361,7 +362,7 @@ func (s *service) fillBilibiliChannel(ctx context.Context, channel vtuberEntity.
 
 	user, _, err := s.bilibili.GetUser(ctx, userID)
 	if err != nil {
-		errors.Wrap(ctx, err)
+		stack.Wrap(ctx, err)
 		return channel
 	}
 
@@ -371,7 +372,7 @@ func (s *service) fillBilibiliChannel(ctx context.Context, channel vtuberEntity.
 
 	follower, _, err := s.bilibili.GetFollowerCount(ctx, user.ID)
 	if err != nil {
-		errors.Wrap(ctx, err)
+		stack.Wrap(ctx, err)
 		return channel
 	}
 
@@ -387,7 +388,7 @@ func (s *service) fillBilibiliVideo(ctx context.Context, channel vtuberEntity.Ch
 
 	videos, _, err := s.bilibili.GetVideos(ctx, channel.ID)
 	if err != nil {
-		errors.Wrap(ctx, err)
+		stack.Wrap(ctx, err)
 		return channel
 	}
 
@@ -415,7 +416,7 @@ func (s *service) fillNiconicoChannel(ctx context.Context, channel vtuberEntity.
 
 	user, _, err := s.niconico.GetUser(ctx, channel.URL)
 	if err != nil {
-		errors.Wrap(ctx, err)
+		stack.Wrap(ctx, err)
 		return channel
 	}
 
@@ -434,7 +435,7 @@ func (s *service) fillNiconicoVideo(ctx context.Context, channel vtuberEntity.Ch
 
 	videos, _, err := s.niconico.GetVideos(ctx, channel.ID)
 	if err != nil {
-		errors.Wrap(ctx, err)
+		stack.Wrap(ctx, err)
 		return channel
 	}
 

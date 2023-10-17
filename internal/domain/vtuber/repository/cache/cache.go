@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/rl404/fairy/cache"
+	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	"github.com/rl404/shimakaze/internal/domain/vtuber/repository"
 	"github.com/rl404/shimakaze/internal/errors"
@@ -36,11 +37,11 @@ func (c *Cache) GetByID(ctx context.Context, id int64) (data *entity.Vtuber, cod
 
 	data, code, err = c.repo.GetByID(ctx, id)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -60,7 +61,7 @@ func (c *Cache) GetAllImages(ctx context.Context, shuffle bool, limit int) (data
 
 	data, code, err = c.repo.GetAllImages(ctx, shuffle, limit)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if shuffle {
@@ -75,7 +76,7 @@ func (c *Cache) GetAllImages(ctx context.Context, shuffle bool, limit int) (data
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -84,12 +85,12 @@ func (c *Cache) GetAllImages(ctx context.Context, shuffle bool, limit int) (data
 // UpdateByID to update by id.
 func (c *Cache) UpdateByID(ctx context.Context, id int64, data entity.Vtuber) (int, error) {
 	if code, err := c.repo.UpdateByID(ctx, id, data); err != nil {
-		return code, errors.Wrap(ctx, err)
+		return code, stack.Wrap(ctx, err)
 	}
 
 	key := utils.GetKey("vtuber", id)
 	if err := c.cacher.Delete(ctx, key); err != nil {
-		return http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 
 	}
 
@@ -99,12 +100,12 @@ func (c *Cache) UpdateByID(ctx context.Context, id int64, data entity.Vtuber) (i
 // DeleteByID to delete by id.
 func (c *Cache) DeleteByID(ctx context.Context, id int64) (int, error) {
 	if code, err := c.repo.DeleteByID(ctx, id); err != nil {
-		return code, errors.Wrap(ctx, err)
+		return code, stack.Wrap(ctx, err)
 	}
 
 	key := utils.GetKey("vtuber", id)
 	if err := c.cacher.Delete(ctx, key); err != nil {
-		return http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 
 	}
 
@@ -135,11 +136,11 @@ func (c *Cache) GetAllForFamilyTree(ctx context.Context) (data []entity.Vtuber, 
 
 	data, code, err = c.repo.GetAllForFamilyTree(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -154,11 +155,11 @@ func (c *Cache) GetAllForAgencyTree(ctx context.Context) (data []entity.Vtuber, 
 
 	data, code, err = c.repo.GetAllForAgencyTree(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -180,11 +181,11 @@ func (c *Cache) GetAll(ctx context.Context, req entity.GetAllRequest) (_ []entit
 
 	data.Data, data.Total, code, err = c.repo.GetAll(ctx, req)
 	if err != nil {
-		return nil, 0, code, errors.Wrap(ctx, err)
+		return nil, 0, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, 0, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data.Data, data.Total, code, nil
@@ -199,11 +200,11 @@ func (c *Cache) GetCharacterDesigners(ctx context.Context) (data []string, code 
 
 	data, code, err = c.repo.GetCharacterDesigners(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -218,11 +219,11 @@ func (c *Cache) GetCharacter2DModelers(ctx context.Context) (data []string, code
 
 	data, code, err = c.repo.GetCharacter2DModelers(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
@@ -237,11 +238,11 @@ func (c *Cache) GetCharacter3DModelers(ctx context.Context) (data []string, code
 
 	data, code, err = c.repo.GetCharacter3DModelers(ctx)
 	if err != nil {
-		return nil, code, errors.Wrap(ctx, err)
+		return nil, code, stack.Wrap(ctx, err)
 	}
 
 	if err := c.cacher.Set(ctx, key, data); err != nil {
-		return nil, http.StatusInternalServerError, errors.Wrap(ctx, errors.ErrInternalCache, err)
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
 	return data, code, nil
