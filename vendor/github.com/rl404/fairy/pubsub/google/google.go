@@ -51,8 +51,8 @@ func (c *Client) Use(middlewares ...func(_pubsub.HandlerFunc) _pubsub.HandlerFun
 }
 
 func (c *Client) applyMiddlewares(handlerFunc _pubsub.HandlerFunc) _pubsub.HandlerFunc {
-	for _, mw := range c.middlewares {
-		handlerFunc = mw(handlerFunc)
+	for i := len(c.middlewares) - 1; i >= 0; i-- {
+		handlerFunc = c.middlewares[i](handlerFunc)
 	}
 	return handlerFunc
 }
