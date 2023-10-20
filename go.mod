@@ -7,7 +7,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.10
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/newrelic/go-agent/v3 v3.26.0
+	github.com/newrelic/go-agent/v3 v3.27.0
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.1
 	github.com/nicklaw5/helix/v2 v2.25.1
 	github.com/rl404/fairy v0.24.0
