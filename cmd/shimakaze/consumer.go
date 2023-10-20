@@ -60,7 +60,7 @@ func consumer() error {
 	}
 
 	// Init in-memory.
-	im, err := cache.New(cache.InMemory, "", "", 5*time.Second)
+	im, err := cache.New(cache.InMemory, "", "", time.Hour)
 	if err != nil {
 		return err
 	}
