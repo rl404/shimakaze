@@ -10,7 +10,6 @@ import (
 	"github.com/newrelic/go-agent/v3/integrations/nrmongo"
 	"github.com/rl404/shimakaze/internal/utils"
 	"github.com/rl404/shimakaze/pkg/cache"
-	"github.com/rl404/shimakaze/pkg/log"
 	"github.com/rl404/shimakaze/pkg/pubsub"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -71,9 +70,9 @@ type cronConfig struct {
 }
 
 type logConfig struct {
-	Level log.LogLevel `envconfig:"LEVEL" default:"-1"`
-	JSON  bool         `envconfig:"JSON" default:"false"`
-	Color bool         `envconfig:"COLOR" default:"true"`
+	Level utils.LogLevel `envconfig:"LEVEL" default:"-1"`
+	JSON  bool           `envconfig:"JSON" default:"false"`
+	Color bool           `envconfig:"COLOR" default:"true"`
 }
 
 type newrelicConfig struct {
