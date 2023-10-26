@@ -158,8 +158,6 @@ github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.1 h1:tUZznhGpWPq0+Wkq/
 github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.1/go.mod h1:+uXCBUgxZbInCqCrJVFNueMNjMeiq8/2uY0A4ljHcpc=
 github.com/newrelic/go-agent/v3/integrations/nrsecurityagent v1.1.0 h1:gqkTDYUHWUyiG+u0PJQCRh98rcHLxP/w7GtIbJDVULY=
 github.com/newrelic/go-agent/v3/integrations/nrsecurityagent v1.1.0/go.mod h1:3wugGvRmOVYov/08y+D8tB1uYIZds5bweVdr5vo4Gbs=
-github.com/nicklaw5/helix/v2 v2.25.1 h1:hccFfWf1kdPKeC/Zp8jNbOvqV0f6ya12hdeNHuQa5wg=
-github.com/nicklaw5/helix/v2 v2.25.1/go.mod h1:zZcKsyyBWDli34x3QleYsVMiiNGMXPAEU5NjsiZDtvY=
 github.com/nicklaw5/helix/v2 v2.25.2 h1:diGnmRnUpNk8vYVM1vOjUo5PGZnr8atbkUYT78T6evc=
 github.com/nicklaw5/helix/v2 v2.25.2/go.mod h1:zZcKsyyBWDli34x3QleYsVMiiNGMXPAEU5NjsiZDtvY=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWbfPhv4DMiApHyliiK5xCTNVSPiaAs=
