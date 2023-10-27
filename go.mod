@@ -10,7 +10,7 @@ require (
 	github.com/newrelic/go-agent/v3 v3.27.0
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.1
 	github.com/nicklaw5/helix/v2 v2.25.2
-	github.com/rl404/fairy v0.25.0
+	github.com/rl404/fairy v0.25.1
 	github.com/spf13/cobra v1.7.0
 	github.com/swaggo/http-swagger/v2 v2.0.2
 	github.com/swaggo/swag v1.16.2
