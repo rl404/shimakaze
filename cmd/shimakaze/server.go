@@ -54,7 +54,7 @@ func server() error {
 		utils.Error(err.Error())
 	} else {
 		defer nrApp.Shutdown(10 * time.Second)
-		utils.AddLog(_nr.NewFromNewrelicApp(nrApp, _nr.ErrorLevel))
+		utils.AddLog(_nr.NewFromNewrelicApp(nrApp, _nr.LogLevel(cfg.Log.Level)))
 		utils.Info("newrelic initialized")
 	}
 
