@@ -33,7 +33,6 @@ github.com/allegro/bigcache/v3
 github.com/allegro/bigcache/v3/queue
 # github.com/andybalholm/brotli v1.0.5
 ## explicit; go 1.12
-github.com/andybalholm/brotli
 # github.com/andybalholm/cascadia v1.3.1
 ## explicit; go 1.16
 github.com/andybalholm/cascadia
@@ -158,13 +157,10 @@ github.com/kelseyhightower/envconfig
 # github.com/klauspost/compress v1.16.3
 ## explicit; go 1.18
 github.com/klauspost/compress
-github.com/klauspost/compress/flate
 github.com/klauspost/compress/fse
-github.com/klauspost/compress/gzip
 github.com/klauspost/compress/huff0
 github.com/klauspost/compress/internal/cpuinfo
 github.com/klauspost/compress/internal/snapref
-github.com/klauspost/compress/zlib
 github.com/klauspost/compress/zstd
 github.com/klauspost/compress/zstd/internal/xxhash
 # github.com/leodido/go-urn v1.2.4
@@ -184,7 +180,7 @@ github.com/mattn/go-isatty
 # github.com/montanaflynn/stats v0.6.6
 ## explicit; go 1.13
 github.com/montanaflynn/stats
-# github.com/newrelic/go-agent/v3 v3.27.0
+# github.com/newrelic/go-agent/v3 v3.28.0
 ## explicit; go 1.19
 github.com/newrelic/go-agent/v3/internal
 github.com/newrelic/go-agent/v3/internal/cat
@@ -272,13 +268,8 @@ github.com/tmdvs/Go-Emoji-Utils
 github.com/tmdvs/Go-Emoji-Utils/utils
 # github.com/valyala/bytebufferpool v1.0.0
 ## explicit
-github.com/valyala/bytebufferpool
 # github.com/valyala/fasthttp v1.49.0
 ## explicit; go 1.20
-github.com/valyala/fasthttp
-github.com/valyala/fasthttp/fasthttpadaptor
-github.com/valyala/fasthttp/fasthttputil
-github.com/valyala/fasthttp/stackless
 # github.com/xdg-go/pbkdf2 v1.0.0
 ## explicit; go 1.9
 github.com/xdg-go/pbkdf2
