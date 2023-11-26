@@ -51,9 +51,13 @@ func (c *client) ExchangeCode(ctx context.Context, code string) (string, int, er
 }
 
 type userResponse struct {
-	ID       int64  `json:"id"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+	Data    struct {
+		ID       int64  `json:"id"`
+		Username string `json:"username"`
+		Email    string `json:"email"`
+	} `json:"data"`
 }
 
 // GetUser to get user data.
@@ -86,6 +90,7 @@ func (c *client) GetUser(ctx context.Context, accessToken string) (*entity.User,
 	}
 
 	return &entity.User{
-		ID: userResp.ID,
+		ID:       userResp.Data.ID,
+		Username: userResp.Data.Username,
 	}, http.StatusOK, nil
 }
