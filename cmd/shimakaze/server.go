@@ -23,6 +23,12 @@ import (
 	nonVtuberMongo "github.com/rl404/shimakaze/internal/domain/non_vtuber/repository/mongo"
 	publisherRepository "github.com/rl404/shimakaze/internal/domain/publisher/repository"
 	publisherPubsub "github.com/rl404/shimakaze/internal/domain/publisher/repository/pubsub"
+	ssoRepository "github.com/rl404/shimakaze/internal/domain/sso/repository"
+	ssoClient "github.com/rl404/shimakaze/internal/domain/sso/repository/client"
+	tokenRepository "github.com/rl404/shimakaze/internal/domain/token/repository"
+	tokenToken "github.com/rl404/shimakaze/internal/domain/token/repository/cache"
+	userRepository "github.com/rl404/shimakaze/internal/domain/user/repository"
+	userMongo "github.com/rl404/shimakaze/internal/domain/user/repository/mongo"
 	vtuberRepository "github.com/rl404/shimakaze/internal/domain/vtuber/repository"
 	vtuberCache "github.com/rl404/shimakaze/internal/domain/vtuber/repository/cache"
 	vtuberMongo "github.com/rl404/shimakaze/internal/domain/vtuber/repository/mongo"
@@ -122,8 +128,20 @@ func server() error {
 	var publisher publisherRepository.Repository = publisherPubsub.New(ps, pubsubTopic)
 	utils.Info("repository publisher initialized")
 
+	// Init sso.
+	var sso ssoRepository.Repository = ssoClient.New(cfg.SSO.ClientID, cfg.SSO.ClientSecret, cfg.SSO.RedirectURL)
+	utils.Info("repository sso initialized")
+
+	// Init user.
+	var user userRepository.Repository = userMongo.New(db)
+	utils.Info("repository user initialized")
+
+	// Init token.
+	var token tokenRepository.Repository = tokenToken.New(c, cfg.JWT.AccessSecret, cfg.JWT.AccessExpired, cfg.JWT.RefreshSecret, cfg.JWT.RefreshExpired)
+	utils.Info("repository token initialized")
+
 	// Init service.
-	service := service.New(wikia, vtuber, nonVtuber, agency, publisher, nil, nil, nil, nil)
+	service := service.New(wikia, vtuber, nonVtuber, agency, publisher, nil, nil, nil, nil, sso, user, token)
 	utils.Info("service initialized")
 
 	// Init web server.
@@ -149,7 +167,7 @@ func server() error {
 	utils.Info("http route swagger initialized")
 
 	// Register api route.
-	api.New(service).Register(r, nrApp)
+	api.New(service, cfg.JWT.AccessSecret, cfg.JWT.RefreshSecret).Register(r, nrApp)
 	utils.Info("http route api initialized")
 
 	// Run web server.

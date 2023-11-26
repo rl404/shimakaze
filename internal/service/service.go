@@ -9,7 +9,10 @@ import (
 	nonVtuberRepository "github.com/rl404/shimakaze/internal/domain/non_vtuber/repository"
 	"github.com/rl404/shimakaze/internal/domain/publisher/entity"
 	publisherRepository "github.com/rl404/shimakaze/internal/domain/publisher/repository"
+	ssoRepository "github.com/rl404/shimakaze/internal/domain/sso/repository"
+	tokenRepository "github.com/rl404/shimakaze/internal/domain/token/repository"
 	twitchRepository "github.com/rl404/shimakaze/internal/domain/twitch/repository"
+	userRepository "github.com/rl404/shimakaze/internal/domain/user/repository"
 	vtuberRepository "github.com/rl404/shimakaze/internal/domain/vtuber/repository"
 	wikiaRepository "github.com/rl404/shimakaze/internal/domain/wikia/repository"
 	youtubeRepository "github.com/rl404/shimakaze/internal/domain/youtube/repository"
@@ -17,6 +20,13 @@ import (
 
 // Service contains functions for service.
 type Service interface {
+	HandleAuthCallback(ctx context.Context, data AuthCallback) (*Token, int, error)
+	ValidateToken(ctx context.Context, uuid string, userID int64) (int, error)
+	InvalidateToken(ctx context.Context, uuid string) (int, error)
+	RefreshToken(ctx context.Context, data JWTClaim) (string, int, error)
+
+	GetProfile(ctx context.Context, userID int64) (*User, int, error)
+
 	GetVtubers(ctx context.Context, params GetVtubersRequest) ([]vtuber, *pagination, int, error)
 	GetVtuberByID(ctx context.Context, id int64) (*vtuber, int, error)
 	GetVtuberImages(ctx context.Context, shuffle bool, limit int) ([]vtuberImage, int, error)
@@ -74,6 +84,9 @@ type service struct {
 	twitch    twitchRepository.Repository
 	bilibili  bilibilRepository.Repository
 	niconico  niconicoRepository.Repository
+	sso       ssoRepository.Repository
+	user      userRepository.Repository
+	token     tokenRepository.Repository
 }
 
 // New to create new service.
@@ -87,6 +100,9 @@ func New(
 	twitch twitchRepository.Repository,
 	bilibili bilibilRepository.Repository,
 	niconico niconicoRepository.Repository,
+	sso ssoRepository.Repository,
+	user userRepository.Repository,
+	token tokenRepository.Repository,
 ) Service {
 	return &service{
 		wikia:     wikia,
@@ -98,6 +114,9 @@ func New(
 		twitch:    twitch,
 		bilibili:  bilibili,
 		niconico:  niconico,
+		sso:       sso,
+		user:      user,
+		token:     token,
 	}
 }
 

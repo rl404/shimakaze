@@ -11,13 +11,17 @@ import (
 
 // API contains all functions for api endpoints.
 type API struct {
-	service service.Service
+	service       service.Service
+	accessSecret  string
+	refreshSecret string
 }
 
 // New to create new api endpoints.
-func New(service service.Service) *API {
+func New(service service.Service, accessSecret, refreshSecret string) *API {
 	return &API{
-		service: service,
+		service:       service,
+		accessSecret:  accessSecret,
+		refreshSecret: refreshSecret,
 	}
 }
 
@@ -37,6 +41,12 @@ func (api *API) Register(r chi.Router, nrApp *newrelic.Application) {
 		r.Use(utils.Recoverer)
 
 		r.Get("/wikia/image/*", api.maxConcurrent(api.handleGetWikiaImage, 5))
+
+		r.Post("/auth/callback", api.handleAuthCallback)
+		r.Post("/auth/token/refresh", api.jwtAuth(api.handleTokenRefresh, tokenRefresh))
+		r.Post("/auth/logout", api.jwtAuth(api.handleLogout))
+
+		r.Get("/user", api.jwtAuth(api.handleGetProfile))
 
 		r.Get("/vtubers", api.handleGetVtubers)
 		r.Get("/vtubers/{id}", api.handleGetVtuberByID)

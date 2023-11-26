@@ -28,6 +28,8 @@ type config struct {
 	Twitch   twitchConfig   `envconfig:"TWITCH"`
 	Bilibili bilibiliConfig `envconfig:"BILIBILI"`
 	Niconico niconicoConfig `envconfig:"NICONICO"`
+	JWT      jwtConfig      `envconfig:"JWT"`
+	SSO      ssoConfig      `envconfig:"SSO"`
 }
 
 type appConfig struct {
@@ -97,6 +99,19 @@ type bilibiliConfig struct {
 
 type niconicoConfig struct {
 	MaxAge int `envconfig:"MAX_AGE" validate:"required,gte=0" mod:"default=60"`
+}
+
+type jwtConfig struct {
+	AccessSecret   string        `envconfig:"ACCESS_SECRET" validate:"required"`
+	AccessExpired  time.Duration `envconfig:"ACCESS_EXPIRED" default:"15m" validate:"required,gt=0"`
+	RefreshSecret  string        `envconfig:"REFRESH_SECRET" validate:"required"`
+	RefreshExpired time.Duration `envconfig:"REFRESH_EXPIRED" default:"168h" validate:"required,gt=0"`
+}
+
+type ssoConfig struct {
+	ClientID     string `envconfig:"CLIENT_ID"`
+	ClientSecret string `envconfig:"CLIENT_SECRET"`
+	RedirectURL  string `envconfig:"REDIRECT_URL"`
 }
 
 const envPath = "../../.env"

@@ -12,6 +12,7 @@ import (
 	"unicode"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/google/uuid"
 )
 
 // CleanWikiaComment to remove wikia comment.
@@ -240,4 +241,9 @@ func ParseDuration(durationStr string, startFromTime ...bool) (time.Duration, er
 	}
 
 	return duration, nil
+}
+
+// GenerateUUID to generate random uuid.
+func GenerateUUID() string {
+	return strings.Replace(uuid.New().String(), "-", "", -1)
 }
