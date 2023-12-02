@@ -28,6 +28,7 @@ import (
 	tokenRepository "github.com/rl404/shimakaze/internal/domain/token/repository"
 	tokenToken "github.com/rl404/shimakaze/internal/domain/token/repository/cache"
 	userRepository "github.com/rl404/shimakaze/internal/domain/user/repository"
+	userCache "github.com/rl404/shimakaze/internal/domain/user/repository/cache"
 	userMongo "github.com/rl404/shimakaze/internal/domain/user/repository/mongo"
 	vtuberRepository "github.com/rl404/shimakaze/internal/domain/vtuber/repository"
 	vtuberCache "github.com/rl404/shimakaze/internal/domain/vtuber/repository/cache"
@@ -133,7 +134,10 @@ func server() error {
 	utils.Info("repository sso initialized")
 
 	// Init user.
-	var user userRepository.Repository = userMongo.New(db)
+	var user userRepository.Repository
+	user = userMongo.New(db)
+	user = userCache.New(c, user)
+	user = userCache.New(im, user)
 	utils.Info("repository user initialized")
 
 	// Init token.
