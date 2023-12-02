@@ -32,10 +32,8 @@ func New(clientID, clientSecret, redirectURL string) *client {
 			ClientSecret: clientSecret,
 			RedirectURL:  redirectURL,
 			Endpoint: oauth2.Endpoint{
-				// AuthURL:  "https://sso.rl404.com",
-				// TokenURL: "https://sso.rl404.com/api/oauth/token",
-				AuthURL:  "http://localhost:3000",
-				TokenURL: "http://localhost:3000/api/oauth/token",
+				AuthURL:  "https://sso.rl404.com",
+				TokenURL: "https://sso.rl404.com/api/oauth/token",
 			},
 		},
 	}
@@ -62,7 +60,7 @@ type userResponse struct {
 
 // GetUser to get user data.
 func (c *client) GetUser(ctx context.Context, accessToken string) (*entity.User, int, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://localhost:41001/user", nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://api.sso.rl404.com/user", nil)
 	if err != nil {
 		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalServer)
 	}
