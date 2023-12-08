@@ -45,7 +45,7 @@ func (s *service) HandleAuthCallback(ctx context.Context, data AuthCallback) (*T
 		return nil, code, stack.Wrap(ctx, err)
 	}
 
-	token, code, err := s.generateToken(ctx, user.ID)
+	token, code, err := s.generateToken(ctx, user.ID, user.Username)
 	if err != nil {
 		return nil, code, stack.Wrap(ctx, err)
 	}
@@ -53,13 +53,14 @@ func (s *service) HandleAuthCallback(ctx context.Context, data AuthCallback) (*T
 	return token, http.StatusOK, nil
 }
 
-func (s *service) generateToken(ctx context.Context, userID int64) (*Token, int, error) {
+func (s *service) generateToken(ctx context.Context, userID int64, username string) (*Token, int, error) {
 	accessUUID := utils.GenerateUUID()
 	refreshUUID := utils.GenerateUUID()
 
 	// Create access token.
 	accessToken, code, err := s.token.CreateAccessToken(ctx, entity.CreateAccessTokenRequest{
 		UserID:      userID,
+		Username:    username,
 		AccessUUID:  accessUUID,
 		RefreshUUID: refreshUUID,
 	})
@@ -70,6 +71,7 @@ func (s *service) generateToken(ctx context.Context, userID int64) (*Token, int,
 	// Create refresh token.
 	refreshToken, code, err := s.token.CreateRefreshToken(ctx, entity.CreateRefreshTokenRequest{
 		UserID:      userID,
+		Username:    username,
 		RefreshUUID: refreshUUID,
 	})
 	if err != nil {
@@ -111,6 +113,7 @@ func (s *service) InvalidateToken(ctx context.Context, uuid string) (int, error)
 // JWTClaim is jwt claim.
 type JWTClaim struct {
 	UserID      int64  `json:"user_id"`
+	Username    string `json:"username"`
 	AccessUUID  string `json:"-"`
 	RefreshUUID string `json:"-"`
 }
@@ -120,6 +123,7 @@ func (s *service) RefreshToken(ctx context.Context, data JWTClaim) (string, int,
 	// Create new access token.
 	accessToken, code, err := s.token.CreateAccessToken(ctx, entity.CreateAccessTokenRequest{
 		UserID:      data.UserID,
+		Username:    data.Username,
 		AccessUUID:  utils.GenerateUUID(),
 		RefreshUUID: data.RefreshUUID,
 	})

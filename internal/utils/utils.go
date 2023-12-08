@@ -4,6 +4,7 @@ import (
 	"errors"
 	"html"
 	"math"
+	"math/rand"
 	"net/url"
 	"regexp"
 	"strconv"
@@ -246,4 +247,16 @@ func ParseDuration(durationStr string, startFromTime ...bool) (time.Duration, er
 // GenerateUUID to generate random uuid.
 func GenerateUUID() string {
 	return strings.Replace(uuid.New().String(), "-", "", -1)
+}
+
+var strs = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+
+// RandomStr to generate random string.
+func RandomStr(n int) string {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = strs[r.Intn(len(strs))]
+	}
+	return string(b)
 }

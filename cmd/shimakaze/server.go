@@ -25,6 +25,9 @@ import (
 	publisherPubsub "github.com/rl404/shimakaze/internal/domain/publisher/repository/pubsub"
 	ssoRepository "github.com/rl404/shimakaze/internal/domain/sso/repository"
 	ssoClient "github.com/rl404/shimakaze/internal/domain/sso/repository/client"
+	tierListRepository "github.com/rl404/shimakaze/internal/domain/tier_list/repository"
+	tierListCache "github.com/rl404/shimakaze/internal/domain/tier_list/repository/cache"
+	tierListMongo "github.com/rl404/shimakaze/internal/domain/tier_list/repository/mongo"
 	tokenRepository "github.com/rl404/shimakaze/internal/domain/token/repository"
 	tokenToken "github.com/rl404/shimakaze/internal/domain/token/repository/cache"
 	userRepository "github.com/rl404/shimakaze/internal/domain/user/repository"
@@ -144,8 +147,15 @@ func server() error {
 	var token tokenRepository.Repository = tokenToken.New(c, cfg.JWT.AccessSecret, cfg.JWT.AccessExpired, cfg.JWT.RefreshSecret, cfg.JWT.RefreshExpired)
 	utils.Info("repository token initialized")
 
+	// Init tier-list.
+	var tierList tierListRepository.Repository
+	tierList = tierListMongo.New(db)
+	tierList = tierListCache.New(c, tierList)
+	tierList = tierListCache.New(im, tierList)
+	utils.Info("repository tier-list initialized")
+
 	// Init service.
-	service := service.New(wikia, vtuber, nonVtuber, agency, publisher, nil, nil, nil, nil, sso, user, token)
+	service := service.New(wikia, vtuber, nonVtuber, agency, publisher, nil, nil, nil, nil, sso, user, token, tierList)
 	utils.Info("service initialized")
 
 	// Init web server.

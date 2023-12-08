@@ -40,6 +40,7 @@ func (c *cache) CreateAccessToken(ctx context.Context, data entity.CreateAccessT
 	accessToken := jwt.New(jwt.SigningMethodHS256)
 	accessClaim := accessToken.Claims.(jwt.MapClaims)
 	accessClaim["sub"] = data.UserID
+	accessClaim["username"] = data.Username
 	accessClaim["access_uuid"] = data.AccessUUID
 	accessClaim["iat"] = time.Now().UTC().Unix()
 	accessClaim["exp"] = time.Now().UTC().Add(c.accessExpired).Unix()
@@ -61,6 +62,7 @@ func (c *cache) CreateRefreshToken(ctx context.Context, data entity.CreateRefres
 	refreshToken := jwt.New(jwt.SigningMethodHS256)
 	refreshClaim := refreshToken.Claims.(jwt.MapClaims)
 	refreshClaim["sub"] = data.UserID
+	refreshClaim["username"] = data.Username
 	refreshClaim["refresh_uuid"] = data.RefreshUUID
 	refreshClaim["iat"] = time.Now().UTC().Unix()
 	refreshClaim["exp"] = time.Now().UTC().Add(c.refreshExpired).Unix()

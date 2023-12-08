@@ -126,6 +126,7 @@ func (api *API) parseJWT(ctx context.Context, jwtTokenStr string, tokenType toke
 	var t service.JWTClaim
 	userID, _ := claims["sub"].(float64)
 	t.UserID = int64(userID)
+	t.Username, _ = claims["username"].(string)
 	t.AccessUUID, _ = claims["access_uuid"].(string)
 	t.RefreshUUID, _ = claims["refresh_uuid"].(string)
 

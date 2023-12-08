@@ -22,6 +22,8 @@ var (
 	ErrAgencyNotFound       = errors.New("agency not found")
 	ErrChannelNotFound      = errors.New("channel not found")
 	ErrUserNotFound         = errors.New("user not found")
+	ErrTierNotFound         = errors.New("tier list not found")
+	ErrUpdateNotAllowed     = errors.New("update not allowed")
 )
 
 // ErrRequiredField is error for missing field.
