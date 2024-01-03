@@ -1,14 +1,9 @@
 # Changelog
 
-## v5.0.11 (2023-12-19)
-
-- History of changes: see https://github.com/go-chi/chi/compare/v5.0.10...v5.0.11
-
-
 ## v5.0.10 (2023-07-13)
 
 - Fixed small edge case in tests of v5.0.9 for older Go versions
-- History of changes: see https://github.com/go-chi/chi/compare/v5.0.9...v5.0.10
+- History of changes: see https://github.com/go-chi/chi/compare/v5.0.8...v5.0.10
 
 
 ## v5.0.9 (2023-07-13)
@@ -311,7 +306,7 @@ Cheers all, happy coding!
   request-scoped values. We're very excited about the new context addition and are proud to
   introduce chi v2, a minimal and powerful routing package for building large HTTP services,
   with zero external dependencies. Chi focuses on idiomatic design and encourages the use of 
-  stdlib HTTP handlers and middlewares.
+  stdlib HTTP handlers and middlwares.
 - chi v2 deprecates its `chi.Handler` interface and requires `http.Handler` or `http.HandlerFunc`
 - chi v2 stores URL routing parameters and patterns in the standard request context: `r.Context()`
 - chi v2 lower-level routing context is accessible by `chi.RouteContext(r.Context()) *chi.Context`,

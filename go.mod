@@ -4,7 +4,9 @@ go 1.21
 
 require (
 	github.com/PuerkitoBio/goquery v1.8.1
-	github.com/go-chi/chi/v5 v5.0.11
+	github.com/go-chi/chi/v5 v5.0.10
+	github.com/golang-jwt/jwt/v5 v5.1.0
+	github.com/google/uuid v1.3.1
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/newrelic/go-agent/v3 v3.29.0
@@ -15,7 +17,8 @@ require (
 	github.com/swaggo/http-swagger/v2 v2.0.2
 	github.com/swaggo/swag v1.16.2
 	github.com/tmdvs/Go-Emoji-Utils v1.1.0
-	go.mongodb.org/mongo-driver v1.13.1
+	go.mongodb.org/mongo-driver v1.12.1
+	golang.org/x/oauth2 v0.13.0
 	golang.org/x/text v0.14.0
 )
 
@@ -74,7 +77,6 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/crypto v0.17.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
-	golang.org/x/oauth2 v0.13.0 // indirect
 	golang.org/x/sync v0.4.0 // indirect
 	golang.org/x/sys v0.15.0 // indirect
 	golang.org/x/tools v0.7.0 // indirect

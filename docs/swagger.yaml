@@ -14,6 +14,54 @@ definitions:
     - ChannelBilibili
     - ChannelNiconico
     - ChannelOther
+  service.AuthCallback:
+    properties:
+      code:
+        type: string
+    required:
+    - code
+    type: object
+  service.TierList:
+    properties:
+      description:
+        maxLength: 1000
+        type: string
+      id:
+        type: string
+      options:
+        items:
+          $ref: '#/definitions/service.tierVtuber'
+        type: array
+      tiers:
+        items:
+          $ref: '#/definitions/service.tier'
+        type: array
+      title:
+        maxLength: 50
+        minLength: 3
+        type: string
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/service.User'
+    required:
+    - tiers
+    - title
+    type: object
+  service.Token:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  service.User:
+    properties:
+      id:
+        type: integer
+      username:
+        type: string
+    type: object
   service.agency:
     properties:
       id:
@@ -39,6 +87,44 @@ definitions:
     - familyTreeDesigner
     - familyTree2DModeler
     - familyTree3DModeler
+  service.tier:
+    properties:
+      color:
+        maxLength: 50
+        type: string
+      description:
+        maxLength: 1000
+        type: string
+      label:
+        maxLength: 50
+        type: string
+      size:
+        maxLength: 50
+        type: string
+      vtubers:
+        items:
+          $ref: '#/definitions/service.tierVtuber'
+        type: array
+    required:
+    - color
+    - label
+    - size
+    type: object
+  service.tierVtuber:
+    properties:
+      description:
+        maxLength: 1000
+        type: string
+      id:
+        type: integer
+      image:
+        type: string
+      name:
+        type: string
+    required:
+    - id
+    - name
+    type: object
   service.vtuber:
     properties:
       affiliations:
@@ -451,6 +537,142 @@ paths:
       summary: Get agency data.
       tags:
       - Agency
+  /auth/callback:
+    post:
+      parameters:
+      - description: request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/service.AuthCallback'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/service.Token'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Handle OAuth2 callback.
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      parameters:
+      - description: Bearer jwt.access.token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Logout.
+      tags:
+      - Auth
+  /auth/token/refresh:
+    post:
+      parameters:
+      - description: Bearer jwt.refresh.token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/service.Token'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Refresh Token.
+      tags:
+      - Auth
+  /profile:
+    get:
+      parameters:
+      - description: Bearer jwt.access.token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/service.User'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get user profile.
+      tags:
+      - User
   /statistics/agencies/count:
     get:
       produces:
@@ -1073,6 +1295,182 @@ paths:
       summary: Get vtuber zodiac count.
       tags:
       - Statistic
+  /tier-lists:
+    get:
+      parameters:
+      - description: query
+        in: query
+        name: query
+        type: string
+      - description: user id
+        in: query
+        name: user_id
+        type: integer
+      - default: -updated_at
+        description: sort
+        enum:
+        - title
+        - -title
+        - updated_at
+        - -updated_at
+        in: query
+        name: sort
+        type: string
+      - default: 1
+        description: page
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/service.TierList'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get tier list data.
+      tags:
+      - TierList
+    put:
+      parameters:
+      - description: request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/service.TierList'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/service.TierList'
+              type: object
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/service.TierList'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Upsert tier list data.
+      tags:
+      - TierList
+  /tier-lists/{id}:
+    delete:
+      parameters:
+      - description: tier list id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Delete tier list data.
+      tags:
+      - TierList
+    get:
+      parameters:
+      - description: tier list id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/service.TierList'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get tier list data.
+      tags:
+      - TierList
   /vtubers:
     get:
       parameters:

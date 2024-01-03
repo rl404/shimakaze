@@ -13,12 +13,17 @@ var (
 	ErrInternalServer       = errors.New("internal server error")
 	ErrInvalidDBFormat      = errors.New("invalid db address")
 	ErrInvalidRequestFormat = errors.New("invalid request format")
+	ErrInvalidRequestData   = errors.New("invalid request data")
 	ErrInvalidMessageType   = errors.New("invalid message type")
+	ErrInvalidToken         = errors.New("invalid token or already expired")
 	ErrWikiaPageNotFound    = errors.New("wikia page not found")
 	ErrInvalidID            = errors.New("invalid id")
 	ErrVtuberNotFound       = errors.New("vtuber not found")
 	ErrAgencyNotFound       = errors.New("agency not found")
 	ErrChannelNotFound      = errors.New("channel not found")
+	ErrUserNotFound         = errors.New("user not found")
+	ErrTierNotFound         = errors.New("tier list not found")
+	ErrUpdateNotAllowed     = errors.New("update not allowed")
 )
 
 // ErrRequiredField is error for missing field.

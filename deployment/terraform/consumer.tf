@@ -102,6 +102,34 @@ resource "kubernetes_deployment" "consumer" {
             value = var.shimakaze_twitch_client_secret
           }
           env {
+            name  = "SHIMAKAZE_JWT_ACCESS_SECRET"
+            value = var.shimakaze_jwt_access_secret
+          }
+          env {
+            name  = "SHIMAKAZE_JWT_ACCESS_EXPIRED"
+            value = var.shimakaze_jwt_access_expired
+          }
+          env {
+            name  = "SHIMAKAZE_JWT_REFRESH_SECRET"
+            value = var.shimakaze_jwt_refresh_secret
+          }
+          env {
+            name  = "SHIMAKAZE_JWT_REFRESH_EXPIRED"
+            value = var.shimakaze_jwt_refresh_expired
+          }
+          env {
+            name  = "SHIMAKAZE_SSO_CLIENT_ID"
+            value = var.shimakaze_sso_client_id
+          }
+          env {
+            name  = "SHIMAKAZE_SSO_CLIENT_SECRET"
+            value = var.shimakaze_sso_client_secret
+          }
+          env {
+            name  = "SHIMAKAZE_SSO_REDIRECT_URL"
+            value = var.shimakaze_sso_redirect_url
+          }
+          env {
             name  = "SHIMAKAZE_LOG_JSON"
             value = var.shimakaze_log_json
           }
