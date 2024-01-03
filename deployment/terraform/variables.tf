@@ -168,6 +168,41 @@ variable "shimakaze_twitch_client_secret" {
   description = "Twitch client secret"
 }
 
+variable "shimakaze_jwt_access_secret" {
+  type        = string
+  description = "JWT access secret"
+}
+
+variable "shimakaze_jwt_access_expired" {
+  type        = string
+  description = "JWT access expired time"
+}
+
+variable "shimakaze_jwt_refresh_secret" {
+  type        = string
+  description = "JWT refresh secret"
+}
+
+variable "shimakaze_jwt_refresh_expired" {
+  type        = string
+  description = "JWT refresh expired time"
+}
+
+variable "shimakaze_sso_client_id" {
+  type        = string
+  description = "SSO client id"
+}
+
+variable "shimakaze_sso_client_secret" {
+  type        = string
+  description = "SSO client secret"
+}
+
+variable "shimakaze_sso_redirect_url" {
+  type        = string
+  description = "SSO redirect url"
+}
+
 variable "shimakaze_log_json" {
   type        = bool
   description = "Log json"
