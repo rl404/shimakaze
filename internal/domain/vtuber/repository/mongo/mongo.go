@@ -282,6 +282,8 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 			"retirement_date": 1,
 			"has_2d":          1,
 			"has_3d":          1,
+			"agencies":        1,
+			"birthday":        1,
 			"updated_at":      1,
 		}}}
 	}
