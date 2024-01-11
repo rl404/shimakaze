@@ -1929,6 +1929,18 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "integer",
+                        "description": "start video count",
+                        "name": "start_video_count",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "end video count",
+                        "name": "end_video_count",
+                        "in": "query"
+                    },
+                    {
                         "enum": [
                             "name",
                             "-name",
@@ -1937,7 +1949,9 @@ const docTemplate = `{
                             "retirement_date",
                             "-retirement_date",
                             "subscriber",
-                            "-subscriber"
+                            "-subscriber",
+                            "video_count",
+                            "-video_count"
                         ],
                         "type": "string",
                         "default": "name",
@@ -2632,8 +2646,14 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
+                "subscriber": {
+                    "type": "integer"
+                },
                 "updated_at": {
                     "type": "string"
+                },
+                "video_count": {
+                    "type": "integer"
                 },
                 "weight": {
                     "type": "number"

@@ -195,8 +195,12 @@ definitions:
         items:
           type: string
         type: array
+      subscriber:
+        type: integer
       updated_at:
         type: string
+      video_count:
+        type: integer
       weight:
         type: number
       zodiac_sign:
@@ -1606,6 +1610,14 @@ paths:
         in: query
         name: end_subscriber
         type: integer
+      - description: start video count
+        in: query
+        name: start_video_count
+        type: integer
+      - description: end video count
+        in: query
+        name: end_video_count
+        type: integer
       - default: name
         description: sort
         enum:
@@ -1617,6 +1629,8 @@ paths:
         - -retirement_date
         - subscriber
         - -subscriber
+        - video_count
+        - -video_count
         in: query
         name: sort
         type: string

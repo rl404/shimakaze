@@ -265,7 +265,7 @@ func (m *Mongo) GetAllForAgencyTree(ctx context.Context) ([]entity.Vtuber, int, 
 
 // GetAll to get all data.
 func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity.Vtuber, int, int, error) {
-	newFieldStage := bson.D{{Key: "$addFields", Value: bson.M{"subscriber": bson.M{"$ifNull": bson.A{bson.M{"$max": "$channels.subscriber"}, 0}}}}}
+	newFieldStage := bson.D{}
 	matchStage := bson.D{}
 	projectStage := bson.D{}
 	sortStage := bson.D{{Key: "$sort", Value: m.convertSort(data.Sort)}}
@@ -280,6 +280,8 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 			"image":           1,
 			"debut_date":      1,
 			"retirement_date": 1,
+			"subscriber":      1,
+			"video_count":     1,
 			"has_2d":          1,
 			"has_3d":          1,
 			"agencies":        1,
@@ -429,6 +431,14 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 
 	if data.EndSubscriber > 0 {
 		matchStage = m.addMatch(matchStage, "subscriber", bson.M{"$lt": data.EndSubscriber})
+	}
+
+	if data.StartVideoCount > 0 {
+		matchStage = m.addMatch(matchStage, "video_count", bson.M{"$gte": data.StartVideoCount})
+	}
+
+	if data.EndVideoCount > 0 {
+		matchStage = m.addMatch(matchStage, "video_count", bson.M{"$lt": data.EndVideoCount})
 	}
 
 	if data.Limit > 0 {

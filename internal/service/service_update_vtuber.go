@@ -69,7 +69,7 @@ func (s *service) updateVtuber(ctx context.Context, id int64) (int, error) {
 	vtuber.Character3DModelers = category.char3DModeler
 
 	// Fill channel data.
-	vtuber.Channels = s.fillChannelData(ctx, vtuber.Channels)
+	vtuber.Channels, vtuber.Subscriber, vtuber.VideoCount = s.fillChannelData(ctx, vtuber.Channels)
 
 	// Update data.
 	if code, err := s.vtuber.UpdateByID(ctx, id, vtuber); err != nil {
@@ -204,7 +204,8 @@ func (s *service) mergeAgencies(a1, a2 []vtuberEntity.Agency) []vtuberEntity.Age
 	return a3
 }
 
-func (s *service) fillChannelData(ctx context.Context, channels []vtuberEntity.Channel) []vtuberEntity.Channel {
+func (s *service) fillChannelData(ctx context.Context, channels []vtuberEntity.Channel) ([]vtuberEntity.Channel, int, int) {
+	subscriber, videoCount := 0, 0
 	for i, channel := range channels {
 		switch channel.Type {
 		case vtuberEntity.ChannelYoutube:
@@ -220,9 +221,15 @@ func (s *service) fillChannelData(ctx context.Context, channels []vtuberEntity.C
 			channels[i] = s.fillNiconicoChannel(ctx, channels[i])
 			channels[i] = s.fillNiconicoVideo(ctx, channels[i])
 		}
+
+		if channels[i].Subscriber > subscriber {
+			subscriber = channels[i].Subscriber
+		}
+
+		videoCount += len(channels[i].Videos)
 	}
 
-	return channels
+	return channels, subscriber, videoCount
 }
 
 func (s *service) fillYoutubeChannel(ctx context.Context, channel vtuberEntity.Channel) vtuberEntity.Channel {

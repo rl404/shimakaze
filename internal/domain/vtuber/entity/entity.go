@@ -20,6 +20,8 @@ type Vtuber struct {
 	Agencies            []Agency
 	Affiliations        []string
 	Channels            []Channel
+	Subscriber          int
+	VideoCount          int
 	SocialMedias        []string
 	OfficialWebsites    []string
 	Gender              string
@@ -116,6 +118,8 @@ type GetAllRequest struct {
 	Zodiacs            []string
 	StartSubscriber    int
 	EndSubscriber      int
+	StartVideoCount    int
+	EndVideoCount      int
 	Sort               string
 	Page               int
 	Limit              int

@@ -236,6 +236,7 @@ type subscriberCount struct {
 }
 
 // GetSubscriberCount to get subscriber count.
+// TODO: use new subscriber field.
 func (m *Mongo) GetSubscriberCount(ctx context.Context, interval, max int) ([]entity.SubscriberCount, int, error) {
 	boundaries := []int{}
 	for i := 0; i <= max; i += interval {
@@ -335,6 +336,7 @@ func (m *Mongo) Get3DModelerCount(ctx context.Context, top int) ([]entity.Design
 }
 
 // GetAverageVideoCount to get average video count.
+// TODO: use new video_count field.
 func (m *Mongo) GetAverageVideoCount(ctx context.Context) (float64, int, error) {
 	newFieldStage := bson.D{{Key: "$addFields", Value: bson.M{
 		"channels": bson.M{"$map": bson.M{
@@ -442,6 +444,7 @@ type videoCount struct {
 }
 
 // GetVideoCount to get video count.
+// TODO: use new video_count field.
 func (m *Mongo) GetVideoCount(ctx context.Context, top int) ([]entity.VideoCount, int, error) {
 	projectStage := bson.D{{Key: "$project", Value: bson.M{"id": 1, "name": 1, "videos": "$channels.videos"}}}
 	unwindStage := bson.D{{Key: "$unwind", Value: bson.M{"path": "$videos"}}}
