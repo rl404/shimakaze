@@ -29,6 +29,8 @@ type vtuber struct {
 	Agencies            []vtuberAgency  `json:"agencies"`
 	Affiliations        []string        `json:"affiliations"`
 	Channels            []vtuberChannel `json:"channels"`
+	Subscriber          int             `json:"subscriber"`
+	VideoCount          int             `json:"video_count"`
 	SocialMedias        []string        `json:"social_medias"`
 	OfficialWebsites    []string        `json:"official_websites"`
 	Gender              string          `json:"gender"`
@@ -125,6 +127,8 @@ func (s *service) GetVtuberByID(ctx context.Context, id int64) (*vtuber, int, er
 		Agencies:            agencies,
 		Affiliations:        vt.Affiliations,
 		Channels:            channels,
+		Subscriber:          vt.Subscriber,
+		VideoCount:          vt.VideoCount,
 		SocialMedias:        vt.SocialMedias,
 		OfficialWebsites:    vt.OfficialWebsites,
 		Gender:              vt.Gender,
@@ -360,7 +364,9 @@ type GetVtubersRequest struct {
 	Zodiacs            []string             `validate:"dive,gte=1" mod:"dive,trim"`
 	StartSubscriber    int                  `validate:"omitempty,gte=1"`
 	EndSubscriber      int                  `validate:"omitempty,gte=1"`
-	Sort               string               `validate:"oneof=name -name debut_date -debut_date retirement_date -retirement_date subscriber -subscriber" mod:"default=name,trim,lcase"`
+	StartVideoCount    int                  `validate:"omitempty,gte=1"`
+	EndVideoCount      int                  `validate:"omitempty,gte=1"`
+	Sort               string               `validate:"oneof=name -name debut_date -debut_date retirement_date -retirement_date subscriber -subscriber video_count -video_count" mod:"default=name,trim,lcase"`
 	Page               int                  `validate:"required,gte=1" mod:"default=1"`
 	Limit              int                  `validate:"required,gte=-1" mod:"default=20"`
 }
@@ -404,6 +410,8 @@ func (s *service) GetVtubers(ctx context.Context, data GetVtubersRequest) ([]vtu
 		Zodiacs:            data.Zodiacs,
 		StartSubscriber:    data.StartSubscriber,
 		EndSubscriber:      data.EndSubscriber,
+		StartVideoCount:    data.StartVideoCount,
+		EndVideoCount:      data.EndVideoCount,
 		Sort:               data.Sort,
 		Page:               data.Page,
 		Limit:              data.Limit,
@@ -465,6 +473,8 @@ func (s *service) GetVtubers(ctx context.Context, data GetVtubersRequest) ([]vtu
 			Agencies:            agencies,
 			Affiliations:        vt.Affiliations,
 			Channels:            channels,
+			Subscriber:          vt.Subscriber,
+			VideoCount:          vt.VideoCount,
 			SocialMedias:        vt.SocialMedias,
 			OfficialWebsites:    vt.OfficialWebsites,
 			Gender:              vt.Gender,

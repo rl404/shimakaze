@@ -25,6 +25,8 @@ type vtuber struct {
 	Agencies            []agency   `bson:"agencies"`
 	Affiliations        []string   `bson:"affiliations"`
 	Channels            []channel  `bson:"channels"`
+	Subscriber          int        `bson:"subscriber"`
+	VideoCount          int        `bson:"video_count"`
 	SocialMedias        []string   `bson:"social_medias"`
 	OfficialWebsites    []string   `bson:"official_websites"`
 	Gender              string     `bson:"gender"`
@@ -103,6 +105,8 @@ func (v *vtuber) toEntity() *entity.Vtuber {
 		Agencies:            agencies,
 		Affiliations:        v.Affiliations,
 		Channels:            channels,
+		Subscriber:          v.Subscriber,
+		VideoCount:          v.VideoCount,
 		SocialMedias:        v.SocialMedias,
 		OfficialWebsites:    v.OfficialWebsites,
 		Gender:              v.Gender,
@@ -194,6 +198,8 @@ func (m *Mongo) vtuberFromEntity(v entity.Vtuber) *vtuber {
 		Agencies:            agencies,
 		Affiliations:        v.Affiliations,
 		Channels:            channels,
+		Subscriber:          v.Subscriber,
+		VideoCount:          v.VideoCount,
 		SocialMedias:        v.SocialMedias,
 		OfficialWebsites:    v.OfficialWebsites,
 		Gender:              v.Gender,
