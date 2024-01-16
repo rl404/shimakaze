@@ -236,14 +236,11 @@ type subscriberCount struct {
 }
 
 // GetSubscriberCount to get subscriber count.
-// TODO: use new subscriber field.
 func (m *Mongo) GetSubscriberCount(ctx context.Context, interval, max int) ([]entity.SubscriberCount, int, error) {
 	boundaries := []int{}
 	for i := 0; i <= max; i += interval {
 		boundaries = append(boundaries, i)
 	}
-
-	newFieldStage := bson.D{{Key: "$addFields", Value: bson.M{"subscriber": bson.M{"$max": "$channels.subscriber"}}}}
 
 	projectStage := bson.D{{Key: "$project", Value: bson.M{"subscriber": bson.M{"$ifNull": bson.A{"$subscriber", 0}}}}}
 
@@ -260,7 +257,7 @@ func (m *Mongo) GetSubscriberCount(ctx context.Context, interval, max int) ([]en
 		"count": "$count",
 	}}}
 
-	countCursor, err := m.db.Aggregate(ctx, m.getPipeline(newFieldStage, projectStage, bucketStage, projectStage2))
+	countCursor, err := m.db.Aggregate(ctx, m.getPipeline(projectStage, bucketStage, projectStage2))
 	if err != nil {
 		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
@@ -336,23 +333,11 @@ func (m *Mongo) Get3DModelerCount(ctx context.Context, top int) ([]entity.Design
 }
 
 // GetAverageVideoCount to get average video count.
-// TODO: use new video_count field.
 func (m *Mongo) GetAverageVideoCount(ctx context.Context) (float64, int, error) {
-	newFieldStage := bson.D{{Key: "$addFields", Value: bson.M{
-		"channels": bson.M{"$map": bson.M{
-			"input": "$channels",
-			"as":    "channel",
-			"in": bson.M{
-				"$mergeObjects": bson.A{"$$channel", bson.M{
-					"video_count": bson.M{"$size": "$$channel.videos"},
-				}},
-			},
-		}}}}}
-	newFieldStage2 := bson.D{{Key: "$addFields", Value: bson.M{"video_count": bson.M{"$sum": "$channels.video_count"}}}}
 	projectStage := bson.D{{Key: "$project", Value: bson.M{"name": 1, "video_count": 1}}}
 	groupStage := bson.D{{Key: "$group", Value: bson.M{"_id": nil, "avg": bson.M{"$avg": "$video_count"}}}}
 
-	avgCursor, err := m.db.Aggregate(ctx, m.getPipeline(newFieldStage, newFieldStage2, projectStage, groupStage))
+	avgCursor, err := m.db.Aggregate(ctx, m.getPipeline(projectStage, groupStage))
 	if err != nil {
 		return 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
@@ -443,8 +428,7 @@ type videoCount struct {
 	Count int    `bson:"count"`
 }
 
-// GetVideoCount to get video count.
-// TODO: use new video_count field.
+// GetVideoCount to get video count. Unused.
 func (m *Mongo) GetVideoCount(ctx context.Context, top int) ([]entity.VideoCount, int, error) {
 	projectStage := bson.D{{Key: "$project", Value: bson.M{"id": 1, "name": 1, "videos": "$channels.videos"}}}
 	unwindStage := bson.D{{Key: "$unwind", Value: bson.M{"path": "$videos"}}}
