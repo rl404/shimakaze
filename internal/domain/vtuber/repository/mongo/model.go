@@ -219,7 +219,14 @@ func (m *Mongo) convertSort(sort string) bson.D {
 	}
 
 	if sort[0] == '-' {
+		if sort[1:] == "video_count" {
+			return bson.D{{Key: sort[1:], Value: -1}, {Key: "retirement_date", Value: 1}, {Key: "id", Value: 1}}
+		}
 		return bson.D{{Key: sort[1:], Value: -1}, {Key: "id", Value: 1}}
+	}
+
+	if sort == "video_count" {
+		return bson.D{{Key: sort, Value: 1}, {Key: "retirement_date", Value: -1}, {Key: "id", Value: 1}}
 	}
 
 	return bson.D{{Key: sort, Value: 1}, {Key: "id", Value: 1}}
