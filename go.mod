@@ -9,8 +9,8 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/newrelic/go-agent/v3 v3.29.0
-	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.2
+	github.com/newrelic/go-agent/v3 v3.29.1
+	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.3
 	github.com/nicklaw5/helix/v2 v2.25.3
 	github.com/rl404/fairy v0.25.2
 	github.com/spf13/cobra v1.8.0
