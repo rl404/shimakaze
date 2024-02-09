@@ -11,14 +11,14 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/newrelic/go-agent/v3 v3.29.1
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.3
-	github.com/nicklaw5/helix/v2 v2.25.3
+	github.com/nicklaw5/helix/v2 v2.26.0
 	github.com/rl404/fairy v0.25.2
 	github.com/spf13/cobra v1.8.0
 	github.com/swaggo/http-swagger/v2 v2.0.2
 	github.com/swaggo/swag v1.16.3
 	github.com/tmdvs/Go-Emoji-Utils v1.1.0
 	go.mongodb.org/mongo-driver v1.13.1
-	golang.org/x/oauth2 v0.16.0
+	golang.org/x/oauth2 v0.17.0
 	golang.org/x/text v0.14.0
 )
 
@@ -75,10 +75,10 @@ require (
 	github.com/xdg-go/stringprep v1.0.4 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
 	go.opencensus.io v0.24.0 // indirect
-	golang.org/x/crypto v0.18.0 // indirect
-	golang.org/x/net v0.20.0 // indirect
+	golang.org/x/crypto v0.19.0 // indirect
+	golang.org/x/net v0.21.0 // indirect
 	golang.org/x/sync v0.4.0 // indirect
-	golang.org/x/sys v0.16.0 // indirect
+	golang.org/x/sys v0.17.0 // indirect
 	golang.org/x/tools v0.7.0 // indirect
 	google.golang.org/api v0.148.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
