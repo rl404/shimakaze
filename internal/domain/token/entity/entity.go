@@ -4,6 +4,7 @@ package entity
 type CreateAccessTokenRequest struct {
 	UserID      int64
 	Username    string
+	IsAdmin     bool
 	AccessUUID  string
 	RefreshUUID string
 }
@@ -12,6 +13,7 @@ type CreateAccessTokenRequest struct {
 type CreateRefreshTokenRequest struct {
 	UserID      int64
 	Username    string
+	IsAdmin     bool
 	RefreshUUID string
 }
 

@@ -16,6 +16,282 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/admin/vtubers/{id}": {
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Delete vtuber data.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer jwt.admin_access.token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "vtuber id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/vtubers/{id}/override": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get vtuber overridden field data.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer jwt.admin_access.token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "vtuber id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.VtuberOverriddenField"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/service.VtuberOverriddenField"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Update vtuber overridden field data.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer jwt.admin_access.token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "vtuber id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.VtuberOverriddenField"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/vtubers/{id}/parse": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Parse vtuber data.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer jwt.admin_access.token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "vtuber id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/agencies": {
             "get": {
                 "produces": [
@@ -1534,6 +1810,13 @@ const docTemplate = `{
                 "summary": "Upsert tier list data.",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Bearer jwt.access.token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "description": "request body",
                         "name": "request",
                         "in": "body",
@@ -1679,6 +1962,13 @@ const docTemplate = `{
                 ],
                 "summary": "Delete tier list data.",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Bearer jwt.access.token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "tier list id",
@@ -2451,6 +2741,26 @@ const docTemplate = `{
                 }
             }
         },
+        "service.VtuberOverriddenField": {
+            "type": "object",
+            "properties": {
+                "affiliations": {
+                    "$ref": "#/definitions/service.overriddenAffiliations"
+                },
+                "agencies": {
+                    "$ref": "#/definitions/service.overriddenAgencies"
+                },
+                "channels": {
+                    "$ref": "#/definitions/service.overriddenChannels"
+                },
+                "debut_date": {
+                    "$ref": "#/definitions/service.overriddenDate"
+                },
+                "retirement_date": {
+                    "$ref": "#/definitions/service.overriddenDate"
+                }
+            }
+        },
         "service.agency": {
             "type": "object",
             "properties": {
@@ -2486,6 +2796,62 @@ const docTemplate = `{
                 "familyTree2DModeler",
                 "familyTree3DModeler"
             ]
+        },
+        "service.overriddenAffiliations": {
+            "type": "object",
+            "required": [
+                "value"
+            ],
+            "properties": {
+                "flag": {
+                    "type": "boolean"
+                },
+                "value": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "service.overriddenAgencies": {
+            "type": "object",
+            "properties": {
+                "flag": {
+                    "type": "boolean"
+                },
+                "value": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.vtuberAgency"
+                    }
+                }
+            }
+        },
+        "service.overriddenChannels": {
+            "type": "object",
+            "properties": {
+                "flag": {
+                    "type": "boolean"
+                },
+                "value": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.vtuberChannel"
+                    }
+                }
+            }
+        },
+        "service.overriddenDate": {
+            "type": "object",
+            "properties": {
+                "flag": {
+                    "type": "boolean"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
         },
         "service.tier": {
             "type": "object",
@@ -2665,9 +3031,14 @@ const docTemplate = `{
         },
         "service.vtuberAgency": {
             "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
             "properties": {
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 1
                 },
                 "image": {
                     "type": "string"
@@ -2755,6 +3126,9 @@ const docTemplate = `{
         },
         "service.vtuberChannel": {
             "type": "object",
+            "required": [
+                "url"
+            ],
             "properties": {
                 "id": {
                     "type": "string"

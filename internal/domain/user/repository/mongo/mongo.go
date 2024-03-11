@@ -37,7 +37,10 @@ func (m *Mongo) Upsert(ctx context.Context, data entity.User) (int, error) {
 		return http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 
-	if _, err := m.db.UpdateOne(ctx, bson.M{"id": data.ID}, bson.M{"$set": bson.M{"username": data.Username}}); err != nil {
+	uu := m.fromEntity(data)
+	uu.CreatedAt = user.CreatedAt
+
+	if _, err := m.db.UpdateOne(ctx, bson.M{"id": data.ID}, bson.M{"$set": uu}); err != nil {
 		return http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 

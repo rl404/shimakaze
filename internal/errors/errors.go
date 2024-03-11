@@ -16,6 +16,7 @@ var (
 	ErrInvalidRequestData   = errors.New("invalid request data")
 	ErrInvalidMessageType   = errors.New("invalid message type")
 	ErrInvalidToken         = errors.New("invalid token or already expired")
+	ErrAdminOnly            = errors.New("admin only")
 	ErrWikiaPageNotFound    = errors.New("wikia page not found")
 	ErrInvalidID            = errors.New("invalid id")
 	ErrVtuberNotFound       = errors.New("vtuber not found")
@@ -54,4 +55,9 @@ func ErrLTEField(str, value string) error {
 // ErrOneOfField is error for oneof field.
 func ErrOneOfField(str, value string) error {
 	return fmt.Errorf("field %s must be one of %s", str, strings.Join(strings.Split(value, " "), "/"))
+}
+
+// ErrUrlField is error for url field.
+func ErrUrlField(str string) error {
+	return fmt.Errorf("field %s must be in URL format", str)
 }

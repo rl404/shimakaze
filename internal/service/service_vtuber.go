@@ -45,16 +45,16 @@ type vtuber struct {
 }
 
 type vtuberAgency struct {
-	ID    int64  `json:"id"`
-	Name  string `json:"name"`
-	Image string `json:"image"`
+	ID    int64  `json:"id" validate:"required,gte=1"`
+	Name  string `json:"name" validate:"required" mod:"trim"`
+	Image string `json:"image" validate:"url" mod:"trim"`
 }
 
 type vtuberChannel struct {
 	ID         string             `json:"id"`
 	Name       string             `json:"name"`
 	Type       entity.ChannelType `json:"type"`
-	URL        string             `json:"url"`
+	URL        string             `json:"url" validate:"required,url" mod:"trim"`
 	Image      string             `json:"image"`
 	Subscriber int                `json:"subscriber"`
 	Videos     []vtuberVideo      `json:"videos"`

@@ -9,36 +9,62 @@ import (
 )
 
 type vtuber struct {
-	ID                  int64      `bson:"id"`
-	Name                string     `bson:"name"`
-	Image               string     `bson:"image"`
-	OriginalNames       []string   `bson:"original_names"`
-	Nicknames           []string   `bson:"nicknames"`
-	Caption             string     `bson:"caption"`
-	DebutDate           *time.Time `bson:"debut_date"`
-	RetirementDate      *time.Time `bson:"retirement_date"`
-	Has2D               bool       `bson:"has_2d"`
-	Has3D               bool       `bson:"has_3d"`
-	CharacterDesigners  []string   `bson:"character_designers"`
-	Character2DModelers []string   `bson:"character_2d_modelers"`
-	Character3DModelers []string   `bson:"character_3d_modelers"`
-	Agencies            []agency   `bson:"agencies"`
-	Affiliations        []string   `bson:"affiliations"`
-	Channels            []channel  `bson:"channels"`
-	Subscriber          int        `bson:"subscriber"`
-	VideoCount          int        `bson:"video_count"`
-	SocialMedias        []string   `bson:"social_medias"`
-	OfficialWebsites    []string   `bson:"official_websites"`
-	Gender              string     `bson:"gender"`
-	Age                 *float64   `bson:"age"`
-	Birthday            *time.Time `bson:"birthday"`
-	Height              *float64   `bson:"height"`
-	Weight              *float64   `bson:"weight"`
-	BloodType           string     `bson:"blood_type"`
-	ZodiacSign          string     `bson:"zodiac_sign"`
-	Emoji               string     `bson:"emoji"`
-	CreatedAt           time.Time  `bson:"created_at"`
-	UpdatedAt           time.Time  `bson:"updated_at"`
+	ID                  int64           `bson:"id"`
+	Name                string          `bson:"name"`
+	Image               string          `bson:"image"`
+	OriginalNames       []string        `bson:"original_names"`
+	Nicknames           []string        `bson:"nicknames"`
+	Caption             string          `bson:"caption"`
+	DebutDate           *time.Time      `bson:"debut_date"`
+	RetirementDate      *time.Time      `bson:"retirement_date"`
+	Has2D               bool            `bson:"has_2d"`
+	Has3D               bool            `bson:"has_3d"`
+	CharacterDesigners  []string        `bson:"character_designers"`
+	Character2DModelers []string        `bson:"character_2d_modelers"`
+	Character3DModelers []string        `bson:"character_3d_modelers"`
+	Agencies            []agency        `bson:"agencies"`
+	Affiliations        []string        `bson:"affiliations"`
+	Channels            []channel       `bson:"channels"`
+	Subscriber          int             `bson:"subscriber"`
+	VideoCount          int             `bson:"video_count"`
+	SocialMedias        []string        `bson:"social_medias"`
+	OfficialWebsites    []string        `bson:"official_websites"`
+	Gender              string          `bson:"gender"`
+	Age                 *float64        `bson:"age"`
+	Birthday            *time.Time      `bson:"birthday"`
+	Height              *float64        `bson:"height"`
+	Weight              *float64        `bson:"weight"`
+	BloodType           string          `bson:"blood_type"`
+	ZodiacSign          string          `bson:"zodiac_sign"`
+	Emoji               string          `bson:"emoji"`
+	OverriddenField     overriddenField `bson:"overridden_field"`
+	CreatedAt           time.Time       `bson:"created_at"`
+	UpdatedAt           time.Time       `bson:"updated_at"`
+}
+
+type agency struct {
+	ID    int64  `json:"id"`
+	Name  string `json:"name"`
+	Image string `json:"image"`
+}
+
+type channel struct {
+	ID         string             `bson:"id"`
+	Name       string             `bson:"name"`
+	Type       entity.ChannelType `bson:"type"`
+	URL        string             `bson:"url"`
+	Image      string             `bson:"image"`
+	Subscriber int                `bson:"subscriber"`
+	Videos     []video            `bson:"videos"`
+}
+
+type video struct {
+	ID        string     `bson:"id"`
+	Title     string     `bson:"title"`
+	URL       string     `bson:"url"`
+	Image     string     `bson:"image"`
+	StartDate *time.Time `bson:"start_date"`
+	EndDate   *time.Time `bson:"end_date"`
 }
 
 // MarshalBSON to override marshal function.
@@ -117,33 +143,9 @@ func (v *vtuber) toEntity() *entity.Vtuber {
 		BloodType:           v.BloodType,
 		ZodiacSign:          v.ZodiacSign,
 		Emoji:               v.Emoji,
+		OverriddenField:     v.OverriddenField.toEntity(),
 		UpdatedAt:           v.UpdatedAt,
 	}
-}
-
-type agency struct {
-	ID    int64  `json:"id"`
-	Name  string `json:"name"`
-	Image string `json:"image"`
-}
-
-type channel struct {
-	ID         string             `bson:"id"`
-	Name       string             `bson:"name"`
-	Type       entity.ChannelType `bson:"type"`
-	URL        string             `bson:"url"`
-	Image      string             `bson:"image"`
-	Subscriber int                `bson:"subscriber"`
-	Videos     []video            `bson:"videos"`
-}
-
-type video struct {
-	ID        string     `bson:"id"`
-	Title     string     `bson:"title"`
-	URL       string     `bson:"url"`
-	Image     string     `bson:"image"`
-	StartDate *time.Time `bson:"start_date"`
-	EndDate   *time.Time `bson:"end_date"`
 }
 
 func (m *Mongo) vtuberFromEntity(v entity.Vtuber) *vtuber {
@@ -210,6 +212,7 @@ func (m *Mongo) vtuberFromEntity(v entity.Vtuber) *vtuber {
 		BloodType:           v.BloodType,
 		ZodiacSign:          v.ZodiacSign,
 		Emoji:               v.Emoji,
+		OverriddenField:     m.overiddenFieldFromEntity(v.OverriddenField),
 	}
 }
 

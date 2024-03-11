@@ -90,5 +90,10 @@ func (api *API) Register(r chi.Router, nrApp *newrelic.Application) {
 		r.Get("/statistics/vtubers/zodiac-count", api.handleGetVtuberZodiacCount)
 
 		r.Get("/statistics/agencies/count", api.handleGetAgencyCount)
+
+		r.Delete("/admin/vtubers/{id}", api.jwtAuth(api.adminAuth(api.handleDeleteVtuberByID)))
+		r.Post("/admin/vtubers/{id}/parse", api.jwtAuth(api.adminAuth(api.handleParseVtuberByID)))
+		r.Get("/admin/vtubers/{id}/override", api.jwtAuth(api.adminAuth(api.handleGetVtuberOverriddenField)))
+		r.Put("/admin/vtubers/{id}/override", api.jwtAuth(api.adminAuth(api.handleUpdateVtuberOverriddenField)))
 	})
 }

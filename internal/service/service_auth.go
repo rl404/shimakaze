@@ -38,14 +38,24 @@ func (s *service) HandleAuthCallback(ctx context.Context, data AuthCallback) (*T
 		return nil, code, stack.Wrap(ctx, err)
 	}
 
-	if code, err := s.user.Upsert(ctx, userEntity.User{
+	userDB := userEntity.User{
 		ID:       user.ID,
 		Username: user.Username,
-	}); err != nil {
+	}
+
+	if existingUser, _, _ := s.user.GetByID(ctx, user.ID); existingUser != nil {
+		userDB = userEntity.User{
+			ID:       existingUser.ID,
+			Username: existingUser.Username,
+			IsAdmin:  existingUser.IsAdmin,
+		}
+	}
+
+	if code, err := s.user.Upsert(ctx, userDB); err != nil {
 		return nil, code, stack.Wrap(ctx, err)
 	}
 
-	token, code, err := s.generateToken(ctx, user.ID, user.Username)
+	token, code, err := s.generateToken(ctx, userDB.ID, userDB.Username, userDB.IsAdmin)
 	if err != nil {
 		return nil, code, stack.Wrap(ctx, err)
 	}
@@ -53,7 +63,7 @@ func (s *service) HandleAuthCallback(ctx context.Context, data AuthCallback) (*T
 	return token, http.StatusOK, nil
 }
 
-func (s *service) generateToken(ctx context.Context, userID int64, username string) (*Token, int, error) {
+func (s *service) generateToken(ctx context.Context, userID int64, username string, isAdmin bool) (*Token, int, error) {
 	accessUUID := utils.GenerateUUID()
 	refreshUUID := utils.GenerateUUID()
 
@@ -61,6 +71,7 @@ func (s *service) generateToken(ctx context.Context, userID int64, username stri
 	accessToken, code, err := s.token.CreateAccessToken(ctx, entity.CreateAccessTokenRequest{
 		UserID:      userID,
 		Username:    username,
+		IsAdmin:     isAdmin,
 		AccessUUID:  accessUUID,
 		RefreshUUID: refreshUUID,
 	})
@@ -72,6 +83,7 @@ func (s *service) generateToken(ctx context.Context, userID int64, username stri
 	refreshToken, code, err := s.token.CreateRefreshToken(ctx, entity.CreateRefreshTokenRequest{
 		UserID:      userID,
 		Username:    username,
+		IsAdmin:     isAdmin,
 		RefreshUUID: refreshUUID,
 	})
 	if err != nil {
@@ -114,6 +126,7 @@ func (s *service) InvalidateToken(ctx context.Context, uuid string) (int, error)
 type JWTClaim struct {
 	UserID      int64  `json:"user_id"`
 	Username    string `json:"username"`
+	IsAdmin     bool   `json:"is_admin"`
 	AccessUUID  string `json:"-"`
 	RefreshUUID string `json:"-"`
 }
@@ -124,6 +137,7 @@ func (s *service) RefreshToken(ctx context.Context, data JWTClaim) (string, int,
 	accessToken, code, err := s.token.CreateAccessToken(ctx, entity.CreateAccessTokenRequest{
 		UserID:      data.UserID,
 		Username:    data.Username,
+		IsAdmin:     data.IsAdmin,
 		AccessUUID:  utils.GenerateUUID(),
 		RefreshUUID: data.RefreshUUID,
 	})

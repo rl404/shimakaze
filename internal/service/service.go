@@ -71,6 +71,11 @@ type Service interface {
 
 	GetWikiaImage(ctx context.Context, path string) ([]byte, int, error)
 
+	DeleteVtuberByID(ctx context.Context, id int64) (int, error)
+	ParseVtuberByID(ctx context.Context, id int64) (int, error)
+	GetVtuberOverriddenFieldByID(ctx context.Context, id int64) (*VtuberOverriddenField, int, error)
+	UpdateVtuberOverriddenFieldByID(ctx context.Context, data VtuberOverriddenField) (int, error)
+
 	ConsumeMessage(ctx context.Context, msg entity.Message) error
 
 	QueueMissingAgency(ctx context.Context, limit int) (int, int, error)

@@ -533,3 +533,14 @@ func (m *Mongo) GetCharacter3DModelers(ctx context.Context) ([]string, int, erro
 
 	return res, http.StatusOK, nil
 }
+
+// UpdateOverriddenFieldByID to update overriden field by id.
+func (m *Mongo) UpdateOverriddenFieldByID(ctx context.Context, id int64, data entity.OverriddenField) (int, error) {
+	if _, err := m.db.UpdateOne(ctx, bson.M{"id": id}, bson.M{"$set": bson.M{
+		"overridden_field": m.overiddenFieldFromEntity(data),
+		"updated_at":       time.Now(),
+	}}); err != nil {
+		return http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
+	}
+	return http.StatusOK, nil
+}
