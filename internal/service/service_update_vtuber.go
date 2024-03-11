@@ -52,6 +52,12 @@ func (s *service) updateVtuber(ctx context.Context, id int64) (int, error) {
 	// Fill vtuber data.
 	vtuber := vtuberEntity.WikiaPageToVtuber(*page)
 
+	// Get existing vtuber.
+	existingVtuber, code, err := s.vtuber.GetByID(ctx, vtuber.ID)
+	if code == http.StatusInternalServerError {
+		return code, stack.Wrap(ctx, err)
+	}
+
 	// Get image.
 	vtuber.Image = s.getVtuberImage(ctx, id)
 
@@ -67,6 +73,9 @@ func (s *service) updateVtuber(ctx context.Context, id int64) (int, error) {
 	vtuber.CharacterDesigners = category.charDesigner
 	vtuber.Character2DModelers = category.char2DModeler
 	vtuber.Character3DModelers = category.char3DModeler
+
+	// Override values.
+	vtuber = s.overrideVtuberData(vtuber, existingVtuber)
 
 	// Fill channel data.
 	vtuber.Channels, vtuber.Subscriber, vtuber.VideoCount = s.fillChannelData(ctx, vtuber.Channels)
@@ -84,6 +93,41 @@ func (s *service) isNonVtuberPage(page wikiaEntity.Page) bool {
 		!strings.Contains(page.Content, "{{Character\n|") ||
 		strings.Contains(page.Title, "/Gallery") ||
 		strings.Contains(page.Title, "/Discography")
+}
+
+func (s *service) overrideVtuberData(vtuber vtuberEntity.Vtuber, existingVtuber *vtuberEntity.Vtuber) vtuberEntity.Vtuber {
+	if existingVtuber == nil {
+		return vtuber
+	}
+
+	if existingVtuber.OverriddenField.DebutDate.Flag {
+		existingVtuber.OverriddenField.DebutDate.OldValue = vtuber.DebutDate
+		vtuber.DebutDate = existingVtuber.OverriddenField.DebutDate.Value
+	}
+
+	if existingVtuber.OverriddenField.RetirementDate.Flag {
+		existingVtuber.OverriddenField.RetirementDate.OldValue = vtuber.RetirementDate
+		vtuber.RetirementDate = existingVtuber.OverriddenField.RetirementDate.Value
+	}
+
+	if existingVtuber.OverriddenField.Agencies.Flag {
+		existingVtuber.OverriddenField.Agencies.OldValue = vtuber.Agencies
+		vtuber.Agencies = existingVtuber.OverriddenField.Agencies.Value
+	}
+
+	if existingVtuber.OverriddenField.Affiliations.Flag {
+		existingVtuber.OverriddenField.Affiliations.OldValue = vtuber.Affiliations
+		vtuber.Affiliations = existingVtuber.OverriddenField.Affiliations.Value
+	}
+
+	if existingVtuber.OverriddenField.Channels.Flag {
+		existingVtuber.OverriddenField.Channels.OldValue = vtuber.Channels
+		vtuber.Channels = existingVtuber.OverriddenField.Channels.Value
+	}
+
+	vtuber.OverriddenField = existingVtuber.OverriddenField
+
+	return vtuber
 }
 
 func (s *service) getVtuberImage(ctx context.Context, id int64) string {
@@ -186,7 +230,6 @@ func (s *service) getAgencyFromAffiliation(affiliations []string, agencyMap map[
 }
 
 func (s *service) mergeAgencies(a1, a2 []vtuberEntity.Agency) []vtuberEntity.Agency {
-
 	agencyMap := make(map[int64]vtuberEntity.Agency)
 	for _, a := range a1 {
 		agencyMap[a.ID] = a

@@ -65,6 +65,7 @@ func (api *API) handleGetTierListByID(w http.ResponseWriter, r *http.Request) {
 // @summary Upsert tier list data.
 // @tags TierList
 // @produce json
+// @param Authorization header string true "Bearer jwt.access.token"
 // @param request body service.TierList true "request body"
 // @success 200 {object} utils.Response{data=service.TierList}
 // @success 201 {object} utils.Response{data=service.TierList}
@@ -97,6 +98,7 @@ func (api *API) handleUpsertTierListByID(w http.ResponseWriter, r *http.Request)
 // @summary Delete tier list data.
 // @tags TierList
 // @produce json
+// @param Authorization header string true "Bearer jwt.access.token"
 // @param id path string true "tier list id"
 // @success 200 {object} utils.Response
 // @failure 400 {object} utils.Response

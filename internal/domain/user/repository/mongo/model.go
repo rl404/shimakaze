@@ -10,6 +10,7 @@ import (
 type user struct {
 	ID        int64     `bson:"id"`
 	Username  string    `bson:"username"`
+	IsAdmin   bool      `bson:"is_admin"`
 	CreatedAt time.Time `bson:"created_at"`
 	UpdatedAt time.Time `bson:"updated_at"`
 }
@@ -30,6 +31,7 @@ func (n *user) toEntity() *entity.User {
 	return &entity.User{
 		ID:       n.ID,
 		Username: n.Username,
+		IsAdmin:  n.IsAdmin,
 	}
 }
 
@@ -37,5 +39,6 @@ func (m *Mongo) fromEntity(data entity.User) *user {
 	return &user{
 		ID:       data.ID,
 		Username: data.Username,
+		IsAdmin:  data.IsAdmin,
 	}
 }

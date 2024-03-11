@@ -240,7 +240,7 @@ func parseChannels(data string) ([]Channel, string) {
 		}
 
 		channels = append(channels, Channel{
-			Type: parseChannelType(link),
+			Type: ParseChannelType(link),
 			URL:  link,
 		})
 	}
@@ -248,7 +248,8 @@ func parseChannels(data string) ([]Channel, string) {
 	return channels, raw
 }
 
-func parseChannelType(link string) ChannelType {
+// ParseChannelType to parse url to channel type.
+func ParseChannelType(link string) ChannelType {
 	u, err := url.Parse(link)
 	if err != nil {
 		return ChannelOther

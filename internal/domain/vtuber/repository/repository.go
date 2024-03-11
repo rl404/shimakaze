@@ -10,6 +10,7 @@ import (
 type Repository interface {
 	GetByID(ctx context.Context, id int64) (*entity.Vtuber, int, error)
 	UpdateByID(ctx context.Context, id int64, data entity.Vtuber) (int, error)
+	UpdateOverriddenFieldByID(ctx context.Context, id int64, data entity.OverriddenField) (int, error)
 	DeleteByID(ctx context.Context, id int64) (int, error)
 	IsOld(ctx context.Context, id int64) (bool, int, error)
 	GetOldActiveIDs(ctx context.Context) ([]int64, int, error)

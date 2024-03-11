@@ -21,6 +21,7 @@ func init() {
 	val.RegisterValidatorError("lte", valErrLTE)
 	val.RegisterValidatorError("lt", valErrLT)
 	val.RegisterValidatorError("oneof", valErrOneOf)
+	val.RegisterValidatorError("url", valErrURL)
 }
 
 // Validate to validate struct using validate tag.
@@ -55,6 +56,10 @@ func valErrLT(f string, param ...string) error {
 
 func valErrOneOf(f string, param ...string) error {
 	return errors.ErrOneOfField(camelToSnake(f), param[0])
+}
+
+func valErrURL(f string, _ ...string) error {
+	return errors.ErrUrlField(camelToSnake(f))
 }
 
 func camelToSnake(name string) string {

@@ -62,6 +62,19 @@ definitions:
       username:
         type: string
     type: object
+  service.VtuberOverriddenField:
+    properties:
+      affiliations:
+        $ref: '#/definitions/service.overriddenAffiliations'
+      agencies:
+        $ref: '#/definitions/service.overriddenAgencies'
+      channels:
+        $ref: '#/definitions/service.overriddenChannels'
+      debut_date:
+        $ref: '#/definitions/service.overriddenDate'
+      retirement_date:
+        $ref: '#/definitions/service.overriddenDate'
+    type: object
   service.agency:
     properties:
       id:
@@ -87,6 +100,42 @@ definitions:
     - familyTreeDesigner
     - familyTree2DModeler
     - familyTree3DModeler
+  service.overriddenAffiliations:
+    properties:
+      flag:
+        type: boolean
+      value:
+        items:
+          type: string
+        type: array
+    required:
+    - value
+    type: object
+  service.overriddenAgencies:
+    properties:
+      flag:
+        type: boolean
+      value:
+        items:
+          $ref: '#/definitions/service.vtuberAgency'
+        type: array
+    type: object
+  service.overriddenChannels:
+    properties:
+      flag:
+        type: boolean
+      value:
+        items:
+          $ref: '#/definitions/service.vtuberChannel'
+        type: array
+    type: object
+  service.overriddenDate:
+    properties:
+      flag:
+        type: boolean
+      value:
+        type: string
+    type: object
   service.tier:
     properties:
       color:
@@ -209,11 +258,15 @@ definitions:
   service.vtuberAgency:
     properties:
       id:
+        minimum: 1
         type: integer
       image:
         type: string
       name:
         type: string
+    required:
+    - id
+    - name
     type: object
   service.vtuberAgencyTree:
     properties:
@@ -282,6 +335,8 @@ definitions:
         items:
           $ref: '#/definitions/service.vtuberVideo'
         type: array
+    required:
+    - url
     type: object
   service.vtuberChannelTypeCount:
     properties:
@@ -456,6 +511,186 @@ info:
   description: Shimakaze API.
   title: Shimakaze API
 paths:
+  /admin/vtubers/{id}:
+    delete:
+      parameters:
+      - description: Bearer jwt.admin_access.token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: vtuber id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Delete vtuber data.
+      tags:
+      - Admin
+  /admin/vtubers/{id}/override:
+    get:
+      parameters:
+      - description: Bearer jwt.admin_access.token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: vtuber id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/service.VtuberOverriddenField'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/service.VtuberOverriddenField'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get vtuber overridden field data.
+      tags:
+      - Admin
+    put:
+      parameters:
+      - description: Bearer jwt.admin_access.token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: vtuber id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/service.VtuberOverriddenField'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Update vtuber overridden field data.
+      tags:
+      - Admin
+  /admin/vtubers/{id}/parse:
+    post:
+      parameters:
+      - description: Bearer jwt.admin_access.token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: vtuber id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Parse vtuber data.
+      tags:
+      - Admin
   /agencies:
     get:
       parameters:
@@ -1357,6 +1592,11 @@ paths:
       - TierList
     put:
       parameters:
+      - description: Bearer jwt.access.token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: request body
         in: body
         name: request
@@ -1410,6 +1650,11 @@ paths:
   /tier-lists/{id}:
     delete:
       parameters:
+      - description: Bearer jwt.access.token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: tier list id
         in: path
         name: id

@@ -247,3 +247,18 @@ func (c *Cache) GetCharacter3DModelers(ctx context.Context) (data []string, code
 
 	return data, code, nil
 }
+
+// UpdateOverriddenFieldByID to update overridden field by id.
+func (c *Cache) UpdateOverriddenFieldByID(ctx context.Context, id int64, data entity.OverriddenField) (int, error) {
+	if code, err := c.repo.UpdateOverriddenFieldByID(ctx, id, data); err != nil {
+		return code, stack.Wrap(ctx, err)
+	}
+
+	key := utils.GetKey("vtuber", id)
+	if err := c.cacher.Delete(ctx, key); err != nil {
+		return http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
+
+	}
+
+	return http.StatusOK, nil
+}

@@ -127,6 +127,7 @@ func (api *API) parseJWT(ctx context.Context, jwtTokenStr string, tokenType toke
 	userID, _ := claims["sub"].(float64)
 	t.UserID = int64(userID)
 	t.Username, _ = claims["username"].(string)
+	t.IsAdmin, _ = claims["is_admin"].(bool)
 	t.AccessUUID, _ = claims["access_uuid"].(string)
 	t.RefreshUUID, _ = claims["refresh_uuid"].(string)
 
@@ -147,4 +148,21 @@ func (api *API) getJWTTokenFromContext(ctx context.Context) (string, int, error)
 		return "", http.StatusInternalServerError, errors.ErrInternalServer
 	}
 	return token, http.StatusOK, nil
+}
+
+func (api *API) adminAuth(next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		claims, code, err := api.getJWTClaimFromContext(r.Context())
+		if err != nil {
+			utils.ResponseWithJSON(w, code, nil, stack.Wrap(r.Context(), err))
+			return
+		}
+
+		if !claims.IsAdmin {
+			utils.ResponseWithJSON(w, http.StatusForbidden, nil, stack.Wrap(r.Context(), errors.ErrAdminOnly))
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }

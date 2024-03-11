@@ -32,6 +32,7 @@ type Vtuber struct {
 	BloodType           string
 	ZodiacSign          string
 	Emoji               string
+	OverriddenField     OverriddenField
 	UpdatedAt           time.Time
 }
 
@@ -216,4 +217,41 @@ type GenderCount struct {
 type ZodiacCount struct {
 	Zodiac string
 	Count  int
+}
+
+// OverriddenField is entity for overridden fields.
+type OverriddenField struct {
+	DebutDate      OverriddenDate
+	RetirementDate OverriddenDate
+	Agencies       OverriddenAgencies
+	Affiliations   OverriddenAffiliations
+	Channels       OverriddenChannels
+}
+
+// OverriddenDate is entity for overridden date.
+type OverriddenDate struct {
+	Flag     bool
+	OldValue *time.Time
+	Value    *time.Time
+}
+
+// OverriddenAgencies is entity
+type OverriddenAgencies struct {
+	Flag     bool
+	OldValue []Agency
+	Value    []Agency
+}
+
+// OverriddenAffiliations is entity
+type OverriddenAffiliations struct {
+	Flag     bool
+	OldValue []string
+	Value    []string
+}
+
+// OverriddenChannels is entity
+type OverriddenChannels struct {
+	Flag     bool
+	OldValue []Channel
+	Value    []Channel
 }
