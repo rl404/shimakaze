@@ -9,7 +9,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/newrelic/go-agent/v3 v3.31.0
+	github.com/newrelic/go-agent/v3 v3.32.0
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.3
 	github.com/nicklaw5/helix/v2 v2.28.1
 	github.com/rl404/fairy v0.25.2
@@ -18,7 +18,7 @@ require (
 	github.com/swaggo/swag v1.16.3
 	github.com/tmdvs/Go-Emoji-Utils v1.1.0
 	go.mongodb.org/mongo-driver v1.14.0
-	golang.org/x/oauth2 v0.18.0
+	golang.org/x/oauth2 v0.19.0
 	golang.org/x/text v0.14.0
 )
 
