@@ -165,6 +165,8 @@ github.com/nicklaw5/helix/v2 v2.28.1 h1:bLVKMrZ0MiSgCLB3nsi7+OrhognsIusqvNL4XFoR
 github.com/nicklaw5/helix/v2 v2.28.1/go.mod h1:zZcKsyyBWDli34x3QleYsVMiiNGMXPAEU5NjsiZDtvY=
 github.com/nicklaw5/helix/v2 v2.28.2 h1:bHOWU341GS+Jv73EKGv7BB4T/M4RKR/umxDBOr+MdjI=
 github.com/nicklaw5/helix/v2 v2.28.2/go.mod h1:zZcKsyyBWDli34x3QleYsVMiiNGMXPAEU5NjsiZDtvY=
+github.com/nicklaw5/helix/v2 v2.28.3 h1:hpy+VxMhEgDCoh8wAUS3mIqUYh0KcfJnd8w8uUOjZ3Y=
+github.com/nicklaw5/helix/v2 v2.28.3/go.mod h1:zZcKsyyBWDli34x3QleYsVMiiNGMXPAEU5NjsiZDtvY=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWbfPhv4DMiApHyliiK5xCTNVSPiaAs=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
