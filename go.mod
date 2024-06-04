@@ -18,8 +18,8 @@ require (
 	github.com/swaggo/swag v1.16.3
 	github.com/tmdvs/Go-Emoji-Utils v1.1.0
 	go.mongodb.org/mongo-driver v1.15.0
-	golang.org/x/oauth2 v0.20.0
-	golang.org/x/text v0.15.0
+	golang.org/x/oauth2 v0.21.0
+	golang.org/x/text v0.16.0
 )
 
 require (
@@ -75,11 +75,11 @@ require (
 	github.com/xdg-go/stringprep v1.0.4 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d // indirect
 	go.opencensus.io v0.24.0 // indirect
-	golang.org/x/crypto v0.22.0 // indirect
-	golang.org/x/net v0.24.0 // indirect
-	golang.org/x/sync v0.4.0 // indirect
-	golang.org/x/sys v0.19.0 // indirect
-	golang.org/x/tools v0.7.0 // indirect
+	golang.org/x/crypto v0.23.0 // indirect
+	golang.org/x/net v0.25.0 // indirect
+	golang.org/x/sync v0.7.0 // indirect
+	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
 	google.golang.org/api v0.148.0 // indirect
 	google.golang.org/genproto v0.0.0-20231002182017-d307bd883b97 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20231002182017-d307bd883b97 // indirect
