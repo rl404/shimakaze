@@ -275,19 +275,20 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 
 	if data.Mode == entity.SearchModeSimple {
 		projectStage = bson.D{{Key: "$project", Value: bson.M{
-			"id":              1,
-			"name":            1,
-			"image":           1,
-			"debut_date":      1,
-			"retirement_date": 1,
-			"subscriber":      1,
-			"video_count":     1,
-			"has_2d":          1,
-			"has_3d":          1,
-			"agencies":        1,
-			"birthday":        1,
-			"emoji":           1,
-			"updated_at":      1,
+			"id":                 1,
+			"name":               1,
+			"image":              1,
+			"debut_date":         1,
+			"retirement_date":    1,
+			"subscriber":         1,
+			"monthly_subscriber": 1,
+			"video_count":        1,
+			"has_2d":             1,
+			"has_3d":             1,
+			"agencies":           1,
+			"birthday":           1,
+			"emoji":              1,
+			"updated_at":         1,
 		}}}
 	}
 

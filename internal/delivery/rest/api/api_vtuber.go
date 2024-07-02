@@ -50,7 +50,7 @@ import (
 // @param end_subscriber query integer false "end subscriber"
 // @param start_video_count query integer false "start video count"
 // @param end_video_count query integer false "end video count"
-// @param sort query string false "sort" enums(name,-name,debut_date,-debut_date,retirement_date,-retirement_date,subscriber,-subscriber,video_count,-video_count) default(name)
+// @param sort query string false "sort" enums(name,-name,debut_date,-debut_date,retirement_date,-retirement_date,subscriber,-subscriber,monthly_subscriber,-monthly_subscriber,video_count,-video_count) default(name)
 // @param page query integer false "page" default(1)
 // @param limit query integer false "limit" default(20)
 // @success 200 {object} utils.Response{data=[]service.vtuber}

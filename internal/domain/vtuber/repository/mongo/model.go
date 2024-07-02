@@ -26,6 +26,7 @@ type vtuber struct {
 	Affiliations        []string        `bson:"affiliations"`
 	Channels            []channel       `bson:"channels"`
 	Subscriber          int             `bson:"subscriber"`
+	MonthlySubscriber   int             `bson:"monthly_subscriber"`
 	VideoCount          int             `bson:"video_count"`
 	SocialMedias        []string        `bson:"social_medias"`
 	OfficialWebsites    []string        `bson:"official_websites"`
@@ -132,6 +133,7 @@ func (v *vtuber) toEntity() *entity.Vtuber {
 		Affiliations:        v.Affiliations,
 		Channels:            channels,
 		Subscriber:          v.Subscriber,
+		MonthlySubscriber:   v.MonthlySubscriber,
 		VideoCount:          v.VideoCount,
 		SocialMedias:        v.SocialMedias,
 		OfficialWebsites:    v.OfficialWebsites,
@@ -201,6 +203,7 @@ func (m *Mongo) vtuberFromEntity(v entity.Vtuber) *vtuber {
 		Affiliations:        v.Affiliations,
 		Channels:            channels,
 		Subscriber:          v.Subscriber,
+		MonthlySubscriber:   v.MonthlySubscriber,
 		VideoCount:          v.VideoCount,
 		SocialMedias:        v.SocialMedias,
 		OfficialWebsites:    v.OfficialWebsites,
