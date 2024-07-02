@@ -2246,6 +2246,8 @@ const docTemplate = `{
                             "-retirement_date",
                             "subscriber",
                             "-subscriber",
+                            "monthly_subscriber",
+                            "-monthly_subscriber",
                             "video_count",
                             "-video_count"
                         ],
@@ -2987,6 +2989,9 @@ const docTemplate = `{
                 },
                 "image": {
                     "type": "string"
+                },
+                "monthly_subscriber": {
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string"

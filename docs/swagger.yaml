@@ -224,6 +224,8 @@ definitions:
         type: integer
       image:
         type: string
+      monthly_subscriber:
+        type: integer
       name:
         type: string
       nicknames:
@@ -1878,6 +1880,8 @@ paths:
         - -retirement_date
         - subscriber
         - -subscriber
+        - monthly_subscriber
+        - -monthly_subscriber
         - video_count
         - -video_count
         in: query
