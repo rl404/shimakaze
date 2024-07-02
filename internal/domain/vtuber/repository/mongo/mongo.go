@@ -286,6 +286,7 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 			"has_3d":          1,
 			"agencies":        1,
 			"birthday":        1,
+			"emoji":           1,
 			"updated_at":      1,
 		}}}
 	}
@@ -320,6 +321,11 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 
 	if data.ExcludeActive && data.ExcludeRetired {
 		return nil, 0, http.StatusOK, nil
+	}
+
+	if data.DebutDay > 0 {
+		newFieldStage = m.addField(newFieldStage, "debut_day", bson.M{"$dayOfMonth": "$debut_date"})
+		matchStage = m.addMatch(matchStage, "debut_day", data.DebutDay)
 	}
 
 	if data.StartDebutMonth > 0 {

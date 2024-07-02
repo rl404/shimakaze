@@ -339,6 +339,7 @@ type GetVtubersRequest struct {
 	Nickname           string               `validate:"omitempty,gte=3" mod:"trim,lcase"`
 	ExcludeActive      bool                 ``
 	ExcludeRetired     bool                 ``
+	DebutDay           int                  `validate:"omitempty,gte=1"`
 	StartDebutMonth    int                  `validate:"omitempty,gte=1"`
 	EndDebutMonth      int                  `validate:"omitempty,gte=1"`
 	StartDebutYear     int                  `validate:"omitempty,gte=1"`
@@ -385,6 +386,7 @@ func (s *service) GetVtubers(ctx context.Context, data GetVtubersRequest) ([]vtu
 		Nickname:           data.Nickname,
 		ExcludeActive:      data.ExcludeActive,
 		ExcludeRetired:     data.ExcludeRetired,
+		DebutDay:           data.DebutDay,
 		StartDebutMonth:    data.StartDebutMonth,
 		EndDebutMonth:      data.EndDebutMonth,
 		StartDebutYear:     data.StartDebutYear,

@@ -2070,6 +2070,12 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
+                        "description": "start debut day",
+                        "name": "debut_day",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
                         "description": "start debut month",
                         "name": "start_debut_month",
                         "in": "query"

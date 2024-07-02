@@ -1755,6 +1755,10 @@ paths:
         in: query
         name: exclude_retired
         type: boolean
+      - description: start debut day
+        in: query
+        name: debut_day
+        type: integer
       - description: start debut month
         in: query
         name: start_debut_month

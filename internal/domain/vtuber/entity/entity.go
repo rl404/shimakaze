@@ -94,6 +94,7 @@ type GetAllRequest struct {
 	Nickname           string
 	ExcludeActive      bool
 	ExcludeRetired     bool
+	DebutDay           int
 	StartDebutMonth    int
 	EndDebutMonth      int
 	StartDebutYear     int
