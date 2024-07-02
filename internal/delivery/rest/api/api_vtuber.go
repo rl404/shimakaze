@@ -22,6 +22,7 @@ import (
 // @param nickname query string false "nickname"
 // @param exclude_active query boolean false "exclude active"
 // @param exclude_retired query boolean false "exclude retired"
+// @param debut_day query integer false "start debut day"
 // @param start_debut_month query integer false "start debut month"
 // @param end_debut_month query integer false "end debut month"
 // @param start_debut_year query integer false "start debut year"
@@ -49,7 +50,7 @@ import (
 // @param end_subscriber query integer false "end subscriber"
 // @param start_video_count query integer false "start video count"
 // @param end_video_count query integer false "end video count"
-// @param sort query string false "sort" enums(name,-name,debut_date,-debut_date,retirement_date,-retirement_date,subscriber,-subscriber,video_count,-video_count) default(name)
+// @param sort query string false "sort" enums(name,-name,debut_date,-debut_date,retirement_date,-retirement_date,subscriber,-subscriber,monthly_subscriber,-monthly_subscriber,video_count,-video_count) default(name)
 // @param page query integer false "page" default(1)
 // @param limit query integer false "limit" default(20)
 // @success 200 {object} utils.Response{data=[]service.vtuber}
@@ -64,6 +65,7 @@ func (api *API) handleGetVtubers(w http.ResponseWriter, r *http.Request) {
 	nickname := r.URL.Query().Get("nickname")
 	excludeActive, _ := strconv.ParseBool(r.URL.Query().Get("exclude_active"))
 	excludeRetired, _ := strconv.ParseBool(r.URL.Query().Get("exclude_retired"))
+	debutDay, _ := strconv.Atoi(r.URL.Query().Get("debut_day"))
 	startDebutMonth, _ := strconv.Atoi(r.URL.Query().Get("start_debut_month"))
 	endDebutMonth, _ := strconv.Atoi(r.URL.Query().Get("end_debut_month"))
 	startDebutYear, _ := strconv.Atoi(r.URL.Query().Get("start_debut_year"))
@@ -103,6 +105,7 @@ func (api *API) handleGetVtubers(w http.ResponseWriter, r *http.Request) {
 		Nickname:           nickname,
 		ExcludeActive:      excludeActive,
 		ExcludeRetired:     excludeRetired,
+		DebutDay:           debutDay,
 		StartDebutMonth:    startDebutMonth,
 		EndDebutMonth:      endDebutMonth,
 		StartDebutYear:     startDebutYear,

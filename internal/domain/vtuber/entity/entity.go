@@ -21,6 +21,7 @@ type Vtuber struct {
 	Affiliations        []string
 	Channels            []Channel
 	Subscriber          int
+	MonthlySubscriber   int
 	VideoCount          int
 	SocialMedias        []string
 	OfficialWebsites    []string
@@ -94,6 +95,7 @@ type GetAllRequest struct {
 	Nickname           string
 	ExcludeActive      bool
 	ExcludeRetired     bool
+	DebutDay           int
 	StartDebutMonth    int
 	EndDebutMonth      int
 	StartDebutYear     int

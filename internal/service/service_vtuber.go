@@ -30,6 +30,7 @@ type vtuber struct {
 	Affiliations        []string        `json:"affiliations"`
 	Channels            []vtuberChannel `json:"channels"`
 	Subscriber          int             `json:"subscriber"`
+	MonthlySubscriber   int             `json:"monthly_subscriber"`
 	VideoCount          int             `json:"video_count"`
 	SocialMedias        []string        `json:"social_medias"`
 	OfficialWebsites    []string        `json:"official_websites"`
@@ -128,6 +129,7 @@ func (s *service) GetVtuberByID(ctx context.Context, id int64) (*vtuber, int, er
 		Affiliations:        vt.Affiliations,
 		Channels:            channels,
 		Subscriber:          vt.Subscriber,
+		MonthlySubscriber:   vt.MonthlySubscriber,
 		VideoCount:          vt.VideoCount,
 		SocialMedias:        vt.SocialMedias,
 		OfficialWebsites:    vt.OfficialWebsites,
@@ -339,6 +341,7 @@ type GetVtubersRequest struct {
 	Nickname           string               `validate:"omitempty,gte=3" mod:"trim,lcase"`
 	ExcludeActive      bool                 ``
 	ExcludeRetired     bool                 ``
+	DebutDay           int                  `validate:"omitempty,gte=1"`
 	StartDebutMonth    int                  `validate:"omitempty,gte=1"`
 	EndDebutMonth      int                  `validate:"omitempty,gte=1"`
 	StartDebutYear     int                  `validate:"omitempty,gte=1"`
@@ -366,7 +369,7 @@ type GetVtubersRequest struct {
 	EndSubscriber      int                  `validate:"omitempty,gte=1"`
 	StartVideoCount    int                  `validate:"omitempty,gte=1"`
 	EndVideoCount      int                  `validate:"omitempty,gte=1"`
-	Sort               string               `validate:"oneof=name -name debut_date -debut_date retirement_date -retirement_date subscriber -subscriber video_count -video_count" mod:"default=name,trim,lcase"`
+	Sort               string               `validate:"oneof=name -name debut_date -debut_date retirement_date -retirement_date subscriber -subscriber monthly_subscriber -monthly_subscriber video_count -video_count" mod:"default=name,trim,lcase"`
 	Page               int                  `validate:"required,gte=1" mod:"default=1"`
 	Limit              int                  `validate:"required,gte=-1" mod:"default=20"`
 }
@@ -385,6 +388,7 @@ func (s *service) GetVtubers(ctx context.Context, data GetVtubersRequest) ([]vtu
 		Nickname:           data.Nickname,
 		ExcludeActive:      data.ExcludeActive,
 		ExcludeRetired:     data.ExcludeRetired,
+		DebutDay:           data.DebutDay,
 		StartDebutMonth:    data.StartDebutMonth,
 		EndDebutMonth:      data.EndDebutMonth,
 		StartDebutYear:     data.StartDebutYear,
@@ -474,6 +478,7 @@ func (s *service) GetVtubers(ctx context.Context, data GetVtubersRequest) ([]vtu
 			Affiliations:        vt.Affiliations,
 			Channels:            channels,
 			Subscriber:          vt.Subscriber,
+			MonthlySubscriber:   vt.MonthlySubscriber,
 			VideoCount:          vt.VideoCount,
 			SocialMedias:        vt.SocialMedias,
 			OfficialWebsites:    vt.OfficialWebsites,

@@ -224,6 +224,8 @@ definitions:
         type: integer
       image:
         type: string
+      monthly_subscriber:
+        type: integer
       name:
         type: string
       nicknames:
@@ -1755,6 +1757,10 @@ paths:
         in: query
         name: exclude_retired
         type: boolean
+      - description: start debut day
+        in: query
+        name: debut_day
+        type: integer
       - description: start debut month
         in: query
         name: start_debut_month
@@ -1874,6 +1880,8 @@ paths:
         - -retirement_date
         - subscriber
         - -subscriber
+        - monthly_subscriber
+        - -monthly_subscriber
         - video_count
         - -video_count
         in: query

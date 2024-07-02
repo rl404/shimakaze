@@ -54,7 +54,7 @@ func (c *Cache) GetAllIDs(ctx context.Context) ([]int64, int, error) {
 
 // GetAllImages to get all images.
 func (c *Cache) GetAllImages(ctx context.Context, shuffle bool, limit int) (data []entity.Vtuber, code int, err error) {
-	key := utils.GetKey("vtuber", "images")
+	key := utils.GetKey("vtuber", "images", limit)
 	if c.cacher.Get(ctx, key, &data) == nil {
 		return data, http.StatusOK, nil
 	}

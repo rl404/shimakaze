@@ -4,8 +4,10 @@ import (
 	"context"
 	_errors "errors"
 	"fmt"
+	"math"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/agency/entity"
@@ -78,7 +80,7 @@ func (s *service) updateVtuber(ctx context.Context, id int64) (int, error) {
 	vtuber = s.overrideVtuberData(vtuber, existingVtuber)
 
 	// Fill channel data.
-	vtuber.Channels, vtuber.Subscriber, vtuber.VideoCount = s.fillChannelData(ctx, vtuber.Channels)
+	vtuber.Channels, vtuber.Subscriber, vtuber.MonthlySubscriber, vtuber.VideoCount = s.fillChannelData(ctx, vtuber.DebutDate, vtuber.Channels)
 
 	// Update data.
 	if code, err := s.vtuber.UpdateByID(ctx, id, vtuber); err != nil {
@@ -247,8 +249,8 @@ func (s *service) mergeAgencies(a1, a2 []vtuberEntity.Agency) []vtuberEntity.Age
 	return a3
 }
 
-func (s *service) fillChannelData(ctx context.Context, channels []vtuberEntity.Channel) ([]vtuberEntity.Channel, int, int) {
-	subscriber, videoCount := 0, 0
+func (s *service) fillChannelData(ctx context.Context, debutDate *time.Time, channels []vtuberEntity.Channel) ([]vtuberEntity.Channel, int, int, int) {
+	subscriber, monthlySubs, videoCount := 0, 0, 0
 	for i, channel := range channels {
 		switch channel.Type {
 		case vtuberEntity.ChannelYoutube:
@@ -272,7 +274,12 @@ func (s *service) fillChannelData(ctx context.Context, channels []vtuberEntity.C
 		videoCount += len(channels[i].Videos)
 	}
 
-	return channels, subscriber, videoCount
+	if debutDate != nil {
+		monthDiff := time.Since(*debutDate).Hours() / 24 / 30
+		monthlySubs = subscriber / int(math.Ceil(monthDiff))
+	}
+
+	return channels, subscriber, monthlySubs, videoCount
 }
 
 func (s *service) fillYoutubeChannel(ctx context.Context, channel vtuberEntity.Channel) vtuberEntity.Channel {

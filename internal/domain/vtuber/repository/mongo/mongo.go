@@ -275,18 +275,20 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 
 	if data.Mode == entity.SearchModeSimple {
 		projectStage = bson.D{{Key: "$project", Value: bson.M{
-			"id":              1,
-			"name":            1,
-			"image":           1,
-			"debut_date":      1,
-			"retirement_date": 1,
-			"subscriber":      1,
-			"video_count":     1,
-			"has_2d":          1,
-			"has_3d":          1,
-			"agencies":        1,
-			"birthday":        1,
-			"updated_at":      1,
+			"id":                 1,
+			"name":               1,
+			"image":              1,
+			"debut_date":         1,
+			"retirement_date":    1,
+			"subscriber":         1,
+			"monthly_subscriber": 1,
+			"video_count":        1,
+			"has_2d":             1,
+			"has_3d":             1,
+			"agencies":           1,
+			"birthday":           1,
+			"emoji":              1,
+			"updated_at":         1,
 		}}}
 	}
 
@@ -320,6 +322,11 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 
 	if data.ExcludeActive && data.ExcludeRetired {
 		return nil, 0, http.StatusOK, nil
+	}
+
+	if data.DebutDay > 0 {
+		newFieldStage = m.addField(newFieldStage, "debut_day", bson.M{"$dayOfMonth": "$debut_date"})
+		matchStage = m.addMatch(matchStage, "debut_day", data.DebutDay)
 	}
 
 	if data.StartDebutMonth > 0 {
