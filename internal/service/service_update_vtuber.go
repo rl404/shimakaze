@@ -276,7 +276,7 @@ func (s *service) fillChannelData(ctx context.Context, debutDate *time.Time, cha
 
 	if debutDate != nil {
 		monthDiff := time.Since(*debutDate).Hours() / 24 / 30
-		if monthDiff > 0 {
+		if int(math.Ceil(monthDiff)) > 0 {
 			monthlySubs = subscriber / int(math.Ceil(monthDiff))
 		}
 	}
