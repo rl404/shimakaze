@@ -10,6 +10,8 @@ import (
 	"github.com/rl404/shimakaze/internal/delivery/cron"
 	agencyRepository "github.com/rl404/shimakaze/internal/domain/agency/repository"
 	agencyMongo "github.com/rl404/shimakaze/internal/domain/agency/repository/mongo"
+	languageRepository "github.com/rl404/shimakaze/internal/domain/language/repository"
+	languageMongo "github.com/rl404/shimakaze/internal/domain/language/repository/mongo"
 	nonVtuberRepository "github.com/rl404/shimakaze/internal/domain/non_vtuber/repository"
 	nonVtuberMongo "github.com/rl404/shimakaze/internal/domain/non_vtuber/repository/mongo"
 	publisherRepository "github.com/rl404/shimakaze/internal/domain/publisher/repository"
@@ -79,12 +81,16 @@ func cronUpdate() error {
 	var agency agencyRepository.Repository = agencyMongo.New(db, cfg.Cron.AgencyAge)
 	utils.Info("repository agency initialized")
 
+	// Init language.
+	var language languageRepository.Repository = languageMongo.New(db)
+	utils.Info("repository language initialized")
+
 	// Init publisher.
 	var publisher publisherRepository.Repository = publisherPubsub.New(ps, pubsubTopic)
 	utils.Info("repository publisher initialized")
 
 	// Init service.
-	service := service.New(wikia, vtuber, nonVtuber, agency, publisher, nil, nil, nil, nil, nil, nil, nil, nil)
+	service := service.New(wikia, vtuber, nonVtuber, agency, language, publisher, nil, nil, nil, nil, nil, nil, nil, nil)
 	utils.Info("service initialized")
 
 	// Run cron.

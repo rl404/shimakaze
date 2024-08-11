@@ -5,6 +5,7 @@ import (
 
 	agencyRepository "github.com/rl404/shimakaze/internal/domain/agency/repository"
 	bilibilRepository "github.com/rl404/shimakaze/internal/domain/bilibili/repository"
+	languageRepository "github.com/rl404/shimakaze/internal/domain/language/repository"
 	niconicoRepository "github.com/rl404/shimakaze/internal/domain/niconico/repository"
 	nonVtuberRepository "github.com/rl404/shimakaze/internal/domain/non_vtuber/repository"
 	"github.com/rl404/shimakaze/internal/domain/publisher/entity"
@@ -80,6 +81,7 @@ type Service interface {
 
 	QueueMissingAgency(ctx context.Context, limit int) (int, int, error)
 	QueueMissingVtuber(ctx context.Context, limit int) (int, int, error)
+	QueueMissingLanguage(ctx context.Context, limit int) (int, int, error)
 	QueueOldAgency(ctx context.Context, limit int) (int, int, error)
 	QueueOldActiveVtuber(ctx context.Context, limit int) (int, int, error)
 	QueueOldRetiredVtuber(ctx context.Context, limit int) (int, int, error)
@@ -90,6 +92,7 @@ type service struct {
 	vtuber    vtuberRepository.Repository
 	nonVtuber nonVtuberRepository.Repository
 	agency    agencyRepository.Repository
+	language  languageRepository.Repository
 	publisher publisherRepository.Repository
 	youtube   youtubeRepository.Repository
 	twitch    twitchRepository.Repository
@@ -107,6 +110,7 @@ func New(
 	vtuber vtuberRepository.Repository,
 	nonVtuber nonVtuberRepository.Repository,
 	agency agencyRepository.Repository,
+	language languageRepository.Repository,
 	publisher publisherRepository.Repository,
 	youtube youtubeRepository.Repository,
 	twitch twitchRepository.Repository,
@@ -122,6 +126,7 @@ func New(
 		vtuber:    vtuber,
 		nonVtuber: nonVtuber,
 		agency:    agency,
+		language:  language,
 		publisher: publisher,
 		youtube:   youtube,
 		twitch:    twitch,

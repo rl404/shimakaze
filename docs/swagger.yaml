@@ -224,6 +224,10 @@ definitions:
         type: integer
       image:
         type: string
+      languages:
+        items:
+          $ref: '#/definitions/service.vtuberLanguage'
+        type: array
       monthly_subscriber:
         type: integer
       name:
@@ -418,6 +422,13 @@ definitions:
         type: integer
       not_in_agency:
         type: integer
+    type: object
+  service.vtuberLanguage:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
     type: object
   service.vtuberModelCount:
     properties:
@@ -1824,6 +1835,10 @@ paths:
       - description: agency id
         in: query
         name: agency_id
+        type: integer
+      - description: language id
+        in: query
+        name: language_id
         type: integer
       - description: channel types
         in: query

@@ -22,6 +22,10 @@ func (c *Cron) Fill(limit int) error {
 		return stack.Wrap(ctx, err)
 	}
 
+	if err := c.queueMissingLanguage(ctx, limit); err != nil {
+		return stack.Wrap(ctx, err)
+	}
+
 	if err := c.queueMissingVtuber(ctx, limit); err != nil {
 		return stack.Wrap(ctx, err)
 	}
@@ -53,6 +57,20 @@ func (c *Cron) queueMissingVtuber(ctx context.Context, limit int) error {
 
 	utils.Info("queued %d vtuber", cnt)
 	c.nrApp.RecordCustomEvent("QueueMissingVtuber", map[string]interface{}{"count": cnt})
+
+	return nil
+}
+
+func (c *Cron) queueMissingLanguage(ctx context.Context, limit int) error {
+	defer newrelic.FromContext(ctx).StartSegment("queueMissingLanguage").End()
+
+	cnt, _, err := c.service.QueueMissingLanguage(ctx, limit)
+	if err != nil {
+		return stack.Wrap(ctx, err)
+	}
+
+	utils.Info("queued %d language", cnt)
+	c.nrApp.RecordCustomEvent("QueueMissingLanguage", map[string]interface{}{"count": cnt})
 
 	return nil
 }

@@ -67,11 +67,15 @@ func (s *service) updateVtuber(ctx context.Context, id int64) (int, error) {
 	agencyMap := s.getAgencyMap(ctx)
 	agencyFromAffiliation := s.getAgencyFromAffiliation(vtuber.Affiliations, agencyMap)
 
+	// Get languages.
+	languageMap := s.getLanguageMap(ctx)
+
 	// Get categories.
-	category := s.getVtuberCategory(ctx, id, agencyMap)
+	category := s.getVtuberCategory(ctx, id, agencyMap, languageMap)
 	vtuber.Has2D = category.has2D
 	vtuber.Has3D = category.has3D
 	vtuber.Agencies = s.mergeAgencies(agencyFromAffiliation, category.agencies)
+	vtuber.Languages = category.languages
 	vtuber.CharacterDesigners = category.charDesigner
 	vtuber.Character2DModelers = category.char2DModeler
 	vtuber.Character3DModelers = category.char3DModeler
@@ -160,16 +164,35 @@ func (s *service) getAgencyMap(ctx context.Context) map[string]vtuberEntity.Agen
 	return agencyMap
 }
 
+func (s *service) getLanguageMap(ctx context.Context) map[string]vtuberEntity.Language {
+	languages, _, _, err := s.language.GetAll(ctx)
+	if err != nil {
+		stack.Wrap(ctx, err)
+		return nil
+	}
+
+	languageMap := make(map[string]vtuberEntity.Language)
+	for _, a := range languages {
+		languageMap[strings.ToLower(a.Name)] = vtuberEntity.Language{
+			ID:   a.ID,
+			Name: a.Name,
+		}
+	}
+
+	return languageMap
+}
+
 type vtuberCategory struct {
 	has2D         bool
 	has3D         bool
 	agencies      []vtuberEntity.Agency
+	languages     []vtuberEntity.Language
 	charDesigner  []string
 	char2DModeler []string
 	char3DModeler []string
 }
 
-func (s *service) getVtuberCategory(ctx context.Context, id int64, agencyMap map[string]vtuberEntity.Agency) (vtuberCategory vtuberCategory) {
+func (s *service) getVtuberCategory(ctx context.Context, id int64, agencyMap map[string]vtuberEntity.Agency, languageMap map[string]vtuberEntity.Language) (vtuberCategory vtuberCategory) {
 	// Loop and map categories.
 	var lastTitle string
 	limitPerPage := 500
@@ -200,6 +223,10 @@ func (s *service) getVtuberCategory(ctx context.Context, id int64, agencyMap map
 
 			if v, ok := agencyMap[strings.ToLower(category)]; ok {
 				vtuberCategory.agencies = append(vtuberCategory.agencies, v)
+			}
+
+			if v, ok := languageMap[strings.ToLower(category)]; ok {
+				vtuberCategory.languages = append(vtuberCategory.languages, v)
 			}
 
 			if designedBy := strings.Split(category, "Designed by "); len(designedBy) > 1 {

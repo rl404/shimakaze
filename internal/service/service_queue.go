@@ -3,8 +3,10 @@ package service
 import (
 	"context"
 	"net/http"
+	"strings"
 
 	"github.com/rl404/fairy/errors/stack"
+	"github.com/rl404/shimakaze/internal/domain/language/entity"
 )
 
 // QueueMissingVtuber to queue missing vtuber.
@@ -75,7 +77,7 @@ func (s *service) QueueMissingAgency(ctx context.Context, limit int) (int, int, 
 	var lastTitle string
 	limitPerPage := 500
 	for {
-		agencies, nextTitle, code, err := s.wikia.GetCategoryMembers(ctx, "Category:Agency", limitPerPage, lastTitle)
+		agencies, nextTitle, code, err := s.wikia.GetCategoryMembers(ctx, "Category:Agency", limitPerPage, lastTitle, true)
 		if err != nil {
 			return cnt, code, stack.Wrap(ctx, err)
 		}
@@ -101,6 +103,56 @@ func (s *service) QueueMissingAgency(ctx context.Context, limit int) (int, int, 
 		}
 
 		if len(agencies) == 0 || lastTitle == "" {
+			return cnt, http.StatusOK, nil
+		}
+	}
+}
+
+// QueueMissingLanguage to queue missing language.
+func (s *service) QueueMissingLanguage(ctx context.Context, limit int) (int, int, error) {
+	languageIDs, code, err := s.language.GetAllIDs(ctx)
+	if err != nil {
+		return 0, code, stack.Wrap(ctx, err)
+	}
+
+	existMap := make(map[int64]bool)
+	for _, id := range languageIDs {
+		existMap[id] = true
+	}
+
+	var cnt int
+	var lastTitle string
+	limitPerPage := 500
+	for {
+		languages, nextTitle, code, err := s.wikia.GetCategoryMembers(ctx, "Category:Language", limitPerPage, lastTitle, false)
+		if err != nil {
+			return cnt, code, stack.Wrap(ctx, err)
+		}
+
+		lastTitle = nextTitle
+
+		for _, language := range languages {
+			if existMap[language.ID] {
+				continue
+			}
+
+			existMap[language.ID] = true
+
+			if code, err := s.language.UpdateByID(ctx, language.ID, entity.Language{
+				ID:   language.ID,
+				Name: strings.ReplaceAll(language.Title, "Category:", ""),
+			}); err != nil {
+				return cnt, code, stack.Wrap(ctx, err)
+			}
+
+			cnt++
+
+			if cnt >= limit {
+				return cnt, http.StatusOK, nil
+			}
+		}
+
+		if len(languages) == 0 || lastTitle == "" {
 			return cnt, http.StatusOK, nil
 		}
 	}

@@ -24,6 +24,7 @@ type vtuber struct {
 	Character3DModelers []string        `bson:"character_3d_modelers"`
 	Agencies            []agency        `bson:"agencies"`
 	Affiliations        []string        `bson:"affiliations"`
+	Languages           []language      `bson:"languages"`
 	Channels            []channel       `bson:"channels"`
 	Subscriber          int             `bson:"subscriber"`
 	MonthlySubscriber   int             `bson:"monthly_subscriber"`
@@ -44,9 +45,14 @@ type vtuber struct {
 }
 
 type agency struct {
-	ID    int64  `json:"id"`
-	Name  string `json:"name"`
-	Image string `json:"image"`
+	ID    int64  `bson:"id"`
+	Name  string `bson:"name"`
+	Image string `bson:"image"`
+}
+
+type language struct {
+	ID   int64  `bson:"id"`
+	Name string `bson:"name"`
 }
 
 type channel struct {
@@ -87,6 +93,14 @@ func (v *vtuber) toEntity() *entity.Vtuber {
 			ID:    a.ID,
 			Name:  a.Name,
 			Image: a.Image,
+		}
+	}
+
+	languages := make([]entity.Language, len(v.Languages))
+	for i, l := range v.Languages {
+		languages[i] = entity.Language{
+			ID:   l.ID,
+			Name: l.Name,
 		}
 	}
 
@@ -131,6 +145,7 @@ func (v *vtuber) toEntity() *entity.Vtuber {
 		Character3DModelers: v.Character3DModelers,
 		Agencies:            agencies,
 		Affiliations:        v.Affiliations,
+		Languages:           languages,
 		Channels:            channels,
 		Subscriber:          v.Subscriber,
 		MonthlySubscriber:   v.MonthlySubscriber,
@@ -157,6 +172,14 @@ func (m *Mongo) vtuberFromEntity(v entity.Vtuber) *vtuber {
 			ID:    a.ID,
 			Name:  a.Name,
 			Image: a.Image,
+		}
+	}
+
+	languages := make([]language, len(v.Languages))
+	for i, l := range v.Languages {
+		languages[i] = language{
+			ID:   l.ID,
+			Name: l.Name,
 		}
 	}
 
@@ -201,6 +224,7 @@ func (m *Mongo) vtuberFromEntity(v entity.Vtuber) *vtuber {
 		Character3DModelers: v.Character3DModelers,
 		Agencies:            agencies,
 		Affiliations:        v.Affiliations,
+		Languages:           languages,
 		Channels:            channels,
 		Subscriber:          v.Subscriber,
 		MonthlySubscriber:   v.MonthlySubscriber,
