@@ -401,6 +401,10 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 		matchStage = m.addMatch(matchStage, "agencies.id", data.AgencyID)
 	}
 
+	if data.LanguageID > 0 {
+		matchStage = m.addMatch(matchStage, "languages.id", data.LanguageID)
+	}
+
 	if len(data.ChannelTypes) > 0 {
 		matchStage = m.addMatch(matchStage, "channels.type", m.getChannelTypeFilter(data.ChannelTypes))
 	}

@@ -591,6 +591,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/languages": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Language"
+                ],
+                "summary": "Get language data.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/service.language"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/profile": {
             "get": {
                 "produces": [
@@ -2171,6 +2217,12 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "integer",
+                        "description": "language id",
+                        "name": "language_id",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "description": "channel types",
                         "name": "channel_types",
@@ -2805,6 +2857,17 @@ const docTemplate = `{
                 "familyTree3DModeler"
             ]
         },
+        "service.language": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "service.overriddenAffiliations": {
             "type": "object",
             "required": [
@@ -2989,6 +3052,12 @@ const docTemplate = `{
                 },
                 "image": {
                     "type": "string"
+                },
+                "languages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/service.vtuberLanguage"
+                    }
                 },
                 "monthly_subscriber": {
                     "type": "integer"
@@ -3287,6 +3356,17 @@ const docTemplate = `{
                 },
                 "not_in_agency": {
                     "type": "integer"
+                }
+            }
+        },
+        "service.vtuberLanguage": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },

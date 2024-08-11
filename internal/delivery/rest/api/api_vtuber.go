@@ -39,6 +39,7 @@ import (
 // @param in_agency query boolean false "in agency"
 // @param agency query string false "agency"
 // @param agency_id query integer false "agency id"
+// @param language_id query integer false "language id"
 // @param channel_types query string false "channel types"
 // @param birthday_day query integer false "birthday day"
 // @param start_birthday_month query integer false "start birthday month"
@@ -82,6 +83,7 @@ func (api *API) handleGetVtubers(w http.ResponseWriter, r *http.Request) {
 	inAgency := utils.StrToPtrBool(r.URL.Query().Get("in_agency"))
 	agency := r.URL.Query().Get("agency")
 	agencyID, _ := strconv.ParseInt(r.URL.Query().Get("agency_id"), 10, 64)
+	languageID, _ := strconv.ParseInt(r.URL.Query().Get("language_id"), 10, 64)
 	channelTypes := utils.StrToStrSlice(r.URL.Query().Get("channel_types"))
 	birthdayDay, _ := strconv.Atoi(r.URL.Query().Get("birthday_day"))
 	startBirthdayMonth, _ := strconv.Atoi(r.URL.Query().Get("start_birthday_month"))
@@ -122,6 +124,7 @@ func (api *API) handleGetVtubers(w http.ResponseWriter, r *http.Request) {
 		InAgency:           inAgency,
 		Agency:             agency,
 		AgencyID:           agencyID,
+		LanguageID:         languageID,
 		ChannelTypes:       entity.StrsToChannelTypes(channelTypes),
 		BirthdayDay:        birthdayDay,
 		StartBirthdayMonth: startBirthdayMonth,

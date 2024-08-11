@@ -18,6 +18,9 @@ import (
 	agencyRepository "github.com/rl404/shimakaze/internal/domain/agency/repository"
 	agencyCache "github.com/rl404/shimakaze/internal/domain/agency/repository/cache"
 	agencyMongo "github.com/rl404/shimakaze/internal/domain/agency/repository/mongo"
+	languageRepository "github.com/rl404/shimakaze/internal/domain/language/repository"
+	languageCache "github.com/rl404/shimakaze/internal/domain/language/repository/cache"
+	languageMongo "github.com/rl404/shimakaze/internal/domain/language/repository/mongo"
 	nonVtuberRepository "github.com/rl404/shimakaze/internal/domain/non_vtuber/repository"
 	nonVtuberCache "github.com/rl404/shimakaze/internal/domain/non_vtuber/repository/cache"
 	nonVtuberMongo "github.com/rl404/shimakaze/internal/domain/non_vtuber/repository/mongo"
@@ -128,6 +131,13 @@ func server() error {
 	agency = agencyCache.New(im, agency)
 	utils.Info("repository agency initialized")
 
+	// Init language.
+	var language languageRepository.Repository
+	language = languageMongo.New(db)
+	language = languageCache.New(c, language)
+	language = languageCache.New(im, language)
+	utils.Info("repository language initialized")
+
 	// Init publisher.
 	var publisher publisherRepository.Repository = publisherPubsub.New(ps, pubsubTopic)
 	utils.Info("repository publisher initialized")
@@ -155,7 +165,7 @@ func server() error {
 	utils.Info("repository tier-list initialized")
 
 	// Init service.
-	service := service.New(wikia, vtuber, nonVtuber, agency, publisher, nil, nil, nil, nil, sso, user, token, tierList)
+	service := service.New(wikia, vtuber, nonVtuber, agency, language, publisher, nil, nil, nil, nil, sso, user, token, tierList)
 	utils.Info("service initialized")
 
 	// Init web server.

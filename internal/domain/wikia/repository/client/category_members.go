@@ -31,7 +31,7 @@ type getCategoryMembersResponse struct {
 }
 
 // GetCategoryMembers to get category members.
-func (c *Client) GetCategoryMembers(ctx context.Context, title string, limit int, lastTitle string) ([]entity.CategoryMember, string, int, error) {
+func (c *Client) GetCategoryMembers(ctx context.Context, title string, limit int, lastTitle string, isPage bool) ([]entity.CategoryMember, string, int, error) {
 	c.limiter.Take()
 
 	url, _ := url.Parse(fmt.Sprintf("%s/api.php", c.host))
@@ -41,10 +41,12 @@ func (c *Client) GetCategoryMembers(ctx context.Context, title string, limit int
 	q.Add("format", "json")
 	q.Add("list", "categorymembers")
 	q.Add("cmtitle", title)
-	q.Add("cmtype", "page")
-	q.Add("cmnamespace", "0")
 	q.Add("cmlimit", strconv.Itoa(limit))
 	q.Add("cmcontinue", lastTitle)
+	if isPage {
+		q.Add("cmtype", "page")
+		q.Add("cmnamespace", "0")
+	}
 	url.RawQuery = q.Encode()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url.String(), nil)

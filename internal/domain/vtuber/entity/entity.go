@@ -19,6 +19,7 @@ type Vtuber struct {
 	Character3DModelers []string
 	Agencies            []Agency
 	Affiliations        []string
+	Languages           []Language
 	Channels            []Channel
 	Subscriber          int
 	MonthlySubscriber   int
@@ -54,6 +55,12 @@ type Agency struct {
 	ID    int64
 	Name  string
 	Image string
+}
+
+// Language is entity for language.
+type Language struct {
+	ID   int64
+	Name string
 }
 
 // Channel is entity for channel.
@@ -112,6 +119,7 @@ type GetAllRequest struct {
 	InAgency           *bool
 	Agency             string
 	AgencyID           int64
+	LanguageID         int64
 	ChannelTypes       []ChannelType
 	BirthdayDay        int
 	StartBirthdayMonth int

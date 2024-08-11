@@ -100,6 +100,13 @@ definitions:
     - familyTreeDesigner
     - familyTree2DModeler
     - familyTree3DModeler
+  service.language:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
   service.overriddenAffiliations:
     properties:
       flag:
@@ -224,6 +231,10 @@ definitions:
         type: integer
       image:
         type: string
+      languages:
+        items:
+          $ref: '#/definitions/service.vtuberLanguage'
+        type: array
       monthly_subscriber:
         type: integer
       name:
@@ -418,6 +429,13 @@ definitions:
         type: integer
       not_in_agency:
         type: integer
+    type: object
+  service.vtuberLanguage:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
     type: object
   service.vtuberModelCount:
     properties:
@@ -879,6 +897,33 @@ paths:
       summary: Refresh Token.
       tags:
       - Auth
+  /languages:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/service.language'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get language data.
+      tags:
+      - Language
   /profile:
     get:
       parameters:
@@ -1824,6 +1869,10 @@ paths:
       - description: agency id
         in: query
         name: agency_id
+        type: integer
+      - description: language id
+        in: query
+        name: language_id
         type: integer
       - description: channel types
         in: query

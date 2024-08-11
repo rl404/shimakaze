@@ -13,42 +13,48 @@ import (
 )
 
 type vtuber struct {
-	ID                  int64           `json:"id"`
-	Name                string          `json:"name"`
-	Image               string          `json:"image"`
-	OriginalNames       []string        `json:"original_names"`
-	Nicknames           []string        `json:"nicknames"`
-	Caption             string          `json:"caption"`
-	DebutDate           *time.Time      `json:"debut_date"`
-	RetirementDate      *time.Time      `json:"retirement_date"`
-	Has2D               bool            `json:"has_2d"`
-	Has3D               bool            `json:"has_3d"`
-	CharacterDesigners  []string        `json:"character_designers"`
-	Character2DModelers []string        `json:"character_2d_modelers"`
-	Character3DModelers []string        `json:"character_3d_modelers"`
-	Agencies            []vtuberAgency  `json:"agencies"`
-	Affiliations        []string        `json:"affiliations"`
-	Channels            []vtuberChannel `json:"channels"`
-	Subscriber          int             `json:"subscriber"`
-	MonthlySubscriber   int             `json:"monthly_subscriber"`
-	VideoCount          int             `json:"video_count"`
-	SocialMedias        []string        `json:"social_medias"`
-	OfficialWebsites    []string        `json:"official_websites"`
-	Gender              string          `json:"gender"`
-	Age                 *float64        `json:"age"`
-	Birthday            *time.Time      `json:"birthday"`
-	Height              *float64        `json:"height"`
-	Weight              *float64        `json:"weight"`
-	BloodType           string          `json:"blood_type"`
-	ZodiacSign          string          `json:"zodiac_sign"`
-	Emoji               string          `json:"emoji"`
-	UpdatedAt           time.Time       `json:"updated_at"`
+	ID                  int64            `json:"id"`
+	Name                string           `json:"name"`
+	Image               string           `json:"image"`
+	OriginalNames       []string         `json:"original_names"`
+	Nicknames           []string         `json:"nicknames"`
+	Caption             string           `json:"caption"`
+	DebutDate           *time.Time       `json:"debut_date"`
+	RetirementDate      *time.Time       `json:"retirement_date"`
+	Has2D               bool             `json:"has_2d"`
+	Has3D               bool             `json:"has_3d"`
+	CharacterDesigners  []string         `json:"character_designers"`
+	Character2DModelers []string         `json:"character_2d_modelers"`
+	Character3DModelers []string         `json:"character_3d_modelers"`
+	Agencies            []vtuberAgency   `json:"agencies"`
+	Affiliations        []string         `json:"affiliations"`
+	Languages           []vtuberLanguage `json:"languages"`
+	Channels            []vtuberChannel  `json:"channels"`
+	Subscriber          int              `json:"subscriber"`
+	MonthlySubscriber   int              `json:"monthly_subscriber"`
+	VideoCount          int              `json:"video_count"`
+	SocialMedias        []string         `json:"social_medias"`
+	OfficialWebsites    []string         `json:"official_websites"`
+	Gender              string           `json:"gender"`
+	Age                 *float64         `json:"age"`
+	Birthday            *time.Time       `json:"birthday"`
+	Height              *float64         `json:"height"`
+	Weight              *float64         `json:"weight"`
+	BloodType           string           `json:"blood_type"`
+	ZodiacSign          string           `json:"zodiac_sign"`
+	Emoji               string           `json:"emoji"`
+	UpdatedAt           time.Time        `json:"updated_at"`
 }
 
 type vtuberAgency struct {
 	ID    int64  `json:"id" validate:"required,gte=1"`
 	Name  string `json:"name" validate:"required" mod:"trim"`
 	Image string `json:"image" validate:"url" mod:"trim"`
+}
+
+type vtuberLanguage struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }
 
 type vtuberChannel struct {
@@ -83,6 +89,14 @@ func (s *service) GetVtuberByID(ctx context.Context, id int64) (*vtuber, int, er
 			ID:    a.ID,
 			Name:  a.Name,
 			Image: a.Image,
+		}
+	}
+
+	languages := make([]vtuberLanguage, len(vt.Languages))
+	for i, l := range vt.Languages {
+		languages[i] = vtuberLanguage{
+			ID:   l.ID,
+			Name: l.Name,
 		}
 	}
 
@@ -127,6 +141,7 @@ func (s *service) GetVtuberByID(ctx context.Context, id int64) (*vtuber, int, er
 		Character3DModelers: vt.Character3DModelers,
 		Agencies:            agencies,
 		Affiliations:        vt.Affiliations,
+		Languages:           languages,
 		Channels:            channels,
 		Subscriber:          vt.Subscriber,
 		MonthlySubscriber:   vt.MonthlySubscriber,
@@ -358,6 +373,7 @@ type GetVtubersRequest struct {
 	InAgency           *bool                ``
 	Agency             string               `mod:"trim"`
 	AgencyID           int64                `validate:"omitempty,gte=1"`
+	LanguageID         int64                `validate:"omitempty,gte=1"`
 	ChannelTypes       []entity.ChannelType `validate:"dive,gte=1" mod:"dive,trim"`
 	BirthdayDay        int                  `validate:"omitempty,gte=1"`
 	StartBirthdayMonth int                  `validate:"omitempty,gte=1"`
@@ -405,6 +421,7 @@ func (s *service) GetVtubers(ctx context.Context, data GetVtubersRequest) ([]vtu
 		InAgency:           data.InAgency,
 		Agency:             data.Agency,
 		AgencyID:           data.AgencyID,
+		LanguageID:         data.LanguageID,
 		ChannelTypes:       data.ChannelTypes,
 		BirthdayDay:        data.BirthdayDay,
 		StartBirthdayMonth: data.StartBirthdayMonth,
@@ -432,6 +449,14 @@ func (s *service) GetVtubers(ctx context.Context, data GetVtubersRequest) ([]vtu
 				ID:    a.ID,
 				Name:  a.Name,
 				Image: a.Image,
+			}
+		}
+
+		languages := make([]vtuberLanguage, len(vt.Languages))
+		for i, l := range vt.Languages {
+			languages[i] = vtuberLanguage{
+				ID:   l.ID,
+				Name: l.Name,
 			}
 		}
 
@@ -476,6 +501,7 @@ func (s *service) GetVtubers(ctx context.Context, data GetVtubersRequest) ([]vtu
 			Character3DModelers: vt.Character3DModelers,
 			Agencies:            agencies,
 			Affiliations:        vt.Affiliations,
+			Languages:           languages,
 			Channels:            channels,
 			Subscriber:          vt.Subscriber,
 			MonthlySubscriber:   vt.MonthlySubscriber,
