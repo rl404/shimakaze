@@ -100,6 +100,13 @@ definitions:
     - familyTreeDesigner
     - familyTree2DModeler
     - familyTree3DModeler
+  service.language:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
   service.overriddenAffiliations:
     properties:
       flag:
@@ -890,6 +897,33 @@ paths:
       summary: Refresh Token.
       tags:
       - Auth
+  /languages:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/service.language'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get language data.
+      tags:
+      - Language
   /profile:
     get:
       parameters:

@@ -70,6 +70,8 @@ type Service interface {
 	GetAgencyByID(ctx context.Context, id int64) (*agency, int, error)
 	GetAgencyCount(ctx context.Context) (int, int, error)
 
+	GetLanguages(ctx context.Context) ([]language, *pagination, int, error)
+
 	GetWikiaImage(ctx context.Context, path string) ([]byte, int, error)
 
 	DeleteVtuberByID(ctx context.Context, id int64) (int, error)
