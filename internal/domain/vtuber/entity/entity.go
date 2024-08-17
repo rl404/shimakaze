@@ -205,6 +205,13 @@ type BirthdayCount struct {
 	Count int
 }
 
+// LanguageCount is entity for language count.
+type LanguageCount struct {
+	ID    int64
+	Name  string
+	Count int
+}
+
 // BloodTypeCount is entity for blood type count.
 type BloodTypeCount struct {
 	BloodType string

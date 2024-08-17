@@ -457,6 +457,31 @@ func (s *service) GetVtuberChannelTypeCount(ctx context.Context) ([]vtuberChanne
 	return res, http.StatusOK, nil
 }
 
+type vtuberLanguageCount struct {
+	ID    int64  `json:"id"`
+	Name  string `json:"name"`
+	Count int    `json:"count"`
+}
+
+// GetVtuberLanguageCount to get vtuber language count.
+func (s *service) GetVtuberLanguageCount(ctx context.Context) ([]vtuberLanguageCount, int, error) {
+	cnt, code, err := s.vtuber.GetLanguageCount(ctx)
+	if err != nil {
+		return nil, code, stack.Wrap(ctx, err)
+	}
+
+	res := make([]vtuberLanguageCount, len(cnt))
+	for i, c := range cnt {
+		res[i] = vtuberLanguageCount{
+			ID:    c.ID,
+			Name:  c.Name,
+			Count: c.Count,
+		}
+	}
+
+	return res, http.StatusOK, nil
+}
+
 type vtuberGenderCount struct {
 	Gender string `json:"gender"`
 	Count  int    `json:"count"`

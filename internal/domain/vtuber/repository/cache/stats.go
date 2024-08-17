@@ -371,6 +371,25 @@ func (c *Cache) GetAverageWeight(ctx context.Context) (data float64, code int, e
 	return data, code, nil
 }
 
+// GetLanguageCount to get language count.
+func (c *Cache) GetLanguageCount(ctx context.Context) (data []entity.LanguageCount, code int, err error) {
+	key := utils.GetKey("vtuber", "stats", "language-count")
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data, http.StatusOK, nil
+	}
+
+	data, code, err = c.repo.GetLanguageCount(ctx)
+	if err != nil {
+		return nil, code, stack.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data); err != nil {
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
+	}
+
+	return data, code, nil
+}
+
 // GetBloodTypeCount to get blood type count.
 func (c *Cache) GetBloodTypeCount(ctx context.Context, top int) (data []entity.BloodTypeCount, code int, err error) {
 	key := utils.GetKey("vtuber", "stats", "blood-type-count", top)

@@ -282,6 +282,17 @@ func (api *API) handleGetVtuberChannelTypeCount(w http.ResponseWriter, r *http.R
 	utils.ResponseWithJSON(w, code, cnt, stack.Wrap(r.Context(), err))
 }
 
+// @summary Get vtuber language count.
+// @tags Statistic
+// @produce json
+// @success 200 {object} utils.Response{data=[]service.vtuberLanguageCount}
+// @failure 500 {object} utils.Response
+// @router /statistics/vtubers/language-count [get]
+func (api *API) handleGetVtuberLanguageCount(w http.ResponseWriter, r *http.Request) {
+	cnt, code, err := api.service.GetVtuberLanguageCount(r.Context())
+	utils.ResponseWithJSON(w, code, cnt, stack.Wrap(r.Context(), err))
+}
+
 // @summary Get vtuber gender count.
 // @tags Statistic
 // @produce json
