@@ -437,6 +437,15 @@ definitions:
       name:
         type: string
     type: object
+  service.vtuberLanguageCount:
+    properties:
+      count:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
   service.vtuberModelCount:
     properties:
       both:
@@ -1393,6 +1402,29 @@ paths:
           schema:
             $ref: '#/definitions/utils.Response'
       summary: Get vtuber in agency count.
+      tags:
+      - Statistic
+  /statistics/vtubers/language-count:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/service.vtuberLanguageCount'
+                  type: array
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get vtuber language count.
       tags:
       - Statistic
   /statistics/vtubers/model-count:

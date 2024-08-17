@@ -289,7 +289,7 @@ type designerCount struct {
 	Count int    `bson:"count"`
 }
 
-func (m *Mongo) getdesignerCount(ctx context.Context, top int, field string) ([]entity.DesignerCount, int, error) {
+func (m *Mongo) getDesignerCount(ctx context.Context, top int, field string) ([]entity.DesignerCount, int, error) {
 	unwindStage := bson.D{{Key: "$unwind", Value: "$" + field}}
 	groupStage := bson.D{{Key: "$group", Value: bson.M{"_id": bson.M{"name": "$" + field}, "count": bson.M{"$sum": 1}}}}
 	projectStage := bson.D{{Key: "$project", Value: bson.M{"name": "$_id.name", "count": "$count"}}}
@@ -319,17 +319,17 @@ func (m *Mongo) getdesignerCount(ctx context.Context, top int, field string) ([]
 
 // GetDesignerCount to get character designer count.
 func (m *Mongo) GetDesignerCount(ctx context.Context, top int) ([]entity.DesignerCount, int, error) {
-	return m.getdesignerCount(ctx, top, "character_designers")
+	return m.getDesignerCount(ctx, top, "character_designers")
 }
 
 // Get2DModelerCount to get character 2d modeler count.
 func (m *Mongo) Get2DModelerCount(ctx context.Context, top int) ([]entity.DesignerCount, int, error) {
-	return m.getdesignerCount(ctx, top, "character_2d_modelers")
+	return m.getDesignerCount(ctx, top, "character_2d_modelers")
 }
 
 // Get2DModelerCount to get character 3d modeler count.
 func (m *Mongo) Get3DModelerCount(ctx context.Context, top int) ([]entity.DesignerCount, int, error) {
-	return m.getdesignerCount(ctx, top, "character_3d_modelers")
+	return m.getDesignerCount(ctx, top, "character_3d_modelers")
 }
 
 // GetAverageVideoCount to get average video count.
@@ -661,6 +661,42 @@ func (m *Mongo) GetChannelTypeCount(ctx context.Context) ([]entity.ChannelTypeCo
 		res[i] = entity.ChannelTypeCount{
 			ChannelType: c.ChannelType,
 			Count:       c.Count,
+		}
+	}
+
+	return res, http.StatusOK, nil
+}
+
+type languageCount struct {
+	ID    int64  `bson:"id"`
+	Name  string `bson:"name"`
+	Count int    `bson:"count"`
+}
+
+// GetLanguageCount to get language count.
+func (m *Mongo) GetLanguageCount(ctx context.Context) ([]entity.LanguageCount, int, error) {
+	projectStage := bson.D{{Key: "$project", Value: bson.M{"languages": 1}}}
+	unwindStage := bson.D{{Key: "$unwind", Value: "$languages"}}
+	groupStage := bson.D{{Key: "$group", Value: bson.M{"_id": bson.M{"id": "$languages.id", "name": "$languages.name"}, "count": bson.M{"$sum": 1}}}}
+	projectStage2 := bson.D{{Key: "$project", Value: bson.M{"id": "$_id.id", "name": "$_id.name", "count": "$count"}}}
+	sortStage := bson.D{{Key: "$sort", Value: bson.M{"count": -1}}}
+
+	countCursor, err := m.db.Aggregate(ctx, m.getPipeline(projectStage, unwindStage, groupStage, projectStage2, sortStage))
+	if err != nil {
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
+	}
+
+	var cnt []languageCount
+	if err := countCursor.All(ctx, &cnt); err != nil {
+		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
+	}
+
+	res := make([]entity.LanguageCount, len(cnt))
+	for i, c := range cnt {
+		res[i] = entity.LanguageCount{
+			ID:    c.ID,
+			Name:  c.Name,
+			Count: c.Count,
 		}
 	}
 

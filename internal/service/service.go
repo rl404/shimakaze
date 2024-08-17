@@ -63,6 +63,7 @@ type Service interface {
 	GetVtuberAverageWeight(ctx context.Context) (float64, int, error)
 	GetVtuberBloodTypeCount(ctx context.Context, params GetVtuberBloodTypeCountRequest) ([]vtuberBloodTypeCount, int, error)
 	GetVtuberChannelTypeCount(ctx context.Context) ([]vtuberChannelTypeCount, int, error)
+	GetVtuberLanguageCount(ctx context.Context) ([]vtuberLanguageCount, int, error)
 	GetVtuberGenderCount(ctx context.Context) ([]vtuberGenderCount, int, error)
 	GetVtuberZodiacCount(ctx context.Context) ([]vtuberZodiacCount, int, error)
 

@@ -1448,6 +1448,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/statistics/vtubers/language-count": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Statistic"
+                ],
+                "summary": "Get vtuber language count.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/service.vtuberLanguageCount"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/statistics/vtubers/model-count": {
             "get": {
                 "produces": [
@@ -3362,6 +3402,20 @@ const docTemplate = `{
         "service.vtuberLanguage": {
             "type": "object",
             "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.vtuberLanguageCount": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
                 "id": {
                     "type": "integer"
                 },
