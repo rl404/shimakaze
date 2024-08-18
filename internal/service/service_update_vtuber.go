@@ -11,6 +11,7 @@ import (
 
 	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/agency/entity"
+	channelStatsEntity "github.com/rl404/shimakaze/internal/domain/channel_stats_history/entity"
 	vtuberEntity "github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	wikiaEntity "github.com/rl404/shimakaze/internal/domain/wikia/entity"
 	"github.com/rl404/shimakaze/internal/errors"
@@ -88,6 +89,11 @@ func (s *service) updateVtuber(ctx context.Context, id int64) (int, error) {
 
 	// Update data.
 	if code, err := s.vtuber.UpdateByID(ctx, id, vtuber); err != nil {
+		return code, stack.Wrap(ctx, err)
+	}
+
+	// Insert channel stats history.
+	if code, err := s.createChannelStats(ctx, vtuber); err != nil {
 		return code, stack.Wrap(ctx, err)
 	}
 
@@ -540,4 +546,18 @@ func (s *service) fillNiconicoVideo(ctx context.Context, channel vtuberEntity.Ch
 	channel.Videos = res
 
 	return channel
+}
+
+func (s *service) createChannelStats(ctx context.Context, vtuber vtuberEntity.Vtuber) (int, error) {
+	for _, channel := range vtuber.Channels {
+		if code, err := s.channelStatsHistory.Create(ctx, channelStatsEntity.ChannelStats{
+			VtuberID:    vtuber.ID,
+			ChannelID:   channel.ID,
+			ChannelType: channel.Type,
+			Subscriber:  channel.Subscriber,
+		}); err != nil {
+			return code, stack.Wrap(ctx, err)
+		}
+	}
+	return http.StatusOK, nil
 }

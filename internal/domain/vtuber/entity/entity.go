@@ -252,21 +252,21 @@ type OverriddenDate struct {
 	Value    *time.Time
 }
 
-// OverriddenAgencies is entity
+// OverriddenAgencies is entity for overriden agency.
 type OverriddenAgencies struct {
 	Flag     bool
 	OldValue []Agency
 	Value    []Agency
 }
 
-// OverriddenAffiliations is entity
+// OverriddenAffiliations is entity for overriden affilication.
 type OverriddenAffiliations struct {
 	Flag     bool
 	OldValue []string
 	Value    []string
 }
 
-// OverriddenChannels is entity
+// OverriddenChannels is entity for overriden channel.
 type OverriddenChannels struct {
 	Flag     bool
 	OldValue []Channel

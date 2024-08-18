@@ -16,6 +16,8 @@ import (
 	agencyMongo "github.com/rl404/shimakaze/internal/domain/agency/repository/mongo"
 	bilibiliRepository "github.com/rl404/shimakaze/internal/domain/bilibili/repository"
 	bilibiliClient "github.com/rl404/shimakaze/internal/domain/bilibili/repository/client"
+	channelStatsHistoryRepository "github.com/rl404/shimakaze/internal/domain/channel_stats_history/repository"
+	channelStatsHistoryMongo "github.com/rl404/shimakaze/internal/domain/channel_stats_history/repository/mongo"
 	languageRepository "github.com/rl404/shimakaze/internal/domain/language/repository"
 	languageMongo "github.com/rl404/shimakaze/internal/domain/language/repository/mongo"
 	niconicoRepository "github.com/rl404/shimakaze/internal/domain/niconico/repository"
@@ -107,6 +109,10 @@ func consumer() error {
 	var language languageRepository.Repository = languageMongo.New(db)
 	utils.Info("repository language initialized")
 
+	// Init channel stats history.
+	var channelStatsHistory channelStatsHistoryRepository.Repository = channelStatsHistoryMongo.New(db)
+	utils.Info("repository channel-stats-history initialized")
+
 	// Init publisher.
 	var publisher publisherRepository.Repository = publisherPubsub.New(ps, pubsubTopic)
 	utils.Info("repository publisher initialized")
@@ -128,7 +134,7 @@ func consumer() error {
 	utils.Info("repository niconico initialized")
 
 	// Init service.
-	service := service.New(wikia, vtuber, nonVtuber, agency, language, publisher, youtube, twitch, bilibili, niconico, nil, nil, nil, nil)
+	service := service.New(wikia, vtuber, nonVtuber, agency, language, channelStatsHistory, publisher, youtube, twitch, bilibili, niconico, nil, nil, nil, nil)
 	utils.Info("service initialized")
 
 	// Init consumer.

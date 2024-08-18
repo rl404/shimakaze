@@ -18,6 +18,9 @@ import (
 	agencyRepository "github.com/rl404/shimakaze/internal/domain/agency/repository"
 	agencyCache "github.com/rl404/shimakaze/internal/domain/agency/repository/cache"
 	agencyMongo "github.com/rl404/shimakaze/internal/domain/agency/repository/mongo"
+	channelStatsHistoryRepository "github.com/rl404/shimakaze/internal/domain/channel_stats_history/repository"
+	channelStatsHistoryCache "github.com/rl404/shimakaze/internal/domain/channel_stats_history/repository/cache"
+	channelStatsHistoryMongo "github.com/rl404/shimakaze/internal/domain/channel_stats_history/repository/mongo"
 	languageRepository "github.com/rl404/shimakaze/internal/domain/language/repository"
 	languageCache "github.com/rl404/shimakaze/internal/domain/language/repository/cache"
 	languageMongo "github.com/rl404/shimakaze/internal/domain/language/repository/mongo"
@@ -138,6 +141,13 @@ func server() error {
 	language = languageCache.New(im, language)
 	utils.Info("repository language initialized")
 
+	// Init channel stats history.
+	var channelStatsHistory channelStatsHistoryRepository.Repository
+	channelStatsHistory = channelStatsHistoryMongo.New(db)
+	channelStatsHistory = channelStatsHistoryCache.New(c, channelStatsHistory)
+	channelStatsHistory = channelStatsHistoryCache.New(im, channelStatsHistory)
+	utils.Info("repository channel-stats-history initialized")
+
 	// Init publisher.
 	var publisher publisherRepository.Repository = publisherPubsub.New(ps, pubsubTopic)
 	utils.Info("repository publisher initialized")
@@ -165,7 +175,7 @@ func server() error {
 	utils.Info("repository tier-list initialized")
 
 	// Init service.
-	service := service.New(wikia, vtuber, nonVtuber, agency, language, publisher, nil, nil, nil, nil, sso, user, token, tierList)
+	service := service.New(wikia, vtuber, nonVtuber, agency, language, channelStatsHistory, publisher, nil, nil, nil, nil, sso, user, token, tierList)
 	utils.Info("service initialized")
 
 	// Init web server.
