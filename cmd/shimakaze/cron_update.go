@@ -10,6 +10,8 @@ import (
 	"github.com/rl404/shimakaze/internal/delivery/cron"
 	agencyRepository "github.com/rl404/shimakaze/internal/domain/agency/repository"
 	agencyMongo "github.com/rl404/shimakaze/internal/domain/agency/repository/mongo"
+	channelStatsHistoryRepository "github.com/rl404/shimakaze/internal/domain/channel_stats_history/repository"
+	channelStatsHistoryMongo "github.com/rl404/shimakaze/internal/domain/channel_stats_history/repository/mongo"
 	languageRepository "github.com/rl404/shimakaze/internal/domain/language/repository"
 	languageMongo "github.com/rl404/shimakaze/internal/domain/language/repository/mongo"
 	nonVtuberRepository "github.com/rl404/shimakaze/internal/domain/non_vtuber/repository"
@@ -85,12 +87,16 @@ func cronUpdate() error {
 	var language languageRepository.Repository = languageMongo.New(db)
 	utils.Info("repository language initialized")
 
+	// Init channel stats history.
+	var channelStatsHistory channelStatsHistoryRepository.Repository = channelStatsHistoryMongo.New(db)
+	utils.Info("repository channel-stats-history initialized")
+
 	// Init publisher.
 	var publisher publisherRepository.Repository = publisherPubsub.New(ps, pubsubTopic)
 	utils.Info("repository publisher initialized")
 
 	// Init service.
-	service := service.New(wikia, vtuber, nonVtuber, agency, language, publisher, nil, nil, nil, nil, nil, nil, nil, nil)
+	service := service.New(wikia, vtuber, nonVtuber, agency, language, channelStatsHistory, publisher, nil, nil, nil, nil, nil, nil, nil, nil)
 	utils.Info("service initialized")
 
 	// Run cron.

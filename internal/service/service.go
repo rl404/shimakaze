@@ -5,6 +5,7 @@ import (
 
 	agencyRepository "github.com/rl404/shimakaze/internal/domain/agency/repository"
 	bilibilRepository "github.com/rl404/shimakaze/internal/domain/bilibili/repository"
+	channelStatsHistoryRepository "github.com/rl404/shimakaze/internal/domain/channel_stats_history/repository"
 	languageRepository "github.com/rl404/shimakaze/internal/domain/language/repository"
 	niconicoRepository "github.com/rl404/shimakaze/internal/domain/niconico/repository"
 	nonVtuberRepository "github.com/rl404/shimakaze/internal/domain/non_vtuber/repository"
@@ -91,20 +92,21 @@ type Service interface {
 }
 
 type service struct {
-	wikia     wikiaRepository.Repository
-	vtuber    vtuberRepository.Repository
-	nonVtuber nonVtuberRepository.Repository
-	agency    agencyRepository.Repository
-	language  languageRepository.Repository
-	publisher publisherRepository.Repository
-	youtube   youtubeRepository.Repository
-	twitch    twitchRepository.Repository
-	bilibili  bilibilRepository.Repository
-	niconico  niconicoRepository.Repository
-	sso       ssoRepository.Repository
-	user      userRepository.Repository
-	token     tokenRepository.Repository
-	tierList  tierListRepository.Repository
+	wikia               wikiaRepository.Repository
+	vtuber              vtuberRepository.Repository
+	nonVtuber           nonVtuberRepository.Repository
+	agency              agencyRepository.Repository
+	language            languageRepository.Repository
+	channelStatsHistory channelStatsHistoryRepository.Repository
+	publisher           publisherRepository.Repository
+	youtube             youtubeRepository.Repository
+	twitch              twitchRepository.Repository
+	bilibili            bilibilRepository.Repository
+	niconico            niconicoRepository.Repository
+	sso                 ssoRepository.Repository
+	user                userRepository.Repository
+	token               tokenRepository.Repository
+	tierList            tierListRepository.Repository
 }
 
 // New to create new service.
@@ -114,6 +116,7 @@ func New(
 	nonVtuber nonVtuberRepository.Repository,
 	agency agencyRepository.Repository,
 	language languageRepository.Repository,
+	channelStatsHistory channelStatsHistoryRepository.Repository,
 	publisher publisherRepository.Repository,
 	youtube youtubeRepository.Repository,
 	twitch twitchRepository.Repository,
@@ -125,20 +128,21 @@ func New(
 	tierList tierListRepository.Repository,
 ) Service {
 	return &service{
-		wikia:     wikia,
-		vtuber:    vtuber,
-		nonVtuber: nonVtuber,
-		agency:    agency,
-		language:  language,
-		publisher: publisher,
-		youtube:   youtube,
-		twitch:    twitch,
-		bilibili:  bilibili,
-		niconico:  niconico,
-		sso:       sso,
-		user:      user,
-		token:     token,
-		tierList:  tierList,
+		wikia:               wikia,
+		vtuber:              vtuber,
+		nonVtuber:           nonVtuber,
+		agency:              agency,
+		language:            language,
+		channelStatsHistory: channelStatsHistory,
+		publisher:           publisher,
+		youtube:             youtube,
+		twitch:              twitch,
+		bilibili:            bilibili,
+		niconico:            niconico,
+		sso:                 sso,
+		user:                user,
+		token:               token,
+		tierList:            tierList,
 	}
 }
 
