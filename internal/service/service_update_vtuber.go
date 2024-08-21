@@ -293,7 +293,7 @@ func (s *service) fillChannelData(ctx context.Context, debutDate *time.Time, cha
 			channels[i] = s.fillTwitchChannel(ctx, channels[i])
 			channels[i] = s.fillTwitchVideo(ctx, channels[i])
 		case vtuberEntity.ChannelBilibili:
-			// channels[i] = s.fillBilibiliChannel(ctx, channels[i])
+			channels[i] = s.fillBilibiliChannel(ctx, channels[i])
 			// channels[i] = s.fillBilibiliVideo(ctx, channels[i])
 		case vtuberEntity.ChannelNiconico:
 			channels[i] = s.fillNiconicoChannel(ctx, channels[i])
@@ -452,17 +452,17 @@ func (s *service) fillBilibiliChannel(ctx context.Context, channel vtuberEntity.
 		return channel
 	}
 
-	user, _, err := s.bilibili.GetUser(ctx, userID)
-	if err != nil {
-		stack.Wrap(ctx, err)
-		return channel
-	}
+	// user, _, err := s.bilibili.GetUser(ctx, userID)
+	// if err != nil {
+	// 	stack.Wrap(ctx, err)
+	// 	return channel
+	// }
 
-	channel.ID = user.ID
-	channel.Name = user.Name
-	channel.Image = user.Image
+	// channel.ID = user.ID
+	// channel.Name = user.Name
+	// channel.Image = user.Image
 
-	follower, _, err := s.bilibili.GetFollowerCount(ctx, user.ID)
+	follower, _, err := s.bilibili.GetFollowerCount(ctx, userID)
 	if err != nil {
 		stack.Wrap(ctx, err)
 		return channel
