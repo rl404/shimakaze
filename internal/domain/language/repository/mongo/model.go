@@ -39,15 +39,3 @@ func (m *Mongo) languageFromEntity(l entity.Language) *language {
 		Name: l.Name,
 	}
 }
-
-func (m *Mongo) convertSort(sort string) bson.D {
-	if sort == "" {
-		sort = "name"
-	}
-
-	if sort[0] == '-' {
-		return bson.D{{Key: sort[1:], Value: -1}}
-	}
-
-	return bson.D{{Key: sort, Value: 1}}
-}
