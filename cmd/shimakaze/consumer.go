@@ -134,7 +134,7 @@ func consumer() error {
 	utils.Info("repository niconico initialized")
 
 	// Init service.
-	service := service.New(wikia, vtuber, nonVtuber, agency, language, channelStatsHistory, publisher, youtube, twitch, bilibili, niconico, nil, nil, nil, nil)
+	service := service.New(wikia, vtuber, nonVtuber, agency, language, channelStatsHistory, publisher, youtube, twitch, bilibili, niconico, nil, nil, nil)
 	utils.Info("service initialized")
 
 	// Init consumer.
