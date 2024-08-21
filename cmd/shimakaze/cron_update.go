@@ -96,7 +96,7 @@ func cronUpdate() error {
 	utils.Info("repository publisher initialized")
 
 	// Init service.
-	service := service.New(wikia, vtuber, nonVtuber, agency, language, channelStatsHistory, publisher, nil, nil, nil, nil, nil, nil, nil, nil)
+	service := service.New(wikia, vtuber, nonVtuber, agency, language, channelStatsHistory, publisher, nil, nil, nil, nil, nil, nil, nil)
 	utils.Info("service initialized")
 
 	// Run cron.

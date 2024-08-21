@@ -48,11 +48,6 @@ func (api *API) Register(r chi.Router, nrApp *newrelic.Application) {
 
 		r.Get("/user", api.jwtAuth(api.handleGetProfile))
 
-		r.Get("/tier-lists", api.handleGetTierLists)
-		r.Put("/tier-lists", api.jwtAuth(api.handleUpsertTierListByID))
-		r.Get("/tier-lists/{id}", api.handleGetTierListByID)
-		r.Delete("/tier-lists/{id}", api.jwtAuth(api.handleDeleteTierListByID))
-
 		r.Get("/vtubers", api.handleGetVtubers)
 		r.Get("/vtubers/{id}", api.handleGetVtuberByID)
 		r.Get("/vtubers/images", api.handleGetVtuberImages)

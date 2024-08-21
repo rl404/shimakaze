@@ -12,7 +12,6 @@ import (
 	"github.com/rl404/shimakaze/internal/domain/publisher/entity"
 	publisherRepository "github.com/rl404/shimakaze/internal/domain/publisher/repository"
 	ssoRepository "github.com/rl404/shimakaze/internal/domain/sso/repository"
-	tierListRepository "github.com/rl404/shimakaze/internal/domain/tier_list/repository"
 	tokenRepository "github.com/rl404/shimakaze/internal/domain/token/repository"
 	twitchRepository "github.com/rl404/shimakaze/internal/domain/twitch/repository"
 	userRepository "github.com/rl404/shimakaze/internal/domain/user/repository"
@@ -29,11 +28,6 @@ type Service interface {
 	RefreshToken(ctx context.Context, data JWTClaim) (string, int, error)
 
 	GetProfile(ctx context.Context, userID int64) (*User, int, error)
-
-	GetTierLists(ctx context.Context, params GetTierListsRequest) ([]TierList, *pagination, int, error)
-	GetTierListByID(ctx context.Context, id string) (*TierList, int, error)
-	UpsertTierListByID(ctx context.Context, data TierList) (*TierList, int, error)
-	DeleteTierListByID(ctx context.Context, id string, userID int64) (int, error)
 
 	GetVtubers(ctx context.Context, params GetVtubersRequest) ([]vtuber, *pagination, int, error)
 	GetVtuberByID(ctx context.Context, id int64) (*vtuber, int, error)
@@ -106,7 +100,6 @@ type service struct {
 	sso                 ssoRepository.Repository
 	user                userRepository.Repository
 	token               tokenRepository.Repository
-	tierList            tierListRepository.Repository
 }
 
 // New to create new service.
@@ -125,7 +118,6 @@ func New(
 	sso ssoRepository.Repository,
 	user userRepository.Repository,
 	token tokenRepository.Repository,
-	tierList tierListRepository.Repository,
 ) Service {
 	return &service{
 		wikia:               wikia,
@@ -142,7 +134,6 @@ func New(
 		sso:                 sso,
 		user:                user,
 		token:               token,
-		tierList:            tierList,
 	}
 }
 
