@@ -7,7 +7,7 @@ resource "kubernetes_deployment" "consumer" {
   }
 
   spec {
-    replicas = 3
+    replicas = 1
     selector {
       match_labels = {
         app = var.gke_deployment_consumer_name
