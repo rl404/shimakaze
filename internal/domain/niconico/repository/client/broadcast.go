@@ -89,10 +89,10 @@ func (c *Client) GetBroadcasts(ctx context.Context, id string) ([]entity.Video, 
 
 		var done bool
 		for _, item := range body.Data.ProgramsList {
-			startDate := time.Unix(int64(item.Program.Schedule.BeginTime.Seconds), 0)
-			endDate := time.Unix(int64(item.Program.Schedule.EndTime.Seconds), 0)
+			startDate := c.getBroadcastDate(item.Program.Schedule.BeginTime.Seconds)
+			endDate := c.getBroadcastDate(item.Program.Schedule.EndTime.Seconds)
 
-			if startDate.Before(c.maxAge) {
+			if startDate != nil && startDate.Before(c.maxAge) {
 				done = true
 				break
 			}
@@ -101,8 +101,8 @@ func (c *Client) GetBroadcasts(ctx context.Context, id string) ([]entity.Video, 
 				ID:        item.ID.Value,
 				Title:     item.Program.Title,
 				Image:     c.getBroadcastImage(item.Thumbnail),
-				StartDate: &startDate,
-				EndDate:   &endDate,
+				StartDate: startDate,
+				EndDate:   endDate,
 				URL:       fmt.Sprintf("https://live.nicovideo.jp/watch/%s", item.ID.Value),
 			})
 		}
@@ -127,4 +127,12 @@ func (c *Client) getBroadcastImage(thumbnail getBroadcastsThumbnail) string {
 	}
 
 	return thumbnail.Screenshot.Small
+}
+
+func (c *Client) getBroadcastDate(sec int) *time.Time {
+	if sec <= 0 {
+		return nil
+	}
+	date := time.Unix(int64(sec), 0)
+	return &date
 }
