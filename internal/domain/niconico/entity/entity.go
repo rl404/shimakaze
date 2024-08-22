@@ -17,4 +17,5 @@ type Video struct {
 	Image     string
 	StartDate *time.Time
 	EndDate   *time.Time
+	URL       string
 }
