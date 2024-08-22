@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+	"sort"
 	"strings"
 	"time"
 
@@ -531,17 +532,41 @@ func (s *service) fillNiconicoVideo(ctx context.Context, channel vtuberEntity.Ch
 		return channel
 	}
 
-	res := make([]vtuberEntity.Video, len(videos))
-	for i, v := range videos {
-		res[i] = vtuberEntity.Video{
+	res := make([]vtuberEntity.Video, 0)
+	for _, v := range videos {
+		res = append(res, vtuberEntity.Video{
 			ID:        v.ID,
 			Title:     v.Title,
-			URL:       fmt.Sprintf("https://www.nicovideo.jp/watch/%s", v.ID),
+			URL:       v.URL,
 			Image:     v.Image,
 			StartDate: v.StartDate,
 			EndDate:   v.EndDate,
-		}
+		})
 	}
+
+	broadcasts, _, err := s.niconico.GetBroadcasts(ctx, channel.ID)
+	if err != nil {
+		stack.Wrap(ctx, err)
+		return channel
+	}
+
+	for _, v := range broadcasts {
+		res = append(res, vtuberEntity.Video{
+			ID:        v.ID,
+			Title:     v.Title,
+			URL:       v.URL,
+			Image:     v.Image,
+			StartDate: v.StartDate,
+			EndDate:   v.EndDate,
+		})
+	}
+
+	sort.Slice(res, func(i, j int) bool {
+		if res[i].StartDate == nil || res[j].StartDate == nil {
+			return true
+		}
+		return res[i].StartDate.After(*res[j].StartDate)
+	})
 
 	channel.Videos = res
 

@@ -91,7 +91,8 @@ func (c *Client) GetVideos(ctx context.Context, id string) ([]entity.Video, int,
 				Title:     item.Essential.Title,
 				Image:     c.getVideoImage(item.Essential.Thumbnail),
 				StartDate: &body.Data.Items[i].Essential.RegisteredAt,
-				EndDate:   c.getVideEndDate(item.Essential.RegisteredAt, item.Essential.Duration),
+				EndDate:   c.getVideoEndDate(item.Essential.RegisteredAt, item.Essential.Duration),
+				URL:       fmt.Sprintf("https://www.nicovideo.jp/watch/%s", item.Essential.ID),
 			})
 		}
 
@@ -117,7 +118,7 @@ func (c *Client) getVideoImage(thumbnail getVideosThumnail) string {
 	return thumbnail.URL
 }
 
-func (c *Client) getVideEndDate(startDate time.Time, dur int) *time.Time {
+func (c *Client) getVideoEndDate(startDate time.Time, dur int) *time.Time {
 	if dur <= 0 {
 		return nil
 	}
