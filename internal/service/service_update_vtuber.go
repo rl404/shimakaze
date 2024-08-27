@@ -86,7 +86,7 @@ func (s *service) updateVtuber(ctx context.Context, id int64) (int, error) {
 	vtuber = s.overrideVtuberData(vtuber, existingVtuber)
 
 	// Fill channel data.
-	vtuber.Channels, vtuber.Subscriber, vtuber.MonthlySubscriber, vtuber.VideoCount = s.fillChannelData(ctx, vtuber.DebutDate, vtuber.Channels)
+	vtuber.Channels, vtuber.Subscriber, vtuber.MonthlySubscriber, vtuber.VideoCount = s.fillChannelData(ctx, vtuber.DebutDate, vtuber.RetirementDate, vtuber.Channels)
 
 	// Update data.
 	if code, err := s.vtuber.UpdateByID(ctx, id, vtuber); err != nil {
@@ -283,22 +283,22 @@ func (s *service) mergeAgencies(a1, a2 []vtuberEntity.Agency) []vtuberEntity.Age
 	return a3
 }
 
-func (s *service) fillChannelData(ctx context.Context, debutDate *time.Time, channels []vtuberEntity.Channel) ([]vtuberEntity.Channel, int, int, int) {
+func (s *service) fillChannelData(ctx context.Context, debutDate, retirementDate *time.Time, channels []vtuberEntity.Channel) ([]vtuberEntity.Channel, int, int, int) {
 	subscriber, monthlySubs, videoCount := 0, 0, 0
 	for i, channel := range channels {
 		switch channel.Type {
 		case vtuberEntity.ChannelYoutube:
 			channels[i] = s.fillYoutubeChannel(ctx, channels[i])
-			channels[i] = s.fillYoutubeVideos(ctx, channels[i])
+			channels[i] = s.fillYoutubeVideos(ctx, channels[i], retirementDate)
 		case vtuberEntity.ChannelTwitch:
 			channels[i] = s.fillTwitchChannel(ctx, channels[i])
-			channels[i] = s.fillTwitchVideo(ctx, channels[i])
+			channels[i] = s.fillTwitchVideo(ctx, channels[i], retirementDate)
 		case vtuberEntity.ChannelBilibili:
 			channels[i] = s.fillBilibiliChannel(ctx, channels[i])
-			// channels[i] = s.fillBilibiliVideo(ctx, channels[i])
+			channels[i] = s.fillBilibiliVideo(ctx, channels[i], retirementDate)
 		case vtuberEntity.ChannelNiconico:
 			channels[i] = s.fillNiconicoChannel(ctx, channels[i])
-			channels[i] = s.fillNiconicoVideo(ctx, channels[i])
+			channels[i] = s.fillNiconicoVideo(ctx, channels[i], retirementDate)
 		}
 
 		if channels[i].Subscriber > subscriber {
@@ -358,8 +358,8 @@ func (s *service) fillYoutubeChannel(ctx context.Context, channel vtuberEntity.C
 	return channel
 }
 
-func (s *service) fillYoutubeVideos(ctx context.Context, channel vtuberEntity.Channel) vtuberEntity.Channel {
-	if channel.ID == "" {
+func (s *service) fillYoutubeVideos(ctx context.Context, channel vtuberEntity.Channel, retirementDate *time.Time) vtuberEntity.Channel {
+	if channel.ID == "" || retirementDate != nil {
 		return channel
 	}
 
@@ -419,8 +419,8 @@ func (s *service) fillTwitchChannel(ctx context.Context, channel vtuberEntity.Ch
 	return channel
 }
 
-func (s *service) fillTwitchVideo(ctx context.Context, channel vtuberEntity.Channel) vtuberEntity.Channel {
-	if channel.ID == "" {
+func (s *service) fillTwitchVideo(ctx context.Context, channel vtuberEntity.Channel, retirementDate *time.Time) vtuberEntity.Channel {
+	if channel.ID == "" || retirementDate != nil {
 		return channel
 	}
 
@@ -474,8 +474,9 @@ func (s *service) fillBilibiliChannel(ctx context.Context, channel vtuberEntity.
 	return channel
 }
 
-func (s *service) fillBilibiliVideo(ctx context.Context, channel vtuberEntity.Channel) vtuberEntity.Channel {
-	if channel.ID == "" {
+func (s *service) fillBilibiliVideo(ctx context.Context, channel vtuberEntity.Channel, retirementDate *time.Time) vtuberEntity.Channel {
+	// todo: fix get bilibili videos.
+	if true || channel.ID == "" || retirementDate != nil {
 		return channel
 	}
 
@@ -521,8 +522,8 @@ func (s *service) fillNiconicoChannel(ctx context.Context, channel vtuberEntity.
 	return channel
 }
 
-func (s *service) fillNiconicoVideo(ctx context.Context, channel vtuberEntity.Channel) vtuberEntity.Channel {
-	if channel.ID == "" {
+func (s *service) fillNiconicoVideo(ctx context.Context, channel vtuberEntity.Channel, retirementDate *time.Time) vtuberEntity.Channel {
+	if channel.ID == "" || retirementDate != nil {
 		return channel
 	}
 
