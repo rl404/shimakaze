@@ -14,6 +14,13 @@ func (s *service) updateAgency(ctx context.Context, id int64) (int, error) {
 	// Call wikia api.
 	page, code, err := s.wikia.GetPageByID(ctx, id)
 	if err != nil {
+		if code == http.StatusNotFound {
+			// Delete existing agency.
+			if code, err := s.agency.DeleteByID(ctx, id); err != nil {
+				return code, stack.Wrap(ctx, err)
+			}
+			return http.StatusOK, nil
+		}
 		return code, stack.Wrap(ctx, err)
 	}
 

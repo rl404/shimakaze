@@ -163,3 +163,11 @@ func (m *Mongo) GetCount(ctx context.Context) (int, int, error) {
 	}
 	return int(cnt), http.StatusOK, nil
 }
+
+// DeleteByID to delete by id.
+func (m *Mongo) DeleteByID(ctx context.Context, id int64) (int, error) {
+	if _, err := m.db.DeleteOne(ctx, bson.M{"id": id}); err != nil {
+		return http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
+	}
+	return http.StatusOK, nil
+}

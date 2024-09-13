@@ -119,3 +119,18 @@ func (c *Cache) GetCount(ctx context.Context) (data int, code int, err error) {
 
 	return data, code, nil
 }
+
+// DeleteByID to delete by id.
+func (c *Cache) DeleteByID(ctx context.Context, id int64) (int, error) {
+	code, err := c.repo.DeleteByID(ctx, id)
+	if err != nil {
+		return code, stack.Wrap(ctx, err)
+	}
+
+	key := utils.GetKey("agency", id)
+	if err := c.cacher.Delete(ctx, key); err != nil {
+		return http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
+	}
+
+	return code, nil
+}
