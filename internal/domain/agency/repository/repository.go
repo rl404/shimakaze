@@ -15,4 +15,5 @@ type Repository interface {
 	UpdateByID(ctx context.Context, id int64, data entity.Agency) (int, error)
 	GetOldIDs(ctx context.Context) ([]int64, int, error)
 	GetCount(ctx context.Context) (int, int, error)
+	DeleteByID(ctx context.Context, id int64) (int, error)
 }
