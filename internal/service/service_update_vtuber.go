@@ -30,7 +30,7 @@ func (s *service) updateVtuber(ctx context.Context, id int64) (int, error) {
 			}
 
 			// Insert to non-vtuber.
-			if code, err := s.nonVtuber.Create(ctx, id); err != nil {
+			if code, err := s.nonVtuber.Create(ctx, id, ""); err != nil {
 				return code, stack.Wrap(ctx, err)
 			}
 			return http.StatusOK, nil
@@ -46,7 +46,7 @@ func (s *service) updateVtuber(ctx context.Context, id int64) (int, error) {
 		}
 
 		// Insert to non-vtuber.
-		if code, err := s.nonVtuber.Create(ctx, id); err != nil {
+		if code, err := s.nonVtuber.Create(ctx, id, page.Title); err != nil {
 			return code, stack.Wrap(ctx, err)
 		}
 

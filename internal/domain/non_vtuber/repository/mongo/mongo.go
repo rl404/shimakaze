@@ -24,17 +24,17 @@ func New(db *mongo.Database) *Mongo {
 }
 
 // Create to create non-vtuber.
-func (m *Mongo) Create(ctx context.Context, id int64) (int, error) {
+func (m *Mongo) Create(ctx context.Context, id int64, name string) (int, error) {
 	if _, err := m.db.DeleteOne(ctx, bson.M{"id": id}); err != nil {
 		return http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
-	if _, err := m.db.InsertOne(ctx, &nonVtuber{ID: id}); err != nil {
+	if _, err := m.db.InsertOne(ctx, &nonVtuber{ID: id, Name: name}); err != nil {
 		return http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
 	return http.StatusCreated, nil
 }
 
-// GetAllIDs
+// GetAllIDs to get all ids.
 func (m *Mongo) GetAllIDs(ctx context.Context) ([]int64, int, error) {
 	var ids []int64
 	c, err := m.db.Find(ctx, bson.M{}, options.Find().SetProjection(bson.M{"id": 1}))
