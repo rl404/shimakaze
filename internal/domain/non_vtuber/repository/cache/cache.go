@@ -45,8 +45,8 @@ func (c *Cache) GetAllIDs(ctx context.Context) (data []int64, code int, err erro
 }
 
 // Create to create new non-vtuber.
-func (c *Cache) Create(ctx context.Context, id int64) (int, error) {
-	code, err := c.repo.Create(ctx, id)
+func (c *Cache) Create(ctx context.Context, id int64, name string) (int, error) {
+	code, err := c.repo.Create(ctx, id, name)
 	if err != nil {
 		return code, stack.Wrap(ctx, err)
 	}

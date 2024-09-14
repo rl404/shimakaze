@@ -42,12 +42,16 @@ type overriddenChannels struct {
 
 // DeleteVtuberByID to delete vtuber by id.
 func (s *service) DeleteVtuberByID(ctx context.Context, id int64) (int, error) {
-	code, err := s.vtuber.DeleteByID(ctx, id)
+	vtuber, code, err := s.vtuber.GetByID(ctx, id)
 	if err != nil {
 		return code, stack.Wrap(ctx, err)
 	}
 
-	if code, err := s.nonVtuber.Create(ctx, id); err != nil {
+	if code, err := s.vtuber.DeleteByID(ctx, id); err != nil {
+		return code, stack.Wrap(ctx, err)
+	}
+
+	if code, err := s.nonVtuber.Create(ctx, vtuber.ID, vtuber.Name); err != nil {
 		return code, stack.Wrap(ctx, err)
 	}
 

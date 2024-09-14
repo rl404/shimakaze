@@ -8,6 +8,7 @@ import (
 
 type nonVtuber struct {
 	ID        int64     `bson:"id"`
+	Name      string    `bson:"name"`
 	CreatedAt time.Time `bson:"created_at"`
 }
 
