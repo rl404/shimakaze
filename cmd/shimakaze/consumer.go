@@ -118,7 +118,7 @@ func consumer() error {
 	utils.Info("repository publisher initialized")
 
 	// Init youtube.
-	var youtube youtubeRepository.Repository = youtubeClient.New(cfg.Youtube.Key, cfg.Youtube.MaxAge)
+	var youtube youtubeRepository.Repository = youtubeClient.New(cfg.Youtube.Keys, cfg.Youtube.MaxAge)
 	utils.Info("repository youtube initialized")
 
 	// Init twitch.
