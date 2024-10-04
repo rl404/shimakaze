@@ -83,8 +83,8 @@ type newrelicConfig struct {
 }
 
 type youtubeConfig struct {
-	Key    string `envconfig:"KEY"`
-	MaxAge int    `envconfig:"MAX_AGE" validate:"required,gte=0" mod:"default=60"`
+	Keys   []string `envconfig:"KEY"`
+	MaxAge int      `envconfig:"MAX_AGE" validate:"required,gte=0" mod:"default=60"`
 }
 
 type twitchConfig struct {

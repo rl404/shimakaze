@@ -1,6 +1,7 @@
 package client
 
 import (
+	"math/rand"
 	"net/http"
 	"time"
 
@@ -15,13 +16,14 @@ type Client struct {
 }
 
 // New to create new youtube client.
-func New(key string, maxAge int) *Client {
+func New(keys []string, maxAge int) *Client {
 	return &Client{
 		host: "https://www.googleapis.com/youtube/v3",
 		http: &http.Client{
 			Timeout: 10 * time.Second,
 			Transport: newrelic.NewRoundTripper(&transportWithKey{
-				key: key,
+				randomizer: rand.New(rand.NewSource(time.Now().UnixNano())),
+				keys:       keys,
 			}),
 		},
 		maxAge: time.Now().Add(time.Duration(maxAge*-24) * time.Hour),
@@ -29,8 +31,9 @@ func New(key string, maxAge int) *Client {
 }
 
 type transportWithKey struct {
-	transport http.RoundTripper
-	key       string
+	transport  http.RoundTripper
+	randomizer *rand.Rand
+	keys       []string
 }
 
 // RoundTrip is http roundtrip.
@@ -40,7 +43,7 @@ func (t *transportWithKey) RoundTrip(req *http.Request) (*http.Response, error) 
 	}
 
 	q := req.URL.Query()
-	q.Add("key", t.key)
+	q.Add("key", t.keys[t.randomizer.Intn(2)])
 	req.URL.RawQuery = q.Encode()
 
 	return t.transport.RoundTrip(req)
