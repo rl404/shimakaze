@@ -7,9 +7,9 @@ import (
 	"github.com/tmdvs/Go-Emoji-Utils/utils"
 )
 
-// SearchResult - Occurence of an emoji in a string
+// SearchResult - Occurrence of an emoji in a string
 type SearchResult struct {
-	Match       interface{}
+	Match       Emoji
 	Occurrences int
 	Locations   [][]int
 }
@@ -28,7 +28,7 @@ func (results SearchResults) IndexOf(result interface{}) int {
 	return -1
 }
 
-// Find a specific emoji character within a srting
+// Find a specific emoji character within a string
 func Find(emojiString string, input string) (result SearchResult, err error) {
 
 	// Firstly we'll grab the emoji record for the emoji we're looking for
@@ -43,7 +43,7 @@ func Find(emojiString string, input string) (result SearchResult, err error) {
 	// Loop through emoji present in input and if any match the
 	// emoji we're looking for we'll return the result
 	for _, r := range allEmoji {
-		if r.Match.(Emoji).Key == emoji.Key {
+		if r.Match.Key == emoji.Key {
 			result = r
 			return
 		}
@@ -65,18 +65,27 @@ func FindAll(input string) (detectedEmojis SearchResults) {
 	// Loop over each "word" in the string
 	for index, r := range runes {
 
-		// If this index has been flaged as a modifier we do
+		// If this index has been flagged as a modifier we do
 		// not want to process it again
 		if detectedModifiers[index] {
 			continue
+		}
+
+		// If the previous rune was a zero width joiner we'll skip this one
+		// [Github issue](https://github.com/tmdvs/Go-Emoji-Utils/issues/12#issuecomment-1362747872)
+		if index >= 1 {
+			previousRune := []rune{runes[index-1]}
+			if isRuneZeroWidthJoiner(previousRune) {
+				continue
+			}
 		}
 
 		// Grab the initial hex value of this run
 		hexKey := utils.RunesToHexKey([]rune{r})
 
 		// Ignore any basic runes, we'll get funny partials
-		// that we dont care about
-		if len(hexKey) < 4 {
+		// that we don't care about
+		if len(hexKey) < 2 {
 			continue
 		}
 
@@ -93,13 +102,13 @@ func FindAll(input string) (detectedEmojis SearchResults) {
 			if len(potentialMatches) == 1 {
 				break
 			} else if len(potentialMatches) == 0 {
-				// We didnt find anything, so we'll check if its a single rune emoji
+				// We didn't find anything, so we'll check if its a single rune emoji
 				// Reset to original hexKey
 				if _, match := Emojis[previousKey]; match {
 					potentialMatches[previousKey] = Emojis[previousKey]
 				}
 
-				// Definately no modifiers
+				// Definitely no modifiers
 				detectedModifiers = map[int]bool{}
 
 				break
@@ -138,7 +147,7 @@ func FindAll(input string) (detectedEmojis SearchResults) {
 						Match:       e,
 						Occurrences: 1,
 						Locations: [][]int{
-							[]int{index, index + emojiRuneLength},
+							{index, index + emojiRuneLength},
 						},
 					})
 				}
@@ -161,4 +170,8 @@ func findEmoji(term string, list map[string]Emoji) (results map[string]Emoji) {
 		}
 	}
 	return
+}
+
+func isRuneZeroWidthJoiner(r []rune) bool {
+	return utils.RunesToHexKey(r) == "200D"
 }
