@@ -364,9 +364,7 @@ func parseEmoji(data string) (string, string) {
 	emojis := emoji.FindAll(value)
 	value = ""
 	for _, e := range emojis {
-		if emoji, ok := e.Match.(emoji.Emoji); ok {
-			value += emoji.Value
-		}
+		value += e.Match.Value
 	}
 
 	s := strings.Split(value, "")
