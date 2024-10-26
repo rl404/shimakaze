@@ -206,7 +206,7 @@ github.com/mattn/go-isatty
 # github.com/montanaflynn/stats v0.7.1
 ## explicit; go 1.13
 github.com/montanaflynn/stats
-# github.com/newrelic/go-agent/v3 v3.35.0
+# github.com/newrelic/go-agent/v3 v3.35.1
 ## explicit; go 1.21
 github.com/newrelic/go-agent/v3/internal
 github.com/newrelic/go-agent/v3/internal/cat
