@@ -351,11 +351,71 @@ func parseBloodType(data string) (string, string) {
 }
 
 func parseZodiacSign(data string) (string, string) {
+	zodiacRegex := regexp.MustCompile(`{{Zodiac\|(.+)}}`)
+	data = zodiacRegex.ReplaceAllString(data, "$1")
+
 	value, raw := parseData("zodiac_sign", data)
 
 	value = strings.ReplaceAll(value, "<br>", ", ")
 
+	if zodiac := toZodiac(value); zodiac != "" {
+		return zodiac, raw
+	}
+
 	return value, raw
+}
+
+func toZodiac(value string) string {
+	layouts := []string{
+		"2 January",
+		"January 2",
+	}
+
+	var date time.Time
+	var err error
+
+	for _, layout := range layouts {
+		date, err = time.Parse(layout, value)
+		if err == nil {
+			break
+		}
+	}
+
+	if err != nil {
+		return ""
+	}
+
+	month := date.Month()
+	day := date.Day()
+
+	switch {
+	case (month == time.March && day >= 21) || (month == time.April && day <= 19):
+		return "Aries"
+	case (month == time.April && day >= 20) || (month == time.May && day <= 20):
+		return "Taurus"
+	case (month == time.May && day >= 21) || (month == time.June && day <= 20):
+		return "Gemini"
+	case (month == time.June && day >= 21) || (month == time.July && day <= 22):
+		return "Cancer"
+	case (month == time.July && day >= 23) || (month == time.August && day <= 22):
+		return "Leo"
+	case (month == time.August && day >= 23) || (month == time.September && day <= 22):
+		return "Virgo"
+	case (month == time.September && day >= 23) || (month == time.October && day <= 22):
+		return "Libra"
+	case (month == time.October && day >= 23) || (month == time.November && day <= 21):
+		return "Scorpio"
+	case (month == time.November && day >= 22) || (month == time.December && day <= 21):
+		return "Sagittarius"
+	case (month == time.December && day >= 22) || (month == time.January && day <= 19):
+		return "Capricorn"
+	case (month == time.January && day >= 20) || (month == time.February && day <= 18):
+		return "Aquarius"
+	case (month == time.February && day >= 19) || (month == time.March && day <= 20):
+		return "Pisces"
+	default:
+		return ""
+	}
 }
 
 func parseEmoji(data string) (string, string) {
