@@ -12,6 +12,7 @@ type User struct {
 // Video is entity for video.
 type Video struct {
 	ID        string
+	StreamID  string
 	Title     string
 	URL       string
 	Image     string
