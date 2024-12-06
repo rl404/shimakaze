@@ -116,6 +116,35 @@ definitions:
       value:
         type: string
     type: object
+  service.video:
+    properties:
+      channel_id:
+        type: string
+      channel_name:
+        type: string
+      channel_type:
+        $ref: '#/definitions/entity.ChannelType'
+      channel_url:
+        type: string
+      video_end_date:
+        type: string
+      video_id:
+        type: string
+      video_image:
+        type: string
+      video_start_date:
+        type: string
+      video_title:
+        type: string
+      video_url:
+        type: string
+      vtuber_id:
+        type: integer
+      vtuber_image:
+        type: string
+      vtuber_name:
+        type: string
+    type: object
   service.vtuber:
     properties:
       affiliations:
@@ -1548,6 +1577,56 @@ paths:
       summary: Get vtuber zodiac count.
       tags:
       - Statistic
+  /videos:
+    get:
+      parameters:
+      - description: start date
+        in: query
+        name: start_date
+        type: string
+      - description: end date
+        in: query
+        name: end_date
+        type: string
+      - description: is finished
+        in: query
+        name: is_finished
+        type: boolean
+      - default: 1
+        description: page
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/service.video'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get videos.
+      tags:
+      - Video
   /vtubers:
     get:
       parameters:

@@ -236,6 +236,32 @@ type ZodiacCount struct {
 	Count  int
 }
 
+// GetVideosRequest is get videos request model.
+type GetVideosRequest struct {
+	StartDate  *time.Time
+	EndDate    *time.Time
+	IsFinished *bool
+	Page       int
+	Limit      int
+}
+
+// VtuberVideo is entity for vtuber video.
+type VtuberVideo struct {
+	VtuberID       int64
+	VtuberName     string
+	VtuberImage    string
+	ChannelID      string
+	ChannelName    string
+	ChannelType    ChannelType
+	ChannelURL     string
+	VideoID        string
+	VideoTitle     string
+	VideoURL       string
+	VideoImage     string
+	VideoStartDate *time.Time
+	VideoEndDate   *time.Time
+}
+
 // OverriddenField is entity for overridden fields.
 type OverriddenField struct {
 	DebutDate      OverriddenDate

@@ -60,6 +60,8 @@ func (api *API) Register(r chi.Router, nrApp *newrelic.Application) {
 		r.Get("/agencies", api.handleGetAgencies)
 		r.Get("/agencies/{id}", api.handleGetAgencyByID)
 
+		r.Get("/videos", api.handleGetVideos)
+
 		r.Get("/languages", api.handleGetLanguages)
 
 		r.Get("/statistics/vtubers/count", api.handleGetVtuberCount)

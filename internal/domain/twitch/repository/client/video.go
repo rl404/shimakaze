@@ -25,7 +25,6 @@ func (c *Client) GetVideos(ctx context.Context, id string) ([]entity.Video, int,
 	for {
 		resp, err := c.client.GetVideos(&helix.VideosParams{
 			UserID: id,
-			Type:   "archive",
 			First:  100,
 			After:  cursor,
 		})
@@ -46,6 +45,7 @@ func (c *Client) GetVideos(ctx context.Context, id string) ([]entity.Video, int,
 
 			res = append(res, entity.Video{
 				ID:        v.ID,
+				StreamID:  v.StreamID,
 				Title:     v.Title,
 				URL:       v.URL,
 				Image:     c.getVideoImage(v.ThumbnailURL),

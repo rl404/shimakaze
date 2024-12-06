@@ -262,3 +262,29 @@ func (c *Cache) UpdateOverriddenFieldByID(ctx context.Context, id int64, data en
 
 	return http.StatusOK, nil
 }
+
+type getVideosCache struct {
+	Data  []entity.VtuberVideo
+	Total int
+}
+
+// GetVideos to get videos.
+func (c *Cache) GetVideos(ctx context.Context, req entity.GetVideosRequest) (_ []entity.VtuberVideo, _ int, code int, err error) {
+	key := utils.GetKey("videos", utils.QueryToKey(req))
+
+	var data getVideosCache
+	if c.cacher.Get(ctx, key, &data) == nil {
+		return data.Data, data.Total, http.StatusOK, nil
+	}
+
+	data.Data, data.Total, code, err = c.repo.GetVideos(ctx, req)
+	if err != nil {
+		return nil, 0, code, stack.Wrap(ctx, err)
+	}
+
+	if err := c.cacher.Set(ctx, key, data, 30*time.Minute); err != nil {
+		return nil, 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
+	}
+
+	return data.Data, data.Total, code, nil
+}

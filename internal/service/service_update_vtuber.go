@@ -430,15 +430,26 @@ func (s *service) fillTwitchVideo(ctx context.Context, channel vtuberEntity.Chan
 		return channel
 	}
 
+	stream, _, err := s.twitch.GetLiveStream(ctx, channel.ID)
+	if err != nil {
+		stack.Wrap(ctx, err)
+		return channel
+	}
+
 	res := make([]vtuberEntity.Video, len(videos))
 	for i, v := range videos {
+		videoURL, image, endDate := v.URL, v.Image, v.EndDate
+		if stream != nil && v.StreamID == stream.ID {
+			videoURL, image, endDate = channel.URL, stream.Image, nil
+		}
+
 		res[i] = vtuberEntity.Video{
 			ID:        v.ID,
 			Title:     v.Title,
-			URL:       v.URL,
-			Image:     v.Image,
+			URL:       videoURL,
+			Image:     image,
 			StartDate: v.StartDate,
-			EndDate:   v.EndDate,
+			EndDate:   endDate,
 		}
 	}
 
