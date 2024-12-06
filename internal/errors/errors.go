@@ -19,6 +19,7 @@ var (
 	ErrAdminOnly            = errors.New("admin only")
 	ErrWikiaPageNotFound    = errors.New("wikia page not found")
 	ErrInvalidID            = errors.New("invalid id")
+	ErrInvalidDate          = errors.New("invalid date")
 	ErrVtuberNotFound       = errors.New("vtuber not found")
 	ErrAgencyNotFound       = errors.New("agency not found")
 	ErrChannelNotFound      = errors.New("channel not found")
@@ -60,4 +61,9 @@ func ErrOneOfField(str, value string) error {
 // ErrUrlField is error for url field.
 func ErrUrlField(str string) error {
 	return fmt.Errorf("field %s must be in URL format", str)
+}
+
+// ErrDatetimeField is error for datetime field.
+func ErrDatetimeField(str, value string) error {
+	return fmt.Errorf("field %s must be in %s format", str, value)
 }

@@ -74,6 +74,22 @@ type video struct {
 	EndDate   *time.Time `bson:"end_date"`
 }
 
+type vtuberVideo struct {
+	VtuberID       int64              `bson:"vtuber_id"`
+	VtuberName     string             `bson:"vtuber_name"`
+	VtuberImage    string             `bson:"vtuber_image"`
+	ChannelID      string             `bson:"channel_id"`
+	ChannelName    string             `bson:"channel_name"`
+	ChannelType    entity.ChannelType `bson:"channel_type"`
+	ChannelURL     string             `bson:"channel_url"`
+	VideoID        string             `bson:"video_id"`
+	VideoTitle     string             `bson:"video_title"`
+	VideoURL       string             `bson:"video_url"`
+	VideoImage     string             `bson:"video_image"`
+	VideoStartDate *time.Time         `bson:"video_start_date"`
+	VideoEndDate   *time.Time         `bson:"video_end_date"`
+}
+
 // MarshalBSON to override marshal function.
 func (n *vtuber) MarshalBSON() ([]byte, error) {
 	if n.CreatedAt.IsZero() {

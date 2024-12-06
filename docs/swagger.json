@@ -1795,6 +1795,86 @@
                 }
             }
         },
+        "/videos": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Video"
+                ],
+                "summary": "Get videos.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "start date",
+                        "name": "start_date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "end date",
+                        "name": "end_date",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "is finished",
+                        "name": "is_finished",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/service.video"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/vtubers": {
             "get": {
                 "produces": [
@@ -2619,6 +2699,50 @@
                     "type": "boolean"
                 },
                 "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.video": {
+            "type": "object",
+            "properties": {
+                "channel_id": {
+                    "type": "string"
+                },
+                "channel_name": {
+                    "type": "string"
+                },
+                "channel_type": {
+                    "$ref": "#/definitions/entity.ChannelType"
+                },
+                "channel_url": {
+                    "type": "string"
+                },
+                "video_end_date": {
+                    "type": "string"
+                },
+                "video_id": {
+                    "type": "string"
+                },
+                "video_image": {
+                    "type": "string"
+                },
+                "video_start_date": {
+                    "type": "string"
+                },
+                "video_title": {
+                    "type": "string"
+                },
+                "video_url": {
+                    "type": "string"
+                },
+                "vtuber_id": {
+                    "type": "integer"
+                },
+                "vtuber_image": {
+                    "type": "string"
+                },
+                "vtuber_name": {
                     "type": "string"
                 }
             }

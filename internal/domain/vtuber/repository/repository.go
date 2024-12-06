@@ -23,6 +23,7 @@ type Repository interface {
 	GetCharacterDesigners(ctx context.Context) ([]string, int, error)
 	GetCharacter2DModelers(ctx context.Context) ([]string, int, error)
 	GetCharacter3DModelers(ctx context.Context) ([]string, int, error)
+	GetVideos(ctx context.Context, data entity.GetVideosRequest) ([]entity.VtuberVideo, int, int, error)
 	GetCount(ctx context.Context) (int, int, error)
 	GetAverageActiveTime(ctx context.Context) (float64, int, error)
 	GetStatusCount(ctx context.Context) (*entity.StatusCount, int, error)

@@ -66,6 +66,8 @@ type Service interface {
 	GetAgencyByID(ctx context.Context, id int64) (*agency, int, error)
 	GetAgencyCount(ctx context.Context) (int, int, error)
 
+	GetVideos(ctx context.Context, params GetVideosRequest) ([]video, *pagination, int, error)
+
 	GetLanguages(ctx context.Context) ([]language, *pagination, int, error)
 
 	GetWikiaImage(ctx context.Context, path string) ([]byte, int, error)

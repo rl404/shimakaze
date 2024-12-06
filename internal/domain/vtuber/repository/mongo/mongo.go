@@ -545,6 +545,94 @@ func (m *Mongo) GetCharacter3DModelers(ctx context.Context) ([]string, int, erro
 	return res, http.StatusOK, nil
 }
 
+// GetVideos to get videos.
+func (m *Mongo) GetVideos(ctx context.Context, data entity.GetVideosRequest) ([]entity.VtuberVideo, int, int, error) {
+	unwindStage := bson.D{{Key: "$unwind", Value: "$channels"}}
+	unwindStage2 := bson.D{{Key: "$unwind", Value: "$channels.videos"}}
+	projectStage := bson.D{{Key: "$project", Value: bson.M{
+		"vtuber_id":        "$id",
+		"vtuber_name":      "$name",
+		"vtuber_image":     "$image",
+		"channel_id":       "$channels.id",
+		"channel_name":     "$channels.name",
+		"channel_type":     "$channels.type",
+		"channel_url":      "$channels.url",
+		"video_id":         "$channels.videos.id",
+		"video_title":      "$channels.videos.title",
+		"video_url":        "$channels.videos.url",
+		"video_image":      "$channels.videos.image",
+		"video_start_date": "$channels.videos.start_date",
+		"video_end_date":   "$channels.videos.end_date",
+	}}}
+	matchStage := bson.D{}
+	sortStage := bson.D{{Key: "$sort", Value: bson.M{"video_start_date": -1}}}
+	skipStage := bson.D{{Key: "$skip", Value: (data.Page - 1) * data.Limit}}
+	limitStage := bson.D{}
+	countStage := bson.D{{Key: "$count", Value: "count"}}
+
+	if data.StartDate != nil {
+		matchStage = m.addMatch(matchStage, "video_start_date", bson.M{"$gte": primitive.NewDateTimeFromTime(*data.StartDate)})
+	}
+
+	if data.EndDate != nil {
+		matchStage = m.addMatch(matchStage, "video_start_date", bson.M{"$lte": primitive.NewDateTimeFromTime(*data.EndDate)})
+	}
+
+	if data.IsFinished != nil {
+		key := map[bool]string{false: "$eq", true: "$ne"}
+		matchStage = m.addMatch(matchStage, "video_end_date", bson.M{key[*data.IsFinished]: nil})
+	}
+
+	if data.Limit > 0 {
+		limitStage = append(limitStage, bson.E{Key: "$limit", Value: data.Limit})
+	}
+
+	cursor, err := m.db.Aggregate(ctx, m.getPipeline(unwindStage, unwindStage2, projectStage, matchStage, sortStage, skipStage, limitStage))
+	if err != nil {
+		return nil, 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
+	}
+
+	var videos []vtuberVideo
+	if err := cursor.All(ctx, &videos); err != nil {
+		return nil, 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
+	}
+
+	res := make([]entity.VtuberVideo, len(videos))
+	for i, video := range videos {
+		res[i] = entity.VtuberVideo{
+			VtuberID:       video.VtuberID,
+			VtuberName:     video.VtuberName,
+			VtuberImage:    video.VtuberImage,
+			ChannelID:      video.ChannelID,
+			ChannelName:    video.ChannelName,
+			ChannelType:    video.ChannelType,
+			ChannelURL:     video.ChannelURL,
+			VideoID:        video.VideoID,
+			VideoTitle:     video.VideoTitle,
+			VideoURL:       video.VideoURL,
+			VideoImage:     video.VideoImage,
+			VideoStartDate: video.VideoStartDate,
+			VideoEndDate:   video.VideoEndDate,
+		}
+	}
+
+	cntCursor, err := m.db.Aggregate(ctx, m.getPipeline(unwindStage, unwindStage2, projectStage, matchStage, countStage))
+	if err != nil {
+		return nil, 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
+	}
+
+	var total []map[string]int64
+	if err := cntCursor.All(ctx, &total); err != nil {
+		return nil, 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
+	}
+
+	if len(total) == 0 {
+		return res, 0, http.StatusOK, nil
+	}
+
+	return res, int(total[0]["count"]), http.StatusOK, nil
+}
+
 // UpdateOverriddenFieldByID to update overriden field by id.
 func (m *Mongo) UpdateOverriddenFieldByID(ctx context.Context, id int64, data entity.OverriddenField) (int, error) {
 	if _, err := m.db.UpdateOne(ctx, bson.M{"id": id}, bson.M{"$set": bson.M{
