@@ -565,7 +565,7 @@ func (m *Mongo) GetVideos(ctx context.Context, data entity.GetVideosRequest) ([]
 		"video_end_date":   "$channels.videos.end_date",
 	}}}
 	matchStage := bson.D{}
-	sortStage := bson.D{{Key: "$sort", Value: bson.M{"video_start_date": -1}}}
+	sortStage := bson.D{{Key: "$sort", Value: m.convertSort(data.Sort)}}
 	skipStage := bson.D{{Key: "$skip", Value: (data.Page - 1) * data.Limit}}
 	limitStage := bson.D{}
 	countStage := bson.D{{Key: "$count", Value: "count"}}

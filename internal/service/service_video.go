@@ -32,6 +32,7 @@ type GetVideosRequest struct {
 	StartDate  string `validate:"omitempty,datetime=2006-01-02T15:04:05Z07:00"`
 	EndDate    string `validate:"omitempty,datetime=2006-01-02T15:04:05Z07:00"`
 	IsFinished *bool  ``
+	Sort       string `validate:"oneof=video_start_date -video_start_date" mod:"default=-video_start_date,trim,lcase"`
 	Page       int    `validate:"required,gte=1" mod:"default=1"`
 	Limit      int    `validate:"required,gte=-1" mod:"default=20"`
 }
@@ -64,6 +65,7 @@ func (s *service) GetVideos(ctx context.Context, data GetVideosRequest) ([]video
 		StartDate:  startDate,
 		EndDate:    endDate,
 		IsFinished: data.IsFinished,
+		Sort:       data.Sort,
 		Page:       data.Page,
 		Limit:      data.Limit,
 	})

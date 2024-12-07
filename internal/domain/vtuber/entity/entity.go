@@ -241,6 +241,7 @@ type GetVideosRequest struct {
 	StartDate  *time.Time
 	EndDate    *time.Time
 	IsFinished *bool
+	Sort       string
 	Page       int
 	Limit      int
 }
