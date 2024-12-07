@@ -1829,6 +1829,17 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "enum": [
+                            "video_start_date",
+                            "-video_start_date"
+                        ],
+                        "type": "string",
+                        "default": "-video_start_date",
+                        "description": "sort",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
                         "default": 1,
                         "description": "page",

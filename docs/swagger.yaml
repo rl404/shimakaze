@@ -1592,6 +1592,14 @@ paths:
         in: query
         name: is_finished
         type: boolean
+      - default: -video_start_date
+        description: sort
+        enum:
+        - video_start_date
+        - -video_start_date
+        in: query
+        name: sort
+        type: string
       - default: 1
         description: page
         in: query

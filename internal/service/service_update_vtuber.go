@@ -359,7 +359,7 @@ func (s *service) fillYoutubeChannel(ctx context.Context, channel vtuberEntity.C
 }
 
 func (s *service) fillYoutubeVideos(ctx context.Context, channel vtuberEntity.Channel, retirementDate *time.Time) vtuberEntity.Channel {
-	if channel.ID == "" || retirementDate != nil {
+	if channel.ID == "" || (retirementDate != nil && retirementDate.Before(time.Now())) {
 		return channel
 	}
 
@@ -420,7 +420,7 @@ func (s *service) fillTwitchChannel(ctx context.Context, channel vtuberEntity.Ch
 }
 
 func (s *service) fillTwitchVideo(ctx context.Context, channel vtuberEntity.Channel, retirementDate *time.Time) vtuberEntity.Channel {
-	if channel.ID == "" || retirementDate != nil {
+	if channel.ID == "" || (retirementDate != nil && retirementDate.Before(time.Now())) {
 		return channel
 	}
 
@@ -487,7 +487,7 @@ func (s *service) fillBilibiliChannel(ctx context.Context, channel vtuberEntity.
 
 func (s *service) fillBilibiliVideo(ctx context.Context, channel vtuberEntity.Channel, retirementDate *time.Time) vtuberEntity.Channel {
 	// todo: fix get bilibili videos.
-	if true || channel.ID == "" || retirementDate != nil {
+	if true || channel.ID == "" || (retirementDate != nil && retirementDate.Before(time.Now())) {
 		return channel
 	}
 
@@ -534,7 +534,7 @@ func (s *service) fillNiconicoChannel(ctx context.Context, channel vtuberEntity.
 }
 
 func (s *service) fillNiconicoVideo(ctx context.Context, channel vtuberEntity.Channel, retirementDate *time.Time) vtuberEntity.Channel {
-	if channel.ID == "" || retirementDate != nil {
+	if channel.ID == "" || (retirementDate != nil && retirementDate.Before(time.Now())) {
 		return channel
 	}
 
