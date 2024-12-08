@@ -166,6 +166,8 @@ github.com/newrelic/go-agent/v3/integrations/nrsecurityagent v1.1.0 h1:gqkTDYUHW
 github.com/newrelic/go-agent/v3/integrations/nrsecurityagent v1.1.0/go.mod h1:3wugGvRmOVYov/08y+D8tB1uYIZds5bweVdr5vo4Gbs=
 github.com/nicklaw5/helix/v2 v2.30.0 h1:bmkVnczkSj2Oa7K0gmHFqnurYDoEVapwpQhxa7haC98=
 github.com/nicklaw5/helix/v2 v2.30.0/go.mod h1:zZcKsyyBWDli34x3QleYsVMiiNGMXPAEU5NjsiZDtvY=
+github.com/nicklaw5/helix/v2 v2.31.0 h1:/8E5H20D/f3PGmSWT5NWtjwt+M8/GeCjnK/AkoLIFQA=
+github.com/nicklaw5/helix/v2 v2.31.0/go.mod h1:e1GsZq4NDk9sQlPJ0Nr3+14R9cizqg09VAk7/IonpOU=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWbfPhv4DMiApHyliiK5xCTNVSPiaAs=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=

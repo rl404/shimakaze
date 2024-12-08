@@ -296,7 +296,7 @@ type EventSubChannelChatMessageEvent struct {
 
 type EventSubChatMessage struct {
 	Text      string                        `json:"text"`
-	Fragments []EventSubChatMessageFragment `json:"fragment"`
+	Fragments []EventSubChatMessageFragment `json:"fragments"`
 }
 
 type EventSubChatMessageReply struct {
@@ -354,10 +354,10 @@ type EventSubChatMessageCheermote struct {
 }
 
 type EventSubChatMessageEmote struct {
-	ID         string `json:"id"`
-	EmoteSetID string `json:"emote_set_id"`
-	OwnerID    string `json:"owner_id"`
-	Format     string `json:"format"`
+	ID         string   `json:"id"`
+	EmoteSetID string   `json:"emote_set_id"`
+	OwnerID    string   `json:"owner_id"`
+	Format     []string `json:"format"`
 }
 
 type EventSubChatMessageMention struct {
@@ -508,7 +508,7 @@ type EventSubChannelChatNotificationBitsBadgeTier struct {
 
 type EventSubChatNotificationMessage struct {
 	Text      string                        `json:"text"`
-	Fragments []EventSubChatMessageFragment `json:"fragment"`
+	Fragments []EventSubChatMessageFragment `json:"fragments"`
 }
 
 // Data for a channel poll begin event
@@ -657,6 +657,7 @@ type EventSubHypeTrainBeginEvent struct {
 	LastContribution     EventSubContribution   `json:"last_contribution"`
 	StartedAt            Time                   `json:"started_at"`
 	ExpiresAt            Time                   `json:"expires_at"`
+	IsGoldenKappaTrain   bool                   `json:"is_golden_kappa_train"`
 }
 
 // Data for a hype train progress notification
@@ -672,6 +673,7 @@ type EventSubHypeTrainProgressEvent struct {
 	LastContribution     EventSubContribution   `json:"last_contribution"`
 	StartedAt            Time                   `json:"started_at"`
 	ExpiresAt            Time                   `json:"expires_at"`
+	IsGoldenKappaTrain   bool                   `json:"is_golden_kappa_train"`
 }
 
 // Data for a hype train end notification
@@ -686,6 +688,7 @@ type EventSubHypeTrainEndEvent struct {
 	StartedAt            Time                   `json:"started_at"`
 	EndedAt              Time                   `json:"ended_at"`
 	CooldownEndsAt       Time                   `json:"cooldown_ends_at"`
+	IsGoldenKappaTrain   bool                   `json:"is_golden_kappa_train"`
 }
 
 // Data for a stream online notification
