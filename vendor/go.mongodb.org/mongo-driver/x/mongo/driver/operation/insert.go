@@ -14,8 +14,6 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson/bsontype"
 	"go.mongodb.org/mongo-driver/event"
-	"go.mongodb.org/mongo-driver/internal/driverutil"
-	"go.mongodb.org/mongo-driver/internal/logger"
 	"go.mongodb.org/mongo-driver/mongo/description"
 	"go.mongodb.org/mongo-driver/mongo/writeconcern"
 	"go.mongodb.org/mongo-driver/x/bsonx/bsoncore"
@@ -25,7 +23,6 @@ import (
 
 // Insert performs an insert operation.
 type Insert struct {
-	authenticator            driver.Authenticator
 	bypassDocumentValidation *bool
 	comment                  bsoncore.Value
 	documents                []bsoncore.Document
@@ -43,7 +40,6 @@ type Insert struct {
 	result                   InsertResult
 	serverAPI                *driver.ServerAPIOptions
 	timeout                  *time.Duration
-	logger                   *logger.Logger
 }
 
 // InsertResult represents an insert result returned by the server.
@@ -59,7 +55,8 @@ func buildInsertResult(response bsoncore.Document) (InsertResult, error) {
 	}
 	ir := InsertResult{}
 	for _, element := range elements {
-		if element.Key() == "n" {
+		switch element.Key() {
+		case "n":
 			var ok bool
 			ir.N, ok = element.Value().AsInt64OK()
 			if !ok {
@@ -113,10 +110,7 @@ func (i *Insert) Execute(ctx context.Context) error {
 		WriteConcern:      i.writeConcern,
 		ServerAPI:         i.serverAPI,
 		Timeout:           i.timeout,
-		Logger:            i.logger,
-		Name:              driverutil.InsertOp,
-		Authenticator:     i.authenticator,
-	}.Execute(ctx)
+	}.Execute(ctx, nil)
 
 }
 
@@ -295,25 +289,5 @@ func (i *Insert) Timeout(timeout *time.Duration) *Insert {
 	}
 
 	i.timeout = timeout
-	return i
-}
-
-// Logger sets the logger for this operation.
-func (i *Insert) Logger(logger *logger.Logger) *Insert {
-	if i == nil {
-		i = new(Insert)
-	}
-
-	i.logger = logger
-	return i
-}
-
-// Authenticator sets the authenticator to use for this operation.
-func (i *Insert) Authenticator(authenticator driver.Authenticator) *Insert {
-	if i == nil {
-		i = new(Insert)
-	}
-
-	i.authenticator = authenticator
 	return i
 }

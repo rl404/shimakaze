@@ -13,7 +13,6 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson/bsontype"
 	"go.mongodb.org/mongo-driver/event"
-	"go.mongodb.org/mongo-driver/internal/driverutil"
 	"go.mongodb.org/mongo-driver/mongo/description"
 	"go.mongodb.org/mongo-driver/mongo/readconcern"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -25,14 +24,13 @@ import (
 
 // Aggregate represents an aggregate operation.
 type Aggregate struct {
-	authenticator            driver.Authenticator
 	allowDiskUse             *bool
 	batchSize                *int32
 	bypassDocumentValidation *bool
 	collation                bsoncore.Document
 	comment                  *string
 	hint                     bsoncore.Value
-	maxTime                  *time.Duration
+	maxTimeMS                *int64
 	pipeline                 bsoncore.Document
 	session                  *session.Client
 	clock                    *session.ClusterClock
@@ -51,7 +49,6 @@ type Aggregate struct {
 	hasOutputStage           bool
 	customOptions            map[string]bsoncore.Value
 	timeout                  *time.Duration
-	omitCSOTMaxTimeMS        bool
 
 	result driver.CursorResponse
 }
@@ -112,12 +109,8 @@ func (a *Aggregate) Execute(ctx context.Context) error {
 		MinimumWriteConcernWireVersion: 5,
 		ServerAPI:                      a.serverAPI,
 		IsOutputAggregate:              a.hasOutputStage,
-		MaxTime:                        a.maxTime,
 		Timeout:                        a.timeout,
-		Name:                           driverutil.AggregateOp,
-		OmitCSOTMaxTimeMS:              a.omitCSOTMaxTimeMS,
-		Authenticator:                  a.authenticator,
-	}.Execute(ctx)
+	}.Execute(ctx, nil)
 
 }
 
@@ -154,6 +147,12 @@ func (a *Aggregate) command(dst []byte, desc description.SelectedServer) ([]byte
 	if a.hint.Type != bsontype.Type(0) {
 
 		dst = bsoncore.AppendValueElement(dst, "hint", a.hint)
+	}
+
+	// Only append specified maxTimeMS if timeout is not also specified.
+	if a.maxTimeMS != nil && a.timeout == nil {
+
+		dst = bsoncore.AppendInt64Element(dst, "maxTimeMS", *a.maxTimeMS)
 	}
 	if a.pipeline != nil {
 
@@ -231,13 +230,13 @@ func (a *Aggregate) Hint(hint bsoncore.Value) *Aggregate {
 	return a
 }
 
-// MaxTime specifies the maximum amount of time to allow the query to run on the server.
-func (a *Aggregate) MaxTime(maxTime *time.Duration) *Aggregate {
+// MaxTimeMS specifies the maximum amount of time to allow the query to run.
+func (a *Aggregate) MaxTimeMS(maxTimeMS int64) *Aggregate {
 	if a == nil {
 		a = new(Aggregate)
 	}
 
-	a.maxTime = maxTime
+	a.maxTimeMS = &maxTimeMS
 	return a
 }
 
@@ -421,27 +420,5 @@ func (a *Aggregate) Timeout(timeout *time.Duration) *Aggregate {
 	}
 
 	a.timeout = timeout
-	return a
-}
-
-// OmitCSOTMaxTimeMS omits the automatically-calculated "maxTimeMS" from the
-// command when CSOT is enabled. It does not effect "maxTimeMS" set by
-// [Aggregate.MaxTime].
-func (a *Aggregate) OmitCSOTMaxTimeMS(omit bool) *Aggregate {
-	if a == nil {
-		a = new(Aggregate)
-	}
-
-	a.omitCSOTMaxTimeMS = omit
-	return a
-}
-
-// Authenticator sets the authenticator to use for this operation.
-func (a *Aggregate) Authenticator(authenticator driver.Authenticator) *Aggregate {
-	if a == nil {
-		a = new(Aggregate)
-	}
-
-	a.authenticator = authenticator
 	return a
 }

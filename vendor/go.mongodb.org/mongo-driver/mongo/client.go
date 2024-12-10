@@ -8,16 +8,15 @@ package mongo
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
-	"net/http"
+	"strings"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/bsoncodec"
 	"go.mongodb.org/mongo-driver/event"
-	"go.mongodb.org/mongo-driver/internal/httputil"
-	"go.mongodb.org/mongo-driver/internal/logger"
 	"go.mongodb.org/mongo-driver/internal/uuid"
 	"go.mongodb.org/mongo-driver/mongo/description"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -29,14 +28,15 @@ import (
 	"go.mongodb.org/mongo-driver/x/mongo/driver/auth"
 	"go.mongodb.org/mongo-driver/x/mongo/driver/mongocrypt"
 	mcopts "go.mongodb.org/mongo-driver/x/mongo/driver/mongocrypt/options"
+	"go.mongodb.org/mongo-driver/x/mongo/driver/ocsp"
 	"go.mongodb.org/mongo-driver/x/mongo/driver/operation"
 	"go.mongodb.org/mongo-driver/x/mongo/driver/session"
 	"go.mongodb.org/mongo-driver/x/mongo/driver/topology"
 )
 
 const (
-	defaultLocalThreshold = 15 * time.Millisecond
-	defaultMaxPoolSize    = 100
+	defaultLocalThreshold        = 15 * time.Millisecond
+	defaultMaxPoolSize    uint64 = 100
 )
 
 var (
@@ -53,24 +53,22 @@ var (
 // The Client type opens and closes connections automatically and maintains a pool of idle connections. For
 // connection pool configuration options, see documentation for the ClientOptions type in the mongo/options package.
 type Client struct {
-	id             uuid.UUID
-	deployment     driver.Deployment
-	localThreshold time.Duration
-	retryWrites    bool
-	retryReads     bool
-	clock          *session.ClusterClock
-	readPreference *readpref.ReadPref
-	readConcern    *readconcern.ReadConcern
-	writeConcern   *writeconcern.WriteConcern
-	bsonOpts       *options.BSONOptions
-	registry       *bsoncodec.Registry
-	monitor        *event.CommandMonitor
-	serverAPI      *driver.ServerAPIOptions
-	serverMonitor  *event.ServerMonitor
-	sessionPool    *session.Pool
-	timeout        *time.Duration
-	httpClient     *http.Client
-	logger         *logger.Logger
+	id              uuid.UUID
+	topologyOptions []topology.Option
+	deployment      driver.Deployment
+	localThreshold  time.Duration
+	retryWrites     bool
+	retryReads      bool
+	clock           *session.ClusterClock
+	readPreference  *readpref.ReadPref
+	readConcern     *readconcern.ReadConcern
+	writeConcern    *writeconcern.WriteConcern
+	registry        *bsoncodec.Registry
+	monitor         *event.CommandMonitor
+	serverAPI       *driver.ServerAPIOptions
+	serverMonitor   *event.ServerMonitor
+	sessionPool     *session.Pool
+	timeout         *time.Duration
 
 	// client-side encryption fields
 	keyVaultClientFLE  *Client
@@ -80,7 +78,6 @@ type Client struct {
 	metadataClientFLE  *Client
 	internalClientFLE  *Client
 	encryptedFieldsMap map[string]interface{}
-	authenticator      driver.Authenticator
 }
 
 // Connect creates a new Client and then initializes it using the Connect method. This is equivalent to calling
@@ -130,8 +127,6 @@ func Connect(ctx context.Context, opts ...*options.ClientOptions) (*Client, erro
 // option fields of previous options, there is no partial overwriting. For example, if Username is
 // set in the Auth field for the first option, and Password is set for the second but with no
 // Username, after the merge the Username field will be empty.
-//
-// Deprecated: Use [Connect] instead.
 func NewClient(opts ...*options.ClientOptions) (*Client, error) {
 	clientOpt := options.MergeClientOptions(opts...)
 
@@ -141,107 +136,17 @@ func NewClient(opts ...*options.ClientOptions) (*Client, error) {
 	}
 	client := &Client{id: id}
 
-	// ClusterClock
-	client.clock = new(session.ClusterClock)
-
-	// LocalThreshold
-	client.localThreshold = defaultLocalThreshold
-	if clientOpt.LocalThreshold != nil {
-		client.localThreshold = *clientOpt.LocalThreshold
-	}
-	// Monitor
-	if clientOpt.Monitor != nil {
-		client.monitor = clientOpt.Monitor
-	}
-	// ServerMonitor
-	if clientOpt.ServerMonitor != nil {
-		client.serverMonitor = clientOpt.ServerMonitor
-	}
-	// ReadConcern
-	client.readConcern = readconcern.New()
-	if clientOpt.ReadConcern != nil {
-		client.readConcern = clientOpt.ReadConcern
-	}
-	// ReadPreference
-	client.readPreference = readpref.Primary()
-	if clientOpt.ReadPreference != nil {
-		client.readPreference = clientOpt.ReadPreference
-	}
-	// BSONOptions
-	if clientOpt.BSONOptions != nil {
-		client.bsonOpts = clientOpt.BSONOptions
-	}
-	// Registry
-	client.registry = bson.DefaultRegistry
-	if clientOpt.Registry != nil {
-		client.registry = clientOpt.Registry
-	}
-	// RetryWrites
-	client.retryWrites = true // retry writes on by default
-	if clientOpt.RetryWrites != nil {
-		client.retryWrites = *clientOpt.RetryWrites
-	}
-	client.retryReads = true
-	if clientOpt.RetryReads != nil {
-		client.retryReads = *clientOpt.RetryReads
-	}
-	// Timeout
-	client.timeout = clientOpt.Timeout
-	client.httpClient = clientOpt.HTTPClient
-	// WriteConcern
-	if clientOpt.WriteConcern != nil {
-		client.writeConcern = clientOpt.WriteConcern
-	}
-	// AutoEncryptionOptions
-	if clientOpt.AutoEncryptionOptions != nil {
-		if err := client.configureAutoEncryption(clientOpt); err != nil {
-			return nil, err
-		}
-	} else {
-		client.cryptFLE = clientOpt.Crypt
-	}
-
-	// Deployment
-	if clientOpt.Deployment != nil {
-		client.deployment = clientOpt.Deployment
-	}
-
-	// Set default options
-	if clientOpt.MaxPoolSize == nil {
-		clientOpt.SetMaxPoolSize(defaultMaxPoolSize)
-	}
-
-	if clientOpt.Auth != nil {
-		client.authenticator, err = auth.CreateAuthenticator(
-			clientOpt.Auth.AuthMechanism,
-			topology.ConvertCreds(clientOpt.Auth),
-			clientOpt.HTTPClient,
-		)
-		if err != nil {
-			return nil, fmt.Errorf("error creating authenticator: %w", err)
-		}
-	}
-
-	cfg, err := topology.NewConfigWithAuthenticator(clientOpt, client.clock, client.authenticator)
+	err = client.configure(clientOpt)
 	if err != nil {
 		return nil, err
 	}
 
-	client.serverAPI = topology.ServerAPIFromServerOptions(cfg.ServerOpts)
-
 	if client.deployment == nil {
-		client.deployment, err = topology.New(cfg)
+		client.deployment, err = topology.New(client.topologyOptions...)
 		if err != nil {
 			return nil, replaceErrors(err)
 		}
 	}
-
-	// Create a logger for the client.
-	client.logger, err = newLogger(clientOpt.LoggerOptions)
-	if err != nil {
-		return nil, fmt.Errorf("invalid logger options: %w", err)
-	}
-
 	return client, nil
 }
 
@@ -250,8 +155,6 @@ func NewClient(opts ...*options.ClientOptions) (*Client, error) {
 //
 // Connect starts background goroutines to monitor the state of the deployment and does not do any I/O in the main
 // goroutine. The Client.Ping method can be used to verify that the connection was created successfully.
-//
-// Deprecated: Use [mongo.Connect] instead.
 func (c *Client) Connect(ctx context.Context) error {
 	if connector, ok := c.deployment.(driver.Connector); ok {
 		err := connector.Connect()
@@ -305,16 +208,8 @@ func (c *Client) Connect(ctx context.Context) error {
 // or write operations. If this method returns with no errors, all connections
 // associated with this Client have been closed.
 func (c *Client) Disconnect(ctx context.Context) error {
-	if c.logger != nil {
-		defer c.logger.Close()
-	}
-
 	if ctx == nil {
 		ctx = context.Background()
-	}
-
-	if c.httpClient == httputil.DefaultHTTPClient {
-		defer httputil.CloseIdleHTTPConnections(c.httpClient)
 	}
 
 	c.endSessions(ctx)
@@ -347,7 +242,6 @@ func (c *Client) Disconnect(ctx context.Context) error {
 	if disconnector, ok := c.deployment.(driver.Disconnector); ok {
 		return replaceErrors(disconnector.Disconnect(ctx))
 	}
-
 	return nil
 }
 
@@ -419,7 +313,7 @@ func (c *Client) StartSession(opts ...*options.SessionOptions) (Session, error) 
 		coreOpts.Snapshot = sopts.Snapshot
 	}
 
-	sess, err := session.NewClientSession(c.sessionPool, c.id, coreOpts)
+	sess, err := session.NewClientSession(c.sessionPool, c.id, session.Explicit, coreOpts)
 	if err != nil {
 		return nil, replaceErrors(err)
 	}
@@ -463,6 +357,366 @@ func (c *Client) endSessions(ctx context.Context) {
 	}
 }
 
+func (c *Client) configure(opts *options.ClientOptions) error {
+	var defaultOptions int
+	// Set default options
+	if opts.MaxPoolSize == nil {
+		defaultOptions++
+		opts.SetMaxPoolSize(defaultMaxPoolSize)
+	}
+	if err := opts.Validate(); err != nil {
+		return err
+	}
+
+	var connOpts []topology.ConnectionOption
+	var serverOpts []topology.ServerOption
+	var topologyOpts []topology.Option
+
+	// TODO(GODRIVER-814): Add tests for topology, server, and connection related options.
+
+	// ServerAPIOptions need to be handled early as other client and server options below reference
+	// c.serverAPI and serverOpts.serverAPI.
+	if opts.ServerAPIOptions != nil {
+		// convert passed in options to driver form for client.
+		c.serverAPI = convertToDriverAPIOptions(opts.ServerAPIOptions)
+
+		serverOpts = append(serverOpts, topology.WithServerAPI(func(*driver.ServerAPIOptions) *driver.ServerAPIOptions {
+			return c.serverAPI
+		}))
+	}
+
+	// ClusterClock
+	c.clock = new(session.ClusterClock)
+
+	// Pass down URI, SRV service name, and SRV max hosts so topology can poll SRV records correctly.
+	topologyOpts = append(topologyOpts,
+		topology.WithURI(func(uri string) string { return opts.GetURI() }),
+		topology.WithSRVServiceName(func(srvName string) string {
+			if opts.SRVServiceName != nil {
+				return *opts.SRVServiceName
+			}
+			return ""
+		}),
+		topology.WithSRVMaxHosts(func(srvMaxHosts int) int {
+			if opts.SRVMaxHosts != nil {
+				return *opts.SRVMaxHosts
+			}
+			return 0
+		}),
+	)
+
+	// AppName
+	var appName string
+	if opts.AppName != nil {
+		appName = *opts.AppName
+
+		serverOpts = append(serverOpts, topology.WithServerAppName(func(string) string {
+			return appName
+		}))
+	}
+	// Compressors & ZlibLevel
+	var comps []string
+	if len(opts.Compressors) > 0 {
+		comps = opts.Compressors
+
+		connOpts = append(connOpts, topology.WithCompressors(
+			func(compressors []string) []string {
+				return append(compressors, comps...)
+			},
+		))
+
+		for _, comp := range comps {
+			switch comp {
+			case "zlib":
+				connOpts = append(connOpts, topology.WithZlibLevel(func(level *int) *int {
+					return opts.ZlibLevel
+				}))
+			case "zstd":
+				connOpts = append(connOpts, topology.WithZstdLevel(func(level *int) *int {
+					return opts.ZstdLevel
+				}))
+			}
+		}
+
+		serverOpts = append(serverOpts, topology.WithCompressionOptions(
+			func(opts ...string) []string { return append(opts, comps...) },
+		))
+	}
+
+	var loadBalanced bool
+	if opts.LoadBalanced != nil {
+		loadBalanced = *opts.LoadBalanced
+	}
+
+	// Handshaker
+	var handshaker = func(driver.Handshaker) driver.Handshaker {
+		return operation.NewHello().AppName(appName).Compressors(comps).ClusterClock(c.clock).
+			ServerAPI(c.serverAPI).LoadBalanced(loadBalanced)
+	}
+	// Auth & Database & Password & Username
+	if opts.Auth != nil {
+		cred := &auth.Cred{
+			Username:    opts.Auth.Username,
+			Password:    opts.Auth.Password,
+			PasswordSet: opts.Auth.PasswordSet,
+			Props:       opts.Auth.AuthMechanismProperties,
+			Source:      opts.Auth.AuthSource,
+		}
+		mechanism := opts.Auth.AuthMechanism
+
+		if len(cred.Source) == 0 {
+			switch strings.ToUpper(mechanism) {
+			case auth.MongoDBX509, auth.GSSAPI, auth.PLAIN:
+				cred.Source = "$external"
+			default:
+				cred.Source = "admin"
+			}
+		}
+
+		authenticator, err := auth.CreateAuthenticator(mechanism, cred)
+		if err != nil {
+			return err
+		}
+
+		handshakeOpts := &auth.HandshakeOptions{
+			AppName:       appName,
+			Authenticator: authenticator,
+			Compressors:   comps,
+			ClusterClock:  c.clock,
+			ServerAPI:     c.serverAPI,
+			LoadBalanced:  loadBalanced,
+		}
+		if mechanism == "" {
+			// Required for SASL mechanism negotiation during handshake
+			handshakeOpts.DBUser = cred.Source + "." + cred.Username
+		}
+		if opts.AuthenticateToAnything != nil && *opts.AuthenticateToAnything {
+			// Authenticate arbiters
+			handshakeOpts.PerformAuthentication = func(serv description.Server) bool {
+				return true
+			}
+		}
+
+		handshaker = func(driver.Handshaker) driver.Handshaker {
+			return auth.Handshaker(nil, handshakeOpts)
+		}
+	}
+	connOpts = append(connOpts, topology.WithHandshaker(handshaker))
+	// ConnectTimeout
+	if opts.ConnectTimeout != nil {
+		serverOpts = append(serverOpts, topology.WithHeartbeatTimeout(
+			func(time.Duration) time.Duration { return *opts.ConnectTimeout },
+		))
+		connOpts = append(connOpts, topology.WithConnectTimeout(
+			func(time.Duration) time.Duration { return *opts.ConnectTimeout },
+		))
+	}
+	// Dialer
+	if opts.Dialer != nil {
+		connOpts = append(connOpts, topology.WithDialer(
+			func(topology.Dialer) topology.Dialer { return opts.Dialer },
+		))
+	}
+	// Direct
+	if opts.Direct != nil && *opts.Direct {
+		topologyOpts = append(topologyOpts, topology.WithMode(
+			func(topology.MonitorMode) topology.MonitorMode { return topology.SingleMode },
+		))
+	}
+	// HeartbeatInterval
+	if opts.HeartbeatInterval != nil {
+		serverOpts = append(serverOpts, topology.WithHeartbeatInterval(
+			func(time.Duration) time.Duration { return *opts.HeartbeatInterval },
+		))
+	}
+	// Hosts
+	hosts := []string{"localhost:27017"} // default host
+	if len(opts.Hosts) > 0 {
+		hosts = opts.Hosts
+	}
+	topologyOpts = append(topologyOpts, topology.WithSeedList(
+		func(...string) []string { return hosts },
+	))
+	// LocalThreshold
+	c.localThreshold = defaultLocalThreshold
+	if opts.LocalThreshold != nil {
+		c.localThreshold = *opts.LocalThreshold
+	}
+	// MaxConIdleTime
+	if opts.MaxConnIdleTime != nil {
+		connOpts = append(connOpts, topology.WithIdleTimeout(
+			func(time.Duration) time.Duration { return *opts.MaxConnIdleTime },
+		))
+	}
+	// MaxPoolSize
+	if opts.MaxPoolSize != nil {
+		serverOpts = append(
+			serverOpts,
+			topology.WithMaxConnections(func(uint64) uint64 { return *opts.MaxPoolSize }),
+		)
+	}
+	// MinPoolSize
+	if opts.MinPoolSize != nil {
+		serverOpts = append(
+			serverOpts,
+			topology.WithMinConnections(func(uint64) uint64 { return *opts.MinPoolSize }),
+		)
+	}
+	// MaxConnecting
+	if opts.MaxConnecting != nil {
+		serverOpts = append(
+			serverOpts,
+			topology.WithMaxConnecting(func(uint64) uint64 { return *opts.MaxConnecting }),
+		)
+	}
+	// PoolMonitor
+	if opts.PoolMonitor != nil {
+		serverOpts = append(
+			serverOpts,
+			topology.WithConnectionPoolMonitor(func(*event.PoolMonitor) *event.PoolMonitor { return opts.PoolMonitor }),
+		)
+	}
+	// Monitor
+	if opts.Monitor != nil {
+		c.monitor = opts.Monitor
+		connOpts = append(connOpts, topology.WithMonitor(
+			func(*event.CommandMonitor) *event.CommandMonitor { return opts.Monitor },
+		))
+	}
+	// ServerMonitor
+	if opts.ServerMonitor != nil {
+		c.serverMonitor = opts.ServerMonitor
+		serverOpts = append(
+			serverOpts,
+			topology.WithServerMonitor(func(*event.ServerMonitor) *event.ServerMonitor { return opts.ServerMonitor }),
+		)
+
+		topologyOpts = append(
+			topologyOpts,
+			topology.WithTopologyServerMonitor(func(*event.ServerMonitor) *event.ServerMonitor { return opts.ServerMonitor }),
+		)
+	}
+	// ReadConcern
+	c.readConcern = readconcern.New()
+	if opts.ReadConcern != nil {
+		c.readConcern = opts.ReadConcern
+	}
+	// ReadPreference
+	c.readPreference = readpref.Primary()
+	if opts.ReadPreference != nil {
+		c.readPreference = opts.ReadPreference
+	}
+	// Registry
+	c.registry = bson.DefaultRegistry
+	if opts.Registry != nil {
+		c.registry = opts.Registry
+	}
+	// ReplicaSet
+	if opts.ReplicaSet != nil {
+		topologyOpts = append(topologyOpts, topology.WithReplicaSetName(
+			func(string) string { return *opts.ReplicaSet },
+		))
+	}
+	// RetryWrites
+	c.retryWrites = true // retry writes on by default
+	if opts.RetryWrites != nil {
+		c.retryWrites = *opts.RetryWrites
+	}
+	c.retryReads = true
+	if opts.RetryReads != nil {
+		c.retryReads = *opts.RetryReads
+	}
+	// ServerSelectionTimeout
+	if opts.ServerSelectionTimeout != nil {
+		topologyOpts = append(topologyOpts, topology.WithServerSelectionTimeout(
+			func(time.Duration) time.Duration { return *opts.ServerSelectionTimeout },
+		))
+	}
+	// SocketTimeout
+	if opts.SocketTimeout != nil {
+		connOpts = append(
+			connOpts,
+			topology.WithReadTimeout(func(time.Duration) time.Duration { return *opts.SocketTimeout }),
+			topology.WithWriteTimeout(func(time.Duration) time.Duration { return *opts.SocketTimeout }),
+		)
+	}
+	// Timeout
+	c.timeout = opts.Timeout
+	// TLSConfig
+	if opts.TLSConfig != nil {
+		connOpts = append(connOpts, topology.WithTLSConfig(
+			func(*tls.Config) *tls.Config {
+				return opts.TLSConfig
+			},
+		))
+	}
+	// WriteConcern
+	if opts.WriteConcern != nil {
+		c.writeConcern = opts.WriteConcern
+	}
+	// AutoEncryptionOptions
+	if opts.AutoEncryptionOptions != nil {
+		if err := c.configureAutoEncryption(opts); err != nil {
+			return err
+		}
+	} else {
+		c.cryptFLE = opts.Crypt
+	}
+
+	// OCSP cache
+	ocspCache := ocsp.NewCache()
+	connOpts = append(
+		connOpts,
+		topology.WithOCSPCache(func(ocsp.Cache) ocsp.Cache { return ocspCache }),
+	)
+
+	// Disable communication with external OCSP responders.
+	if opts.DisableOCSPEndpointCheck != nil {
+		connOpts = append(
+			connOpts,
+			topology.WithDisableOCSPEndpointCheck(func(bool) bool { return *opts.DisableOCSPEndpointCheck }),
+		)
+	}
+
+	// LoadBalanced
+	if opts.LoadBalanced != nil {
+		topologyOpts = append(
+			topologyOpts,
+			topology.WithLoadBalanced(func(bool) bool { return *opts.LoadBalanced }),
+		)
+		serverOpts = append(
+			serverOpts,
+			topology.WithServerLoadBalanced(func(bool) bool { return *opts.LoadBalanced }),
+		)
+		connOpts = append(
+			connOpts,
+			topology.WithConnectionLoadBalanced(func(bool) bool { return *opts.LoadBalanced }),
+		)
+	}
+
+	serverOpts = append(
+		serverOpts,
+		topology.WithClock(func(*session.ClusterClock) *session.ClusterClock { return c.clock }),
+		topology.WithConnectionOptions(func(...topology.ConnectionOption) []topology.ConnectionOption { return connOpts }),
+	)
+	topologyOpts = append(topologyOpts, topology.WithServerOptions(
+		func(...topology.ServerOption) []topology.ServerOption { return serverOpts },
+	))
+	c.topologyOptions = topologyOpts
+
+	// Deployment
+	if opts.Deployment != nil {
+		// topology options: WithSeedlist, WithURI, WithSRVServiceName, WithSRVMaxHosts, and WithServerOptions
+		// server options: WithClock and WithConnectionOptions + default maxPoolSize
+		if len(serverOpts) > 2+defaultOptions || len(topologyOpts) > 5 {
+			return errors.New("cannot specify topology or server options with a deployment")
+		}
+		c.deployment = opts.Deployment
+	}
+
+	return nil
+}
+
 func (c *Client) configureAutoEncryption(clientOpts *options.ClientOptions) error {
 	c.encryptedFieldsMap = clientOpts.AutoEncryptionOptions.EncryptedFieldsMap
 	if err := c.configureKeyVaultClientFLE(clientOpts); err != nil {
@@ -477,14 +731,14 @@ func (c *Client) configureAutoEncryption(clientOpts *options.ClientOptions) erro
 		return err
 	}
 
-	// If the crypt_shared library was not loaded, try to spawn and connect to mongocryptd.
-	if mc.CryptSharedLibVersionString() == "" {
-		mongocryptdFLE, err := newMongocryptdClient(clientOpts.AutoEncryptionOptions)
-		if err != nil {
-			return err
-		}
-		c.mongocryptdFLE = mongocryptdFLE
+	// If the crypt_shared library was loaded successfully, signal to the mongocryptd client creator
+	// that it can bypass spawning mongocryptd.
+	cryptSharedLibAvailable := mc.CryptSharedLibVersionString() != ""
+	mongocryptdFLE, err := newMongocryptdClient(cryptSharedLibAvailable, clientOpts.AutoEncryptionOptions)
+	if err != nil {
+		return err
 	}
+	c.mongocryptdFLE = mongocryptdFLE
 
 	c.configureCryptFLE(mc, clientOpts.AutoEncryptionOptions)
 	return nil
@@ -546,7 +800,7 @@ func (c *Client) newMongoCrypt(opts *options.AutoEncryptionOptions) (*mongocrypt
 	// convert schemas in SchemaMap to bsoncore documents
 	cryptSchemaMap := make(map[string]bsoncore.Document)
 	for k, v := range opts.SchemaMap {
-		schema, err := marshal(v, c.bsonOpts, c.registry)
+		schema, err := transformBsoncoreDocument(c.registry, v, true, "schemaMap")
 		if err != nil {
 			return nil, err
 		}
@@ -556,16 +810,16 @@ func (c *Client) newMongoCrypt(opts *options.AutoEncryptionOptions) (*mongocrypt
 	// convert schemas in EncryptedFieldsMap to bsoncore documents
 	cryptEncryptedFieldsMap := make(map[string]bsoncore.Document)
 	for k, v := range opts.EncryptedFieldsMap {
-		encryptedFields, err := marshal(v, c.bsonOpts, c.registry)
+		encryptedFields, err := transformBsoncoreDocument(c.registry, v, true, "encryptedFieldsMap")
 		if err != nil {
 			return nil, err
 		}
 		cryptEncryptedFieldsMap[k] = encryptedFields
 	}
 
-	kmsProviders, err := marshal(opts.KmsProviders, c.bsonOpts, c.registry)
+	kmsProviders, err := transformBsoncoreDocument(c.registry, opts.KmsProviders, true, "kmsProviders")
 	if err != nil {
-		return nil, fmt.Errorf("error creating KMS providers document: %w", err)
+		return nil, fmt.Errorf("error creating KMS providers document: %v", err)
 	}
 
 	// Set the crypt_shared library override path from the "cryptSharedLibPath" extra option if one
@@ -597,8 +851,7 @@ func (c *Client) newMongoCrypt(opts *options.AutoEncryptionOptions) (*mongocrypt
 		SetBypassQueryAnalysis(bypassQueryAnalysis).
 		SetEncryptedFieldsMap(cryptEncryptedFieldsMap).
 		SetCryptSharedLibDisabled(cryptSharedLibDisabled || bypassAutoEncryption).
-		SetCryptSharedLibOverridePath(cryptSharedLibPath).
-		SetHTTPClient(opts.HTTPClient))
+		SetCryptSharedLibOverridePath(cryptSharedLibPath))
 	if err != nil {
 		return nil, err
 	}
@@ -654,6 +907,18 @@ func (c *Client) validSession(sess *session.Client) error {
 	return nil
 }
 
+// convertToDriverAPIOptions converts a options.ServerAPIOptions instance to a driver.ServerAPIOptions.
+func convertToDriverAPIOptions(s *options.ServerAPIOptions) *driver.ServerAPIOptions {
+	driverOpts := driver.NewServerAPIOptions(string(s.ServerAPIVersion))
+	if s.Strict != nil {
+		driverOpts.SetStrict(*s.Strict)
+	}
+	if s.DeprecationErrors != nil {
+		driverOpts.SetDeprecationErrors(*s.DeprecationErrors)
+	}
+	return driverOpts
+}
+
 // Database returns a handle for a database with the given name configured with the given DatabaseOptions.
 func (c *Client) Database(name string, opts ...*options.DatabaseOptions) *Database {
 	return newDatabase(c, name, opts...)
@@ -680,7 +945,10 @@ func (c *Client) ListDatabases(ctx context.Context, filter interface{}, opts ...
 		return ListDatabasesResult{}, err
 	}
 	if sess == nil && c.sessionPool != nil {
-		sess = session.NewImplicitClientSession(c.sessionPool, c.id)
+		sess, err = session.NewClientSession(c.sessionPool, c.id, session.Implicit)
+		if err != nil {
+			return ListDatabasesResult{}, err
+		}
 		defer sess.EndSession()
 	}
 
@@ -689,7 +957,7 @@ func (c *Client) ListDatabases(ctx context.Context, filter interface{}, opts ...
 		return ListDatabasesResult{}, err
 	}
 
-	filterDoc, err := marshal(filter, c.bsonOpts, c.registry)
+	filterDoc, err := transformBsoncoreDocument(c.registry, filter, true, "filter")
 	if err != nil {
 		return ListDatabasesResult{}, err
 	}
@@ -704,7 +972,7 @@ func (c *Client) ListDatabases(ctx context.Context, filter interface{}, opts ...
 	op := operation.NewListDatabases(filterDoc).
 		Session(sess).ReadPreference(c.readPreference).CommandMonitor(c.monitor).
 		ServerSelector(selector).ClusterClock(c.clock).Database("admin").Deployment(c.deployment).Crypt(c.cryptFLE).
-		ServerAPI(c.serverAPI).Timeout(c.timeout).Authenticator(c.authenticator)
+		ServerAPI(c.serverAPI).Timeout(c.timeout)
 
 	if ldo.NameOnly != nil {
 		op = op.NameOnly(*ldo.NameOnly)
@@ -820,7 +1088,6 @@ func (c *Client) Watch(ctx context.Context, pipeline interface{},
 		readConcern:    c.readConcern,
 		readPreference: c.readPreference,
 		client:         c,
-		bsonOpts:       c.bsonOpts,
 		registry:       c.registry,
 		streamType:     ClientStream,
 		crypt:          c.cryptFLE,
@@ -832,15 +1099,7 @@ func (c *Client) Watch(ctx context.Context, pipeline interface{},
 // NumberSessionsInProgress returns the number of sessions that have been started for this client but have not been
 // closed (i.e. EndSession has not been called).
 func (c *Client) NumberSessionsInProgress() int {
-	// The underlying session pool uses an int64 for checkedOut to allow atomic
-	// access. We convert to an int here to maintain backward compatibility with
-	// older versions of the driver that did not atomically access checkedOut.
-	return int(c.sessionPool.CheckedOut())
-}
-
-// Timeout returns the timeout set for this client.
-func (c *Client) Timeout() *time.Duration {
-	return c.timeout
+	return c.sessionPool.CheckedOut()
 }
 
 func (c *Client) createBaseCursorOptions() driver.CursorOptions {
@@ -849,29 +1108,4 @@ func (c *Client) createBaseCursorOptions() driver.CursorOptions {
 		Crypt:          c.cryptFLE,
 		ServerAPI:      c.serverAPI,
 	}
-}
-
-// newLogger will use the LoggerOptions to create an internal logger and publish
-// messages using a LogSink.
-func newLogger(opts *options.LoggerOptions) (*logger.Logger, error) {
-	// If there are no logger options, then create a default logger.
-	if opts == nil {
-		opts = options.Logger()
-	}
-
-	// If there are no component-level options and the environment does not
-	// contain component variables, then do nothing.
-	if (opts.ComponentLevels == nil || len(opts.ComponentLevels) == 0) &&
-		!logger.EnvHasComponentVariables() {
-
-		return nil, nil
-	}
-
-	// Otherwise, collect the component-level options and create a logger.
-	componentLevels := make(map[logger.Component]logger.Level)
-	for component, level := range opts.ComponentLevels {
-		componentLevels[logger.Component(component)] = logger.Level(level)
-	}
-
-	return logger.New(opts.Sink, opts.MaxDocumentLength, componentLevels)
 }

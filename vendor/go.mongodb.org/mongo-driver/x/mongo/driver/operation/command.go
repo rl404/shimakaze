@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/event"
-	"go.mongodb.org/mongo-driver/internal/logger"
 	"go.mongodb.org/mongo-driver/mongo/description"
+	"go.mongodb.org/mongo-driver/mongo/readconcern"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"go.mongodb.org/mongo-driver/x/bsonx/bsoncore"
 	"go.mongodb.org/mongo-driver/x/mongo/driver"
@@ -22,8 +22,8 @@ import (
 
 // Command is used to run a generic operation.
 type Command struct {
-	authenticator  driver.Authenticator
 	command        bsoncore.Document
+	readConcern    *readconcern.ReadConcern
 	database       string
 	deployment     driver.Deployment
 	selector       description.ServerSelector
@@ -38,7 +38,6 @@ type Command struct {
 	createCursor   bool
 	cursorOpts     driver.CursorOptions
 	timeout        *time.Duration
-	logger         *logger.Logger
 }
 
 // NewCommand constructs and returns a new Command. Once the operation is executed, the result may only be accessed via
@@ -79,7 +78,7 @@ func (c *Command) Execute(ctx context.Context) error {
 	}
 
 	return driver.Operation{
-		CommandFn: func(dst []byte, _ description.SelectedServer) ([]byte, error) {
+		CommandFn: func(dst []byte, desc description.SelectedServer) ([]byte, error) {
 			return append(dst, c.command[4:len(c.command)-1]...), nil
 		},
 		ProcessResponseFn: func(info driver.ResponseInfo) error {
@@ -107,9 +106,7 @@ func (c *Command) Execute(ctx context.Context) error {
 		Crypt:          c.crypt,
 		ServerAPI:      c.serverAPI,
 		Timeout:        c.timeout,
-		Logger:         c.logger,
-		Authenticator:  c.authenticator,
-	}.Execute(ctx)
+	}.Execute(ctx, nil)
 }
 
 // Session sets the session for this operation.
@@ -162,6 +159,16 @@ func (c *Command) Deployment(deployment driver.Deployment) *Command {
 	return c
 }
 
+// ReadConcern specifies the read concern for this operation.
+func (c *Command) ReadConcern(readConcern *readconcern.ReadConcern) *Command {
+	if c == nil {
+		c = new(Command)
+	}
+
+	c.readConcern = readConcern
+	return c
+}
+
 // ReadPreference set the read preference used with this operation.
 func (c *Command) ReadPreference(readPreference *readpref.ReadPref) *Command {
 	if c == nil {
@@ -209,25 +216,5 @@ func (c *Command) Timeout(timeout *time.Duration) *Command {
 	}
 
 	c.timeout = timeout
-	return c
-}
-
-// Logger sets the logger for this operation.
-func (c *Command) Logger(logger *logger.Logger) *Command {
-	if c == nil {
-		c = new(Command)
-	}
-
-	c.logger = logger
-	return c
-}
-
-// Authenticator sets the authenticator to use for this operation.
-func (c *Command) Authenticator(authenticator driver.Authenticator) *Command {
-	if c == nil {
-		c = new(Command)
-	}
-
-	c.authenticator = authenticator
 	return c
 }

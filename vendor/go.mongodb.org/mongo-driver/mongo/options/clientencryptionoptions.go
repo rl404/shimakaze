@@ -9,9 +9,6 @@ package options
 import (
 	"crypto/tls"
 	"fmt"
-	"net/http"
-
-	"go.mongodb.org/mongo-driver/internal/httputil"
 )
 
 // ClientEncryptionOptions represents all possible options used to configure a ClientEncryption instance.
@@ -19,14 +16,11 @@ type ClientEncryptionOptions struct {
 	KeyVaultNamespace string
 	KmsProviders      map[string]map[string]interface{}
 	TLSConfig         map[string]*tls.Config
-	HTTPClient        *http.Client
 }
 
 // ClientEncryption creates a new ClientEncryptionOptions instance.
 func ClientEncryption() *ClientEncryptionOptions {
-	return &ClientEncryptionOptions{
-		HTTPClient: httputil.DefaultHTTPClient,
-	}
+	return &ClientEncryptionOptions{}
 }
 
 // SetKeyVaultNamespace specifies the namespace of the key vault collection. This is required.
@@ -62,12 +56,12 @@ func (c *ClientEncryptionOptions) SetTLSConfig(tlsOpts map[string]*tls.Config) *
 // to the KMS provider. The input map should contain a mapping from each KMS provider to a document containing the necessary
 // options, as follows:
 //
-//	{
-//			"kmip": {
-//				"tlsCertificateKeyFile": "foo.pem",
-//				"tlsCAFile": "fooCA.pem"
-//			}
-//	}
+// {
+//		"kmip": {
+//			"tlsCertificateKeyFile": "foo.pem",
+// 			"tlsCAFile": "fooCA.pem"
+//		}
+// }
 //
 // Currently, the following TLS options are supported:
 //
@@ -122,9 +116,6 @@ func BuildTLSConfig(tlsOpts map[string]interface{}) (*tls.Config, error) {
 }
 
 // MergeClientEncryptionOptions combines the argued ClientEncryptionOptions in a last-one wins fashion.
-//
-// Deprecated: Merging options structs will not be supported in Go Driver 2.0. Users should create a
-// single options struct instead.
 func MergeClientEncryptionOptions(opts ...*ClientEncryptionOptions) *ClientEncryptionOptions {
 	ceo := ClientEncryption()
 	for _, opt := range opts {
@@ -140,9 +131,6 @@ func MergeClientEncryptionOptions(opts ...*ClientEncryptionOptions) *ClientEncry
 		}
 		if opt.TLSConfig != nil {
 			ceo.TLSConfig = opt.TLSConfig
-		}
-		if opt.HTTPClient != nil {
-			ceo.HTTPClient = opt.HTTPClient
 		}
 	}
 

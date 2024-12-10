@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/event"
-	"go.mongodb.org/mongo-driver/internal/driverutil"
 	"go.mongodb.org/mongo-driver/mongo/description"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"go.mongodb.org/mongo-driver/x/bsonx/bsoncore"
@@ -22,7 +21,6 @@ import (
 
 // ListCollections performs a listCollections operation.
 type ListCollections struct {
-	authenticator         driver.Authenticator
 	filter                bsoncore.Document
 	nameOnly              *bool
 	authorizedCollections *bool
@@ -49,10 +47,17 @@ func NewListCollections(filter bsoncore.Document) *ListCollections {
 }
 
 // Result returns the result of executing this operation.
-func (lc *ListCollections) Result(opts driver.CursorOptions) (*driver.BatchCursor, error) {
+func (lc *ListCollections) Result(opts driver.CursorOptions) (*driver.ListCollectionsBatchCursor, error) {
 	opts.ServerAPI = lc.serverAPI
-
-	return driver.NewBatchCursor(lc.result, lc.session, lc.clock, opts)
+	bc, err := driver.NewBatchCursor(lc.result, lc.session, lc.clock, opts)
+	if err != nil {
+		return nil, err
+	}
+	desc := lc.result.Desc
+	if desc.WireVersion == nil || desc.WireVersion.Max < 3 {
+		return driver.NewLegacyListCollectionsBatchCursor(bc)
+	}
+	return driver.NewListCollectionsBatchCursor(bc)
 }
 
 func (lc *ListCollections) processResponse(info driver.ResponseInfo) error {
@@ -83,13 +88,11 @@ func (lc *ListCollections) Execute(ctx context.Context) error {
 		Legacy:            driver.LegacyListCollections,
 		ServerAPI:         lc.serverAPI,
 		Timeout:           lc.timeout,
-		Name:              driverutil.ListCollectionsOp,
-		Authenticator:     lc.authenticator,
-	}.Execute(ctx)
+	}.Execute(ctx, nil)
 
 }
 
-func (lc *ListCollections) command(dst []byte, _ description.SelectedServer) ([]byte, error) {
+func (lc *ListCollections) command(dst []byte, desc description.SelectedServer) ([]byte, error) {
 	dst = bsoncore.AppendInt32Element(dst, "listCollections", 1)
 	if lc.filter != nil {
 		dst = bsoncore.AppendDocumentElement(dst, "filter", lc.filter)
@@ -259,15 +262,5 @@ func (lc *ListCollections) Timeout(timeout *time.Duration) *ListCollections {
 	}
 
 	lc.timeout = timeout
-	return lc
-}
-
-// Authenticator sets the authenticator to use for this operation.
-func (lc *ListCollections) Authenticator(authenticator driver.Authenticator) *ListCollections {
-	if lc == nil {
-		lc = new(ListCollections)
-	}
-
-	lc.authenticator = authenticator
 	return lc
 }
