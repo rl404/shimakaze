@@ -29,14 +29,9 @@ func WithMaxStaleness(ms time.Duration) Option {
 	}
 }
 
-// WithTags specifies a single tag set used to match replica set members. If no members match the
-// tag set, read operations will return an error. To avoid errors if no members match the tag set, use
-// [WithTagSets] and include an empty tag set as the last tag set in the list.
-//
-// The last call to [WithTags] or [WithTagSets] overrides all previous calls to either method.
-//
-// For more information about read preference tags, see
-// https://www.mongodb.com/docs/manual/core/read-preference-tags/
+// WithTags sets a single tag set used to match
+// a server. The last call to WithTags or WithTagSets
+// overrides all previous calls to either method.
 func WithTags(tags ...string) Option {
 	return func(rp *ReadPref) error {
 		length := len(tags)
@@ -54,16 +49,9 @@ func WithTags(tags ...string) Option {
 	}
 }
 
-// WithTagSets specifies a list of tag sets used to match replica set members. If the list contains
-// multiple tag sets, members are matched against each tag set in succession until a match is found.
-// Once a match is found, the remaining tag sets are ignored. If no members match any of the tag
-// sets, the read operation returns with an error. To avoid an error if no members match any of the
-// tag sets, include an empty tag set as the last tag set in the list.
-//
-// The last call to [WithTags] or [WithTagSets] overrides all previous calls to either method.
-//
-// For more information about read preference tags, see
-// https://www.mongodb.com/docs/manual/core/read-preference-tags/
+// WithTagSets sets the tag sets used to match
+// a server. The last call to WithTags or WithTagSets
+// overrides all previous calls to either method.
 func WithTagSets(tagSets ...tag.Set) Option {
 	return func(rp *ReadPref) error {
 		rp.tagSets = tagSets

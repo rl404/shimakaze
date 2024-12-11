@@ -27,10 +27,6 @@ type DatabaseOptions struct {
 	// the read preference of the Client used to configure the Database will be used.
 	ReadPreference *readpref.ReadPref
 
-	// BSONOptions configures optional BSON marshaling and unmarshaling
-	// behavior.
-	BSONOptions *BSONOptions
-
 	// Registry is the BSON registry to marshal and unmarshal documents for operations executed on the Database. The default value
 	// is nil, which means that the registry of the Client used to configure the Database will be used.
 	Registry *bsoncodec.Registry
@@ -59,12 +55,6 @@ func (d *DatabaseOptions) SetReadPreference(rp *readpref.ReadPref) *DatabaseOpti
 	return d
 }
 
-// SetBSONOptions configures optional BSON marshaling and unmarshaling behavior.
-func (d *DatabaseOptions) SetBSONOptions(opts *BSONOptions) *DatabaseOptions {
-	d.BSONOptions = opts
-	return d
-}
-
 // SetRegistry sets the value for the Registry field.
 func (d *DatabaseOptions) SetRegistry(r *bsoncodec.Registry) *DatabaseOptions {
 	d.Registry = r
@@ -73,9 +63,6 @@ func (d *DatabaseOptions) SetRegistry(r *bsoncodec.Registry) *DatabaseOptions {
 
 // MergeDatabaseOptions combines the given DatabaseOptions instances into a single DatabaseOptions in a last-one-wins
 // fashion.
-//
-// Deprecated: Merging options structs will not be supported in Go Driver 2.0. Users should create a
-// single options struct instead.
 func MergeDatabaseOptions(opts ...*DatabaseOptions) *DatabaseOptions {
 	d := Database()
 
@@ -94,9 +81,6 @@ func MergeDatabaseOptions(opts ...*DatabaseOptions) *DatabaseOptions {
 		}
 		if opt.Registry != nil {
 			d.Registry = opt.Registry
-		}
-		if opt.BSONOptions != nil {
-			d.BSONOptions = opt.BSONOptions
 		}
 	}
 

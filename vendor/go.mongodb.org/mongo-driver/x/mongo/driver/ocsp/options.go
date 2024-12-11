@@ -6,11 +6,8 @@
 
 package ocsp
 
-import "net/http"
-
 // VerifyOptions specifies options to configure OCSP verification.
 type VerifyOptions struct {
 	Cache                   Cache
 	DisableEndpointChecking bool
-	HTTPClient              *http.Client
 }

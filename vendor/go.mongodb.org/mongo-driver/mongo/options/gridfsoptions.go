@@ -85,9 +85,6 @@ func (b *BucketOptions) SetReadPreference(rp *readpref.ReadPref) *BucketOptions 
 }
 
 // MergeBucketOptions combines the given BucketOptions instances into a single BucketOptions in a last-one-wins fashion.
-//
-// Deprecated: Merging options structs will not be supported in Go Driver 2.0. Users should create a
-// single options struct instead.
 func MergeBucketOptions(opts ...*BucketOptions) *BucketOptions {
 	b := GridFSBucket()
 
@@ -147,9 +144,6 @@ func (u *UploadOptions) SetMetadata(doc interface{}) *UploadOptions {
 }
 
 // MergeUploadOptions combines the given UploadOptions instances into a single UploadOptions in a last-one-wins fashion.
-//
-// Deprecated: Merging options structs will not be supported in Go Driver 2.0. Users should create a
-// single options struct instead.
 func MergeUploadOptions(opts ...*UploadOptions) *UploadOptions {
 	u := GridFSUpload()
 
@@ -198,9 +192,6 @@ func (n *NameOptions) SetRevision(r int32) *NameOptions {
 }
 
 // MergeNameOptions combines the given NameOptions instances into a single *NameOptions in a last-one-wins fashion.
-//
-// Deprecated: Merging options structs will not be supported in Go Driver 2.0. Users should create a
-// single options struct instead.
 func MergeNameOptions(opts ...*NameOptions) *NameOptions {
 	n := GridFSName()
 	n.Revision = &DefaultRevision
@@ -305,9 +296,6 @@ func (f *GridFSFindOptions) SetSort(sort interface{}) *GridFSFindOptions {
 
 // MergeGridFSFindOptions combines the given GridFSFindOptions instances into a single GridFSFindOptions in a
 // last-one-wins fashion.
-//
-// Deprecated: Merging options structs will not be supported in Go Driver 2.0. Users should create a
-// single options struct instead.
 func MergeGridFSFindOptions(opts ...*GridFSFindOptions) *GridFSFindOptions {
 	fo := GridFSFind()
 	for _, opt := range opts {

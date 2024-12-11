@@ -77,9 +77,6 @@ func (c *CreateIndexesOptions) SetCommitQuorumVotingMembers() *CreateIndexesOpti
 
 // MergeCreateIndexesOptions combines the given CreateIndexesOptions into a single CreateIndexesOptions in a last one
 // wins fashion.
-//
-// Deprecated: Merging options structs will not be supported in Go Driver 2.0. Users should create a
-// single options struct instead.
 func MergeCreateIndexesOptions(opts ...*CreateIndexesOptions) *CreateIndexesOptions {
 	c := CreateIndexes()
 	for _, opt := range opts {
@@ -126,9 +123,6 @@ func (d *DropIndexesOptions) SetMaxTime(duration time.Duration) *DropIndexesOpti
 
 // MergeDropIndexesOptions combines the given DropIndexesOptions into a single DropIndexesOptions in a last-one-wins
 // fashion.
-//
-// Deprecated: Merging options structs will not be supported in Go Driver 2.0. Users should create a
-// single options struct instead.
 func MergeDropIndexesOptions(opts ...*DropIndexesOptions) *DropIndexesOptions {
 	c := DropIndexes()
 	for _, opt := range opts {
@@ -180,9 +174,6 @@ func (l *ListIndexesOptions) SetMaxTime(d time.Duration) *ListIndexesOptions {
 
 // MergeListIndexesOptions combines the given ListIndexesOptions instances into a single *ListIndexesOptions in a
 // last-one-wins fashion.
-//
-// Deprecated: Merging options structs will not be supported in Go Driver 2.0. Users should create a
-// single options struct instead.
 func MergeListIndexesOptions(opts ...*ListIndexesOptions) *ListIndexesOptions {
 	c := ListIndexes()
 	for _, opt := range opts {
@@ -418,9 +409,6 @@ func (i *IndexOptions) SetHidden(hidden bool) *IndexOptions {
 }
 
 // MergeIndexOptions combines the given IndexOptions into a single IndexOptions in a last-one-wins fashion.
-//
-// Deprecated: Merging options structs will not be supported in Go Driver 2.0. Users should create a
-// single options struct instead.
 func MergeIndexOptions(opts ...*IndexOptions) *IndexOptions {
 	i := Index()
 

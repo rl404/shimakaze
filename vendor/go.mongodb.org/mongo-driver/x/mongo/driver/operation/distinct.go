@@ -13,7 +13,6 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson/bsontype"
 	"go.mongodb.org/mongo-driver/event"
-	"go.mongodb.org/mongo-driver/internal/driverutil"
 	"go.mongodb.org/mongo-driver/mongo/description"
 	"go.mongodb.org/mongo-driver/mongo/readconcern"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -24,10 +23,9 @@ import (
 
 // Distinct performs a distinct operation.
 type Distinct struct {
-	authenticator  driver.Authenticator
 	collation      bsoncore.Document
 	key            *string
-	maxTime        *time.Duration
+	maxTimeMS      *int64
 	query          bsoncore.Document
 	session        *session.Client
 	clock          *session.ClusterClock
@@ -59,7 +57,8 @@ func buildDistinctResult(response bsoncore.Document) (DistinctResult, error) {
 	}
 	dr := DistinctResult{}
 	for _, element := range elements {
-		if element.Key() == "values" {
+		switch element.Key() {
+		case "values":
 			dr.Values = element.Value()
 		}
 	}
@@ -100,15 +99,12 @@ func (d *Distinct) Execute(ctx context.Context) error {
 		Crypt:             d.crypt,
 		Database:          d.database,
 		Deployment:        d.deployment,
-		MaxTime:           d.maxTime,
 		ReadConcern:       d.readConcern,
 		ReadPreference:    d.readPreference,
 		Selector:          d.selector,
 		ServerAPI:         d.serverAPI,
 		Timeout:           d.timeout,
-		Name:              driverutil.DistinctOp,
-		Authenticator:     d.authenticator,
-	}.Execute(ctx)
+	}.Execute(ctx, nil)
 
 }
 
@@ -125,6 +121,9 @@ func (d *Distinct) command(dst []byte, desc description.SelectedServer) ([]byte,
 	}
 	if d.key != nil {
 		dst = bsoncore.AppendStringElement(dst, "key", *d.key)
+	}
+	if d.maxTimeMS != nil {
+		dst = bsoncore.AppendInt64Element(dst, "maxTimeMS", *d.maxTimeMS)
 	}
 	if d.query != nil {
 		dst = bsoncore.AppendDocumentElement(dst, "query", d.query)
@@ -152,13 +151,13 @@ func (d *Distinct) Key(key string) *Distinct {
 	return d
 }
 
-// MaxTime specifies the maximum amount of time to allow the query to run on the server.
-func (d *Distinct) MaxTime(maxTime *time.Duration) *Distinct {
+// MaxTimeMS specifies the maximum amount of time to allow the query to run.
+func (d *Distinct) MaxTimeMS(maxTimeMS int64) *Distinct {
 	if d == nil {
 		d = new(Distinct)
 	}
 
-	d.maxTime = maxTime
+	d.maxTimeMS = &maxTimeMS
 	return d
 }
 
@@ -310,15 +309,5 @@ func (d *Distinct) Timeout(timeout *time.Duration) *Distinct {
 	}
 
 	d.timeout = timeout
-	return d
-}
-
-// Authenticator sets the authenticator to use for this operation.
-func (d *Distinct) Authenticator(authenticator driver.Authenticator) *Distinct {
-	if d == nil {
-		d = new(Distinct)
-	}
-
-	d.authenticator = authenticator
 	return d
 }

@@ -15,20 +15,15 @@ import (
 	"sync/atomic"
 	"time"
 
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/event"
-	"go.mongodb.org/mongo-driver/internal/driverutil"
-	"go.mongodb.org/mongo-driver/internal/logger"
 	"go.mongodb.org/mongo-driver/mongo/address"
 	"go.mongodb.org/mongo-driver/mongo/description"
 	"go.mongodb.org/mongo-driver/x/mongo/driver"
-	"go.mongodb.org/mongo-driver/x/mongo/driver/connstring"
 	"go.mongodb.org/mongo-driver/x/mongo/driver/operation"
 )
 
 const minHeartbeatInterval = 500 * time.Millisecond
-const wireVersion42 = 8 // Wire version for MongoDB 4.2
 
 // Server state constants.
 const (
@@ -125,7 +120,6 @@ type Server struct {
 
 	processErrorLock sync.Mutex
 	rttMonitor       *rttMonitor
-	monitorOnce      sync.Once
 }
 
 // updateTopologyCallback is a callback used to create a server that should be called when the parent Topology instance
@@ -135,12 +129,7 @@ type updateTopologyCallback func(description.Server) description.Server
 
 // ConnectServer creates a new Server and then initializes it using the
 // Connect method.
-func ConnectServer(
-	addr address.Address,
-	updateCallback updateTopologyCallback,
-	topologyID primitive.ObjectID,
-	opts ...ServerOption,
-) (*Server, error) {
+func ConnectServer(addr address.Address, updateCallback updateTopologyCallback, topologyID primitive.ObjectID, opts ...ServerOption) (*Server, error) {
 	srvr := NewServer(addr, topologyID, opts...)
 	err := srvr.Connect(updateCallback)
 	if err != nil {
@@ -186,9 +175,7 @@ func NewServer(addr address.Address, topologyID primitive.ObjectID, opts ...Serv
 		MaxConnecting:    cfg.maxConnecting,
 		MaxIdleTime:      cfg.poolMaxIdleTime,
 		MaintainInterval: cfg.poolMaintainInterval,
-		LoadBalanced:     cfg.loadBalanced,
 		PoolMonitor:      cfg.poolMonitor,
-		Logger:           cfg.logger,
 		handshakeErrFn:   s.ProcessHandshakeError,
 	}
 
@@ -197,39 +184,6 @@ func NewServer(addr address.Address, topologyID primitive.ObjectID, opts ...Serv
 	s.publishServerOpeningEvent(s.address)
 
 	return s
-}
-
-func mustLogServerMessage(srv *Server) bool {
-	return srv.cfg.logger != nil && srv.cfg.logger.LevelComponentEnabled(
-		logger.LevelDebug, logger.ComponentTopology)
-}
-
-func logServerMessage(srv *Server, msg string, keysAndValues ...interface{}) {
-	serverHost, serverPort, err := net.SplitHostPort(srv.address.String())
-	if err != nil {
-		serverHost = srv.address.String()
-		serverPort = ""
-	}
-
-	var driverConnectionID uint64
-	var serverConnectionID *int64
-
-	if srv.conn != nil {
-		driverConnectionID = srv.conn.driverConnectionID
-		serverConnectionID = srv.conn.serverConnectionID
-	}
-
-	srv.cfg.logger.Print(logger.LevelDebug,
-		logger.ComponentTopology,
-		msg,
-		logger.SerializeServer(logger.Server{
-			DriverConnectionID: driverConnectionID,
-			TopologyID:         srv.topologyID,
-			Message:            msg,
-			ServerConnectionID: serverConnectionID,
-			ServerHost:         serverHost,
-			ServerPort:         serverPort,
-		}, keysAndValues...)...)
 }
 
 // Connect initializes the Server by starting background monitoring goroutines.
@@ -248,6 +202,7 @@ func (s *Server) Connect(updateCallback updateTopologyCallback) error {
 	s.updateTopologyCallback.Store(updateCallback)
 
 	if !s.cfg.monitoringDisabled && !s.cfg.loadBalanced {
+		s.rttMonitor.connect()
 		s.closewg.Add(1)
 		go s.update()
 	}
@@ -286,10 +241,10 @@ func (s *Server) Disconnect(ctx context.Context) error {
 	close(s.done)
 	s.cancelCheck()
 
+	s.rttMonitor.disconnect()
 	s.pool.close(ctx)
 
 	s.closewg.Wait()
-	s.rttMonitor.disconnect()
 	atomic.StoreInt64(&s.state, serverDisconnected)
 
 	return nil
@@ -335,12 +290,10 @@ func (s *Server) ProcessHandshakeError(err error, startingGenerationNumber uint6
 		return
 	}
 	// Ignore the error if the connection is stale.
-	if generation, _ := s.pool.generation.getGeneration(serviceID); startingGenerationNumber < generation {
+	if startingGenerationNumber < s.pool.generation.getGeneration(serviceID) {
 		return
 	}
 
-	// Unwrap any connection errors. If there is no wrapped connection error, then the error should
-	// not result in any Server state change (e.g. a command error from the database).
 	wrappedConnErr := unwrapConnectionError(err)
 	if wrappedConnErr == nil {
 		return
@@ -417,8 +370,8 @@ func (s *Server) RequestImmediateCheck() {
 // (error, true) if the error is a WriteConcernError and the falls under the requirements for SDAM error
 // handling and (nil, false) otherwise.
 func getWriteConcernErrorForProcessing(err error) (*driver.WriteConcernError, bool) {
-	var writeCmdErr driver.WriteCommandError
-	if !errors.As(err, &writeCmdErr) {
+	writeCmdErr, ok := err.(driver.WriteCommandError)
+	if !ok {
 		return nil, false
 	}
 
@@ -431,17 +384,8 @@ func getWriteConcernErrorForProcessing(err error) (*driver.WriteConcernError, bo
 
 // ProcessError handles SDAM error handling and implements driver.ErrorProcessor.
 func (s *Server) ProcessError(err error, conn driver.Connection) driver.ProcessErrorResult {
-	// Ignore nil errors.
+	// ignore nil error
 	if err == nil {
-		return driver.NoChange
-	}
-
-	// Ignore errors from stale connections because the error came from a previous generation of the
-	// connection pool. The root cause of the error has already been handled, which is what caused
-	// the pool generation to increment. Processing errors for stale connections could result in
-	// handling the same error root cause multiple times (e.g. a temporary network interrupt causing
-	// all connections to the same server to return errors).
-	if conn.Stale() {
 		return driver.NoChange
 	}
 
@@ -451,38 +395,16 @@ func (s *Server) ProcessError(err error, conn driver.Connection) driver.ProcessE
 	s.processErrorLock.Lock()
 	defer s.processErrorLock.Unlock()
 
-	// Get the wire version and service ID from the connection description because they will never
-	// change for the lifetime of a connection and can possibly be different between connections to
-	// the same server.
-	connDesc := conn.Description()
-	wireVersion := connDesc.WireVersion
-	serviceID := connDesc.ServiceID
-
-	// Get the topology version from the Server description because the Server description is
-	// updated by heartbeats and errors, so typically has a more up-to-date topology version.
-	serverDesc := s.desc.Load().(description.Server)
-	topologyVersion := serverDesc.TopologyVersion
-
-	// We don't currently update the Server topology version when we create new application
-	// connections, so it's possible for a connection's topology version to be newer than the
-	// Server's topology version. Pick the "newest" of the two topology versions.
-	// Technically a nil topology version on a new database response should be considered a new
-	// topology version and replace the Server's topology version. However, we don't know if the
-	// connection's topology version is based on a new or old database response, so we ignore a nil
-	// topology version on the connection for now.
-	//
-	// TODO(GODRIVER-2841): Remove this logic once we set the Server description when we create
-	// TODO application connections because then the Server's topology version will always be the
-	// TODO latest known.
-	if tv := connDesc.TopologyVersion; tv != nil && topologyVersion.CompareToIncoming(tv) < 0 {
-		topologyVersion = tv
+	// ignore stale error
+	if conn.Stale() {
+		return driver.NoChange
 	}
-
 	// Invalidate server description if not primary or node recovering error occurs.
 	// These errors can be reported as a command error or a write concern error.
+	desc := conn.Description()
 	if cerr, ok := err.(driver.Error); ok && (cerr.NodeIsRecovering() || cerr.NotPrimary()) {
-		// Ignore errors that came from when the database was on a previous topology version.
-		if topologyVersion.CompareToIncoming(cerr.TopologyVersion) >= 0 {
+		// ignore stale error
+		if desc.TopologyVersion.CompareToIncoming(cerr.TopologyVersion) >= 0 {
 			return driver.NoChange
 		}
 
@@ -492,16 +414,16 @@ func (s *Server) ProcessError(err error, conn driver.Connection) driver.ProcessE
 
 		res := driver.ServerMarkedUnknown
 		// If the node is shutting down or is older than 4.2, we synchronously clear the pool
-		if cerr.NodeIsShuttingDown() || wireVersion == nil || wireVersion.Max < wireVersion42 {
+		if cerr.NodeIsShuttingDown() || desc.WireVersion == nil || desc.WireVersion.Max < 8 {
 			res = driver.ConnectionPoolCleared
-			s.pool.clear(err, serviceID)
+			s.pool.clear(err, desc.ServiceID)
 		}
 
 		return res
 	}
 	if wcerr, ok := getWriteConcernErrorForProcessing(err); ok {
-		// Ignore errors that came from when the database was on a previous topology version.
-		if topologyVersion.CompareToIncoming(wcerr.TopologyVersion) >= 0 {
+		// ignore stale error
+		if desc.TopologyVersion.CompareToIncoming(wcerr.TopologyVersion) >= 0 {
 			return driver.NoChange
 		}
 
@@ -511,9 +433,9 @@ func (s *Server) ProcessError(err error, conn driver.Connection) driver.ProcessE
 
 		res := driver.ServerMarkedUnknown
 		// If the node is shutting down or is older than 4.2, we synchronously clear the pool
-		if wcerr.NodeIsShuttingDown() || wireVersion == nil || wireVersion.Max < wireVersion42 {
+		if wcerr.NodeIsShuttingDown() || desc.WireVersion == nil || desc.WireVersion.Max < 8 {
 			res = driver.ConnectionPoolCleared
-			s.pool.clear(err, serviceID)
+			s.pool.clear(err, desc.ServiceID)
 		}
 		return res
 	}
@@ -527,7 +449,7 @@ func (s *Server) ProcessError(err error, conn driver.Connection) driver.ProcessE
 	if netErr, ok := wrappedConnErr.(net.Error); ok && netErr.Timeout() {
 		return driver.NoChange
 	}
-	if errors.Is(wrappedConnErr, context.Canceled) || errors.Is(wrappedConnErr, context.DeadlineExceeded) {
+	if wrappedConnErr == context.Canceled || wrappedConnErr == context.DeadlineExceeded {
 		return driver.NoChange
 	}
 
@@ -535,12 +457,12 @@ func (s *Server) ProcessError(err error, conn driver.Connection) driver.ProcessE
 	// monitoring check. The check is cancelled last to avoid a post-cancellation reconnect racing with
 	// updateDescription.
 	s.updateDescription(description.NewServerFromError(s.address, err, nil))
-	s.pool.clear(err, serviceID)
+	s.pool.clear(err, desc.ServiceID)
 	s.cancelCheck()
 	return driver.ConnectionPoolCleared
 }
 
-// update handle performing heartbeats and updating any subscribers of the
+// update handles performing heartbeats and updating any subscribers of the
 // newest description.Server retrieved.
 func (s *Server) update() {
 	defer s.closewg.Done()
@@ -551,9 +473,19 @@ func (s *Server) update() {
 	checkNow := s.checkNow
 	done := s.done
 
-	defer logUnexpectedFailure(s.cfg.logger, "Encountered unexpected failure updating server")
+	var doneOnce bool
+	defer func() {
+		if r := recover(); r != nil {
+			if doneOnce {
+				return
+			}
+			// We keep this goroutine alive attempting to read from the done channel.
+			<-done
+		}
+	}()
 
 	closeServer := func() {
+		doneOnce = true
 		s.subLock.Lock()
 		for id, c := range s.subscribers {
 			close(c)
@@ -588,7 +520,6 @@ func (s *Server) update() {
 		}
 	}
 
-	timeoutCnt := 0
 	for {
 		// Check if the server is disconnecting. Even if waitForNextCheck has already read from the done channel, we
 		// can safely read from it again because Disconnect closes the channel.
@@ -603,7 +534,7 @@ func (s *Server) update() {
 
 		// Perform the next check.
 		desc, err := s.check()
-		if errors.Is(err, errCheckCancelled) {
+		if err == errCheckCancelled {
 			if atomic.LoadInt64(&s.state) != serverConnected {
 				continue
 			}
@@ -614,59 +545,28 @@ func (s *Server) update() {
 			continue
 		}
 
-		if isShortcut := func() bool {
-			// Must hold the processErrorLock while updating the server description and clearing the
-			// pool. Not holding the lock leads to possible out-of-order processing of pool.clear() and
-			// pool.ready() calls from concurrent server description updates.
-			s.processErrorLock.Lock()
-			defer s.processErrorLock.Unlock()
-
-			s.updateDescription(desc)
-			// Retry after the first timeout before clearing the pool in case of a FAAS pause as
-			// described in GODRIVER-2577.
-			if err := unwrapConnectionError(desc.LastError); err != nil && timeoutCnt < 1 {
-				if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
-					timeoutCnt++
-					// We want to immediately retry on timeout error. Continue to next loop.
-					return true
-				}
-				if err, ok := err.(net.Error); ok && err.Timeout() {
-					timeoutCnt++
-					// We want to immediately retry on timeout error. Continue to next loop.
-					return true
-				}
-			}
-			if err := desc.LastError; err != nil {
-				// Clear the pool once the description has been updated to Unknown. Pass in a nil service ID to clear
-				// because the monitoring routine only runs for non-load balanced deployments in which servers don't return
-				// IDs.
-				if timeoutCnt > 0 {
-					s.pool.clearAll(err, nil)
-				} else {
-					s.pool.clear(err, nil)
-				}
-			}
-			// We're either not handling a timeout error, or we just handled the 2nd consecutive
-			// timeout error. In either case, reset the timeout count to 0 and return false to
-			// continue the normal check process.
-			timeoutCnt = 0
-			return false
-		}(); isShortcut {
-			continue
+		// Must hold the processErrorLock while updating the server description and clearing the
+		// pool. Not holding the lock leads to possible out-of-order processing of pool.clear() and
+		// pool.ready() calls from concurrent server description updates.
+		s.processErrorLock.Lock()
+		s.updateDescription(desc)
+		if err := desc.LastError; err != nil {
+			// Clear the pool once the description has been updated to Unknown. Pass in a nil service ID to clear
+			// because the monitoring routine only runs for non-load balanced deployments in which servers don't return
+			// IDs.
+			s.pool.clear(err, nil)
 		}
+		s.processErrorLock.Unlock()
 
 		// If the server supports streaming or we're already streaming, we want to move to streaming the next response
 		// without waiting. If the server has transitioned to Unknown from a network error, we want to do another
 		// check without waiting in case it was a transient error and the server isn't actually down.
+		serverSupportsStreaming := desc.Kind != description.Unknown && desc.TopologyVersion != nil
 		connectionIsStreaming := s.conn != nil && s.conn.getCurrentlyStreaming()
 		transitionedFromNetworkError := desc.LastError != nil && unwrapConnectionError(desc.LastError) != nil &&
 			previousDescription.Kind != description.Unknown
 
-		if isStreamingEnabled(s) && isStreamable(s) {
-			s.monitorOnce.Do(s.rttMonitor.connect)
-		}
-
-		if isStreamingEnabled(s) && (isStreamable(s) || connectionIsStreaming) || transitionedFromNetworkError {
+		if serverSupportsStreaming || connectionIsStreaming || transitionedFromNetworkError {
 			continue
 		}
 
@@ -687,7 +587,10 @@ func (s *Server) updateDescription(desc description.Server) {
 		return
 	}
 
-	defer logUnexpectedFailure(s.cfg.logger, "Encountered unexpected failure updating server description")
+	defer func() {
+		//  ¯\_(ツ)_/¯
+		_ = recover()
+	}()
 
 	// Anytime we update the server description to something other than "unknown", set the pool to
 	// "ready". Do this before updating the description so that connections can be checked out as
@@ -730,7 +633,7 @@ func (s *Server) createConnection() *connection {
 		WithWriteTimeout(func(time.Duration) time.Duration { return s.cfg.heartbeatTimeout }),
 		// We override whatever handshaker is currently attached to the options with a basic
 		// one because need to make sure we don't do auth.
-		WithHandshaker(func(Handshaker) Handshaker {
+		WithHandshaker(func(h Handshaker) Handshaker {
 			return operation.NewHello().AppName(s.cfg.appname).Compressors(s.cfg.compressionOpts).
 				ServerAPI(s.cfg.serverAPI)
 		}),
@@ -795,67 +698,38 @@ func (s *Server) createBaseOperation(conn driver.Connection) *operation.Hello {
 	return operation.
 		NewHello().
 		ClusterClock(s.cfg.clock).
-		Deployment(driver.SingleConnectionDeployment{C: conn}).
+		Deployment(driver.SingleConnectionDeployment{conn}).
 		ServerAPI(s.cfg.serverAPI)
-}
-
-func isStreamingEnabled(srv *Server) bool {
-	switch srv.cfg.serverMonitoringMode {
-	case connstring.ServerMonitoringModeStream:
-		return true
-	case connstring.ServerMonitoringModePoll:
-		return false
-	default:
-		return driverutil.GetFaasEnvName() == ""
-	}
-}
-
-func isStreamable(srv *Server) bool {
-	return srv.Description().Kind != description.Unknown && srv.Description().TopologyVersion != nil
 }
 
 func (s *Server) check() (description.Server, error) {
 	var descPtr *description.Server
 	var err error
-	var duration time.Duration
-
-	start := time.Now()
+	var durationNanos int64
 
 	// Create a new connection if this is the first check, the connection was closed after an error during the previous
 	// check, or the previous check was cancelled.
 	if s.conn == nil || s.conn.closed() || s.checkWasCancelled() {
-		connID := "0"
-		if s.conn != nil {
-			connID = s.conn.ID()
-		}
-		s.publishServerHeartbeatStartedEvent(connID, false)
 		// Create a new connection and add it's handshake RTT as a sample.
 		err = s.setupHeartbeatConnection()
-		duration = time.Since(start)
-		connID = "0"
-		if s.conn != nil {
-			connID = s.conn.ID()
-		}
 		if err == nil {
 			// Use the description from the connection handshake as the value for this check.
 			s.rttMonitor.addSample(s.conn.helloRTT)
 			descPtr = &s.conn.desc
-			s.publishServerHeartbeatSucceededEvent(connID, duration, s.conn.desc, false)
-		} else {
-			err = unwrapConnectionError(err)
-			s.publishServerHeartbeatFailedEvent(connID, duration, err, false)
 		}
-	} else {
+	}
+
+	if descPtr == nil && err == nil {
 		// An existing connection is being used. Use the server description properties to execute the right heartbeat.
 
 		// Wrap conn in a type that implements driver.StreamerConnection.
 		heartbeatConn := initConnection{s.conn}
 		baseOperation := s.createBaseOperation(heartbeatConn)
 		previousDescription := s.Description()
-		streamable := isStreamingEnabled(s) && isStreamable(s)
+		streamable := previousDescription.TopologyVersion != nil
 
 		s.publishServerHeartbeatStartedEvent(s.conn.ID(), s.conn.getCurrentlyStreaming() || streamable)
-
+		start := time.Now()
 		switch {
 		case s.conn.getCurrentlyStreaming():
 			// The connection is already in a streaming state, so we stream the next response.
@@ -886,34 +760,26 @@ func (s *Server) check() (description.Server, error) {
 			s.conn.setSocketTimeout(s.cfg.heartbeatTimeout)
 			err = baseOperation.Execute(s.heartbeatCtx)
 		}
-
-		duration = time.Since(start)
-
-		// We need to record an RTT sample in the polling case so that if the server
-		// is < 4.4, or if polling is specified by the user, then the
-		// RTT-short-circuit feature of CSOT is not disabled.
-		if !streamable {
-			s.rttMonitor.addSample(duration)
-		}
+		durationNanos = time.Since(start).Nanoseconds()
 
 		if err == nil {
 			tempDesc := baseOperation.Result(s.address)
 			descPtr = &tempDesc
-			s.publishServerHeartbeatSucceededEvent(s.conn.ID(), duration, tempDesc, s.conn.getCurrentlyStreaming() || streamable)
+			s.publishServerHeartbeatSucceededEvent(s.conn.ID(), durationNanos, tempDesc, s.conn.getCurrentlyStreaming() || streamable)
 		} else {
 			// Close the connection here rather than below so we ensure we're not closing a connection that wasn't
 			// successfully created.
 			if s.conn != nil {
 				_ = s.conn.close()
 			}
-			s.publishServerHeartbeatFailedEvent(s.conn.ID(), duration, err, s.conn.getCurrentlyStreaming() || streamable)
+			s.publishServerHeartbeatFailedEvent(s.conn.ID(), durationNanos, err, s.conn.getCurrentlyStreaming() || streamable)
 		}
 	}
 
 	if descPtr != nil {
 		// The check was successful. Set the average RTT and the 90th percentile RTT and return.
 		desc := *descPtr
-		desc = desc.SetAverageRTT(s.rttMonitor.EWMA())
+		desc = desc.SetAverageRTT(s.rttMonitor.getRTT())
 		desc.HeartbeatInterval = s.cfg.heartbeatInterval
 		return desc, nil
 	}
@@ -948,9 +814,14 @@ func extractTopologyVersion(err error) *description.TopologyVersion {
 	return nil
 }
 
-// RTTMonitor returns this server's round-trip-time monitor.
-func (s *Server) RTTMonitor() driver.RTTMonitor {
-	return s.rttMonitor
+// MinRTT returns the minimum round-trip time to the server observed over the last 5 minutes.
+func (s *Server) MinRTT() time.Duration {
+	return s.rttMonitor.getMinRTT()
+}
+
+// RTT90 returns the 90th percentile round-trip time to the server observed over the last 5 minutes.
+func (s *Server) RTT90() time.Duration {
+	return s.rttMonitor.getRTT90()
 }
 
 // OperationCount returns the current number of in-progress operations for this server.
@@ -968,7 +839,7 @@ func (s *Server) String() string {
 		str += fmt.Sprintf(", Tag sets: %s", desc.Tags)
 	}
 	if state == serverConnected {
-		str += fmt.Sprintf(", Average RTT: %s, Min RTT: %s", desc.AverageRTT, s.RTTMonitor().Min())
+		str += fmt.Sprintf(", Average RTT: %s, Min RTT: %s", desc.AverageRTT, s.MinRTT())
 	}
 	if desc.LastError != nil {
 		str += fmt.Sprintf(", Last error: %s", desc.LastError)
@@ -1019,10 +890,6 @@ func (s *Server) publishServerOpeningEvent(addr address.Address) {
 	if s.cfg.serverMonitor != nil && s.cfg.serverMonitor.ServerOpening != nil {
 		s.cfg.serverMonitor.ServerOpening(serverOpening)
 	}
-
-	if mustLogServerMessage(s) {
-		logServerMessage(s, logger.TopologyServerOpening)
-	}
 }
 
 // publishes a ServerHeartbeatStartedEvent to indicate a hello command has started
@@ -1035,22 +902,15 @@ func (s *Server) publishServerHeartbeatStartedEvent(connectionID string, await b
 	if s != nil && s.cfg.serverMonitor != nil && s.cfg.serverMonitor.ServerHeartbeatStarted != nil {
 		s.cfg.serverMonitor.ServerHeartbeatStarted(serverHeartbeatStarted)
 	}
-
-	if mustLogServerMessage(s) {
-		logServerMessage(s, logger.TopologyServerHeartbeatStarted,
-			logger.KeyAwaited, await)
-	}
 }
 
 // publishes a ServerHeartbeatSucceededEvent to indicate hello has succeeded
 func (s *Server) publishServerHeartbeatSucceededEvent(connectionID string,
-	duration time.Duration,
+	durationNanos int64,
 	desc description.Server,
-	await bool,
-) {
+	await bool) {
 	serverHeartbeatSucceeded := &event.ServerHeartbeatSucceededEvent{
-		DurationNanos: duration.Nanoseconds(),
-		Duration:      duration,
+		DurationNanos: durationNanos,
 		Reply:         desc,
 		ConnectionID:  connectionID,
 		Awaited:       await,
@@ -1059,38 +919,15 @@ func (s *Server) publishServerHeartbeatSucceededEvent(connectionID string,
 	if s != nil && s.cfg.serverMonitor != nil && s.cfg.serverMonitor.ServerHeartbeatSucceeded != nil {
 		s.cfg.serverMonitor.ServerHeartbeatSucceeded(serverHeartbeatSucceeded)
 	}
-
-	if mustLogServerMessage(s) {
-		descRaw, _ := bson.Marshal(struct {
-			description.Server `bson:",inline"`
-			Ok                 int32
-		}{
-			Server: desc,
-			Ok: func() int32 {
-				if desc.LastError != nil {
-					return 0
-				}
-
-				return 1
-			}(),
-		})
-
-		logServerMessage(s, logger.TopologyServerHeartbeatSucceeded,
-			logger.KeyAwaited, await,
-			logger.KeyDurationMS, duration.Milliseconds(),
-			logger.KeyReply, bson.Raw(descRaw).String())
-	}
 }
 
 // publishes a ServerHeartbeatFailedEvent to indicate hello has failed
 func (s *Server) publishServerHeartbeatFailedEvent(connectionID string,
-	duration time.Duration,
+	durationNanos int64,
 	err error,
-	await bool,
-) {
+	await bool) {
 	serverHeartbeatFailed := &event.ServerHeartbeatFailedEvent{
-		DurationNanos: duration.Nanoseconds(),
-		Duration:      duration,
+		DurationNanos: durationNanos,
 		Failure:       err,
 		ConnectionID:  connectionID,
 		Awaited:       await,
@@ -1098,13 +935,6 @@ func (s *Server) publishServerHeartbeatFailedEvent(connectionID string,
 
 	if s != nil && s.cfg.serverMonitor != nil && s.cfg.serverMonitor.ServerHeartbeatFailed != nil {
 		s.cfg.serverMonitor.ServerHeartbeatFailed(serverHeartbeatFailed)
-	}
-
-	if mustLogServerMessage(s) {
-		logServerMessage(s, logger.TopologyServerHeartbeatFailed,
-			logger.KeyAwaited, await,
-			logger.KeyDurationMS, duration.Milliseconds(),
-			logger.KeyFailure, err.Error())
 	}
 }
 
