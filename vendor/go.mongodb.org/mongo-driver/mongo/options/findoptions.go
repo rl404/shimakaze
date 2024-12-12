@@ -251,9 +251,6 @@ func (f *FindOptions) SetSort(sort interface{}) *FindOptions {
 }
 
 // MergeFindOptions combines the given FindOptions instances into a single FindOptions in a last-one-wins fashion.
-//
-// Deprecated: Merging options structs will not be supported in Go Driver 2.0. Users should create a
-// single options struct instead.
 func MergeFindOptions(opts ...*FindOptions) *FindOptions {
 	fo := Find()
 	for _, opt := range opts {
@@ -552,9 +549,6 @@ func (f *FindOneOptions) SetSort(sort interface{}) *FindOneOptions {
 
 // MergeFindOneOptions combines the given FindOneOptions instances into a single FindOneOptions in a last-one-wins
 // fashion.
-//
-// Deprecated: Merging options structs will not be supported in Go Driver 2.0. Users should create a
-// single options struct instead.
 func MergeFindOneOptions(opts ...*FindOneOptions) *FindOneOptions {
 	fo := FindOne()
 	for _, opt := range opts {
@@ -748,9 +742,6 @@ func (f *FindOneAndReplaceOptions) SetLet(let interface{}) *FindOneAndReplaceOpt
 
 // MergeFindOneAndReplaceOptions combines the given FindOneAndReplaceOptions instances into a single
 // FindOneAndReplaceOptions in a last-one-wins fashion.
-//
-// Deprecated: Merging options structs will not be supported in Go Driver 2.0. Users should create a
-// single options struct instead.
 func MergeFindOneAndReplaceOptions(opts ...*FindOneAndReplaceOptions) *FindOneAndReplaceOptions {
 	fo := FindOneAndReplace()
 	for _, opt := range opts {
@@ -931,9 +922,6 @@ func (f *FindOneAndUpdateOptions) SetLet(let interface{}) *FindOneAndUpdateOptio
 
 // MergeFindOneAndUpdateOptions combines the given FindOneAndUpdateOptions instances into a single
 // FindOneAndUpdateOptions in a last-one-wins fashion.
-//
-// Deprecated: Merging options structs will not be supported in Go Driver 2.0. Users should create a
-// single options struct instead.
 func MergeFindOneAndUpdateOptions(opts ...*FindOneAndUpdateOptions) *FindOneAndUpdateOptions {
 	fo := FindOneAndUpdate()
 	for _, opt := range opts {
@@ -1074,9 +1062,6 @@ func (f *FindOneAndDeleteOptions) SetLet(let interface{}) *FindOneAndDeleteOptio
 
 // MergeFindOneAndDeleteOptions combines the given FindOneAndDeleteOptions instances into a single
 // FindOneAndDeleteOptions in a last-one-wins fashion.
-//
-// Deprecated: Merging options structs will not be supported in Go Driver 2.0. Users should create a
-// single options struct instead.
 func MergeFindOneAndDeleteOptions(opts ...*FindOneAndDeleteOptions) *FindOneAndDeleteOptions {
 	fo := FindOneAndDelete()
 	for _, opt := range opts {
