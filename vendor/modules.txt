@@ -226,8 +226,6 @@ github.com/newrelic/go-agent/v3/integrations/nrmongo
 # github.com/nicklaw5/helix/v2 v2.31.0
 ## explicit; go 1.22
 github.com/nicklaw5/helix/v2
-# github.com/pkg/errors v0.9.1
-## explicit
 # github.com/redis/go-redis/v9 v9.6.1
 ## explicit; go 1.18
 github.com/redis/go-redis/v9
@@ -355,8 +353,6 @@ go.mongodb.org/mongo-driver/x/mongo/driver/operation
 go.mongodb.org/mongo-driver/x/mongo/driver/session
 go.mongodb.org/mongo-driver/x/mongo/driver/topology
 go.mongodb.org/mongo-driver/x/mongo/driver/wiremessage
-# go.mongodb.org/mongo-driver/v2 v2.0.0
-## explicit; go 1.18
 # go.opencensus.io v0.24.0
 ## explicit; go 1.13
 go.opencensus.io
@@ -407,7 +403,7 @@ go.opentelemetry.io/otel/metric/noop
 ## explicit; go 1.21
 go.opentelemetry.io/otel/trace
 go.opentelemetry.io/otel/trace/embedded
-# golang.org/x/crypto v0.29.0
+# golang.org/x/crypto v0.31.0
 ## explicit; go 1.20
 golang.org/x/crypto/chacha20
 golang.org/x/crypto/chacha20poly1305
@@ -447,7 +443,7 @@ golang.org/x/oauth2/jwt
 golang.org/x/sync/errgroup
 golang.org/x/sync/semaphore
 golang.org/x/sync/singleflight
-# golang.org/x/sys v0.27.0
+# golang.org/x/sys v0.28.0
 ## explicit; go 1.18
 golang.org/x/sys/cpu
 golang.org/x/sys/unix
