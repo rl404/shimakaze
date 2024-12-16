@@ -4,10 +4,7 @@
 // not use this file except in compliance with the License. You may obtain
 // a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 
-// Package tag provides types for filtering replica set members using tags in a read preference.
-//
-// For more information about read preference tags, see
-// https://www.mongodb.com/docs/manual/core/read-preference-tags/
+// Package tag provides a way to define filters for tagged servers.
 package tag // import "go.mongodb.org/mongo-driver/tag"
 
 import (
@@ -15,7 +12,7 @@ import (
 	"fmt"
 )
 
-// Tag is a name/value pair.
+// Tag is a name/vlaue pair.
 type Tag struct {
 	Name  string
 	Value string
@@ -26,10 +23,7 @@ func (tag Tag) String() string {
 	return fmt.Sprintf("%s=%s", tag.Name, tag.Value)
 }
 
-// NewTagSetFromMap creates a tag set from a map.
-//
-// For more information about read preference tags, see
-// https://www.mongodb.com/docs/manual/core/read-preference-tags/
+// NewTagSetFromMap creates a new tag set from a map.
 func NewTagSetFromMap(m map[string]string) Set {
 	var set Set
 	for k, v := range m {
@@ -39,10 +33,7 @@ func NewTagSetFromMap(m map[string]string) Set {
 	return set
 }
 
-// NewTagSetsFromMaps creates a list of tag sets from a slice of maps.
-//
-// For more information about read preference tags, see
-// https://www.mongodb.com/docs/manual/core/read-preference-tags/
+// NewTagSetsFromMaps creates new tag sets from maps.
 func NewTagSetsFromMaps(maps []map[string]string) []Set {
 	sets := make([]Set, 0, len(maps))
 	for _, m := range maps {
