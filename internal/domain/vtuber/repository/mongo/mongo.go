@@ -550,6 +550,7 @@ func (m *Mongo) GetVideos(ctx context.Context, data entity.GetVideosRequest) ([]
 	unwindStage := bson.D{{Key: "$unwind", Value: "$channels"}}
 	unwindStage2 := bson.D{{Key: "$unwind", Value: "$channels.videos"}}
 	projectStage := bson.D{{Key: "$project", Value: bson.M{
+		"id":               "$id",
 		"vtuber_id":        "$id",
 		"vtuber_name":      "$name",
 		"vtuber_image":     "$image",
