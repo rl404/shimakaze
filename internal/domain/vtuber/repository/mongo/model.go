@@ -275,6 +275,10 @@ func (m *Mongo) convertSort(sort string) bson.D {
 		return bson.D{{Key: sort, Value: 1}, {Key: "retirement_date", Value: -1}, {Key: "id", Value: 1}}
 	}
 
+	if sort == "debut_date" {
+		return bson.D{{Key: "is_debut_date_null", Value: 1}, {Key: sort, Value: 1}, {Key: "id", Value: 1}}
+	}
+
 	return bson.D{{Key: sort, Value: 1}, {Key: "id", Value: 1}}
 }
 

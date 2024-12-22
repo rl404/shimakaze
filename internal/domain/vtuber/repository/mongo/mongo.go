@@ -289,6 +289,10 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 			"birthday":           1,
 			"emoji":              1,
 			"updated_at":         1,
+			"is_debut_date_null": bson.M{"$cond": bson.A{
+				bson.M{"$eq": bson.A{"$debut_date", nil}},
+				1, 0,
+			}},
 		}}}
 	}
 
