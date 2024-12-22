@@ -282,7 +282,7 @@ func (c *Cache) GetVideos(ctx context.Context, req entity.GetVideosRequest) (_ [
 		return nil, 0, code, stack.Wrap(ctx, err)
 	}
 
-	if err := c.cacher.Set(ctx, key, data, 30*time.Minute); err != nil {
+	if err := c.cacher.Set(ctx, key, data, 5*time.Minute); err != nil {
 		return nil, 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalCache)
 	}
 
