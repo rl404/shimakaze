@@ -365,7 +365,7 @@ func (s *service) fillYoutubeVideos(ctx context.Context, channel vtuberEntity.Ch
 
 	videoIDs, _, err := s.youtube.GetVideoIDsByChannelID(ctx, channel.ID)
 	if err != nil {
-		// stack.Wrap(ctx, err)
+		stack.Wrap(ctx, err)
 		return channel
 	}
 

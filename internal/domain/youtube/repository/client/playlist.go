@@ -57,6 +57,9 @@ func (c *Client) GetVideoIDsByChannelID(ctx context.Context, channelID string) (
 		defer resp.Body.Close()
 
 		if resp.StatusCode != http.StatusOK {
+			if resp.StatusCode == http.StatusNotFound {
+				return nil, resp.StatusCode, nil
+			}
 			return nil, resp.StatusCode, stack.Wrap(ctx, _errors.New(http.StatusText(resp.StatusCode)))
 		}
 
