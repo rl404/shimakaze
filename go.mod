@@ -17,8 +17,8 @@ require (
 	github.com/swaggo/http-swagger/v2 v2.0.2
 	github.com/swaggo/swag v1.16.4
 	github.com/tmdvs/Go-Emoji-Utils v1.2.1
-	go.mongodb.org/mongo-driver v1.17.1
-	golang.org/x/oauth2 v0.24.0
+	go.mongodb.org/mongo-driver v1.17.2
+	golang.org/x/oauth2 v0.25.0
 	golang.org/x/text v0.21.0
 )
 
