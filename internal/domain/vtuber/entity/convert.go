@@ -268,7 +268,10 @@ func ParseChannelType(link string) ChannelType {
 	case "bilibili":
 		return ChannelBilibili
 	case "nicovideo":
-		return ChannelNiconico
+		if strings.ToLower(u.Hostname()) == "www.nicovideo.jp" {
+			return ChannelNiconico
+		}
+		return ChannelOther
 	default:
 		return ChannelOther
 	}
