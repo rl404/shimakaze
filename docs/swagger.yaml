@@ -157,6 +157,8 @@ definitions:
         items:
           $ref: '#/definitions/service.vtuberAgency'
         type: array
+      average_video_length:
+        type: integer
       birthday:
         type: string
       blood_type:
@@ -222,6 +224,8 @@ definitions:
           type: string
         type: array
       subscriber:
+        type: integer
+      total_video_length:
         type: integer
       updated_at:
         type: string
@@ -1801,6 +1805,10 @@ paths:
         - -monthly_subscriber
         - video_count
         - -video_count
+        - average_video_length
+        - -average_video_length
+        - total_video_length
+        - -total_video_length
         in: query
         name: sort
         type: string

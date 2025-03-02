@@ -86,7 +86,7 @@ func (s *service) updateVtuber(ctx context.Context, id int64) (int, error) {
 	vtuber = s.overrideVtuberData(vtuber, existingVtuber)
 
 	// Fill channel data.
-	vtuber.Channels, vtuber.Subscriber, vtuber.MonthlySubscriber, vtuber.VideoCount = s.fillChannelData(ctx, vtuber.DebutDate, vtuber.RetirementDate, vtuber.Channels)
+	vtuber.Channels, vtuber.Subscriber, vtuber.MonthlySubscriber, vtuber.VideoCount, vtuber.AverageVideoLength, vtuber.TotalVideoLength = s.fillChannelData(ctx, vtuber.DebutDate, vtuber.RetirementDate, vtuber.Channels)
 
 	// Update data.
 	if code, err := s.vtuber.UpdateByID(ctx, id, vtuber); err != nil {
@@ -283,8 +283,8 @@ func (s *service) mergeAgencies(a1, a2 []vtuberEntity.Agency) []vtuberEntity.Age
 	return a3
 }
 
-func (s *service) fillChannelData(ctx context.Context, debutDate, retirementDate *time.Time, channels []vtuberEntity.Channel) ([]vtuberEntity.Channel, int, int, int) {
-	subscriber, monthlySubs, videoCount := 0, 0, 0
+func (s *service) fillChannelData(ctx context.Context, debutDate, retirementDate *time.Time, channels []vtuberEntity.Channel) ([]vtuberEntity.Channel, int, int, int, int, int) {
+	subscriber, monthlySubs, allVideoCount, avgVideoCount, totalVideoLength := 0, 0, 0, 0, 0
 	for i, channel := range channels {
 		switch channel.Type {
 		case vtuberEntity.ChannelYoutube:
@@ -305,7 +305,15 @@ func (s *service) fillChannelData(ctx context.Context, debutDate, retirementDate
 			subscriber = channels[i].Subscriber
 		}
 
-		videoCount += len(channels[i].Videos)
+		allVideoCount += len(channels[i].Videos)
+
+		for _, video := range channels[i].Videos {
+			if video.StartDate == nil || video.EndDate == nil {
+				continue
+			}
+			avgVideoCount++
+			totalVideoLength += int(video.EndDate.Sub(*video.StartDate).Seconds())
+		}
 	}
 
 	if debutDate != nil {
@@ -315,7 +323,12 @@ func (s *service) fillChannelData(ctx context.Context, debutDate, retirementDate
 		}
 	}
 
-	return channels, subscriber, monthlySubs, videoCount
+	var avgVideoLength int
+	if avgVideoCount > 0 {
+		avgVideoLength = int(float64(totalVideoLength) / float64(avgVideoCount))
+	}
+
+	return channels, subscriber, monthlySubs, allVideoCount, avgVideoLength, totalVideoLength
 }
 
 func (s *service) fillYoutubeChannel(ctx context.Context, channel vtuberEntity.Channel) vtuberEntity.Channel {
