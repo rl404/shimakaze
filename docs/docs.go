@@ -2135,7 +2135,11 @@ const docTemplate = `{
                             "monthly_subscriber",
                             "-monthly_subscriber",
                             "video_count",
-                            "-video_count"
+                            "-video_count",
+                            "average_video_length",
+                            "-average_video_length",
+                            "total_video_length",
+                            "-total_video_length"
                         ],
                         "type": "string",
                         "default": "name",
@@ -2781,6 +2785,9 @@ const docTemplate = `{
                         "$ref": "#/definitions/service.vtuberAgency"
                     }
                 },
+                "average_video_length": {
+                    "type": "integer"
+                },
                 "birthday": {
                     "type": "string"
                 },
@@ -2878,6 +2885,9 @@ const docTemplate = `{
                     }
                 },
                 "subscriber": {
+                    "type": "integer"
+                },
+                "total_video_length": {
                     "type": "integer"
                 },
                 "updated_at": {

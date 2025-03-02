@@ -29,6 +29,8 @@ type vtuber struct {
 	Subscriber          int             `bson:"subscriber"`
 	MonthlySubscriber   int             `bson:"monthly_subscriber"`
 	VideoCount          int             `bson:"video_count"`
+	AverageVideoLength  int             `bson:"average_video_length"`
+	TotalVideoLength    int             `bson:"total_video_length"`
 	SocialMedias        []string        `bson:"social_medias"`
 	OfficialWebsites    []string        `bson:"official_websites"`
 	Gender              string          `bson:"gender"`
@@ -166,6 +168,8 @@ func (v *vtuber) toEntity() *entity.Vtuber {
 		Subscriber:          v.Subscriber,
 		MonthlySubscriber:   v.MonthlySubscriber,
 		VideoCount:          v.VideoCount,
+		AverageVideoLength:  v.AverageVideoLength,
+		TotalVideoLength:    v.TotalVideoLength,
 		SocialMedias:        v.SocialMedias,
 		OfficialWebsites:    v.OfficialWebsites,
 		Gender:              v.Gender,
@@ -245,6 +249,8 @@ func (m *Mongo) vtuberFromEntity(v entity.Vtuber) *vtuber {
 		Subscriber:          v.Subscriber,
 		MonthlySubscriber:   v.MonthlySubscriber,
 		VideoCount:          v.VideoCount,
+		AverageVideoLength:  v.AverageVideoLength,
+		TotalVideoLength:    v.TotalVideoLength,
 		SocialMedias:        v.SocialMedias,
 		OfficialWebsites:    v.OfficialWebsites,
 		Gender:              v.Gender,

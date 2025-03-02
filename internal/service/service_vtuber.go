@@ -33,6 +33,8 @@ type vtuber struct {
 	Subscriber          int              `json:"subscriber"`
 	MonthlySubscriber   int              `json:"monthly_subscriber"`
 	VideoCount          int              `json:"video_count"`
+	AverageVideoLength  int              `json:"average_video_length"`
+	TotalVideoLength    int              `json:"total_video_length"`
 	SocialMedias        []string         `json:"social_medias"`
 	OfficialWebsites    []string         `json:"official_websites"`
 	Gender              string           `json:"gender"`
@@ -146,6 +148,8 @@ func (s *service) GetVtuberByID(ctx context.Context, id int64) (*vtuber, int, er
 		Subscriber:          vt.Subscriber,
 		MonthlySubscriber:   vt.MonthlySubscriber,
 		VideoCount:          vt.VideoCount,
+		AverageVideoLength:  vt.AverageVideoLength,
+		TotalVideoLength:    vt.TotalVideoLength,
 		SocialMedias:        vt.SocialMedias,
 		OfficialWebsites:    vt.OfficialWebsites,
 		Gender:              vt.Gender,
@@ -385,7 +389,7 @@ type GetVtubersRequest struct {
 	EndSubscriber      int                  `validate:"omitempty,gte=1"`
 	StartVideoCount    int                  `validate:"omitempty,gte=1"`
 	EndVideoCount      int                  `validate:"omitempty,gte=1"`
-	Sort               string               `validate:"oneof=name -name debut_date -debut_date retirement_date -retirement_date subscriber -subscriber monthly_subscriber -monthly_subscriber video_count -video_count" mod:"default=name,trim,lcase"`
+	Sort               string               `validate:"oneof=name -name debut_date -debut_date retirement_date -retirement_date subscriber -subscriber monthly_subscriber -monthly_subscriber video_count -video_count average_video_length -average_video_length total_video_length -total_video_length" mod:"default=name,trim,lcase"`
 	Page               int                  `validate:"required,gte=1" mod:"default=1"`
 	Limit              int                  `validate:"required,gte=-1" mod:"default=20"`
 }
@@ -506,6 +510,8 @@ func (s *service) GetVtubers(ctx context.Context, data GetVtubersRequest) ([]vtu
 			Subscriber:          vt.Subscriber,
 			MonthlySubscriber:   vt.MonthlySubscriber,
 			VideoCount:          vt.VideoCount,
+			AverageVideoLength:  vt.AverageVideoLength,
+			TotalVideoLength:    vt.TotalVideoLength,
 			SocialMedias:        vt.SocialMedias,
 			OfficialWebsites:    vt.OfficialWebsites,
 			Gender:              vt.Gender,

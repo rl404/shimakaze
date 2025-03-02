@@ -24,6 +24,8 @@ type Vtuber struct {
 	Subscriber          int
 	MonthlySubscriber   int
 	VideoCount          int
+	AverageVideoLength  int
+	TotalVideoLength    int
 	SocialMedias        []string
 	OfficialWebsites    []string
 	Gender              string
