@@ -11,7 +11,7 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/newrelic/go-agent/v3 v3.38.0
 	github.com/newrelic/go-agent/v3/integrations/nrmongo v1.1.3
-	github.com/nicklaw5/helix/v2 v2.31.0
+	github.com/nicklaw5/helix/v2 v2.31.1
 	github.com/rl404/fairy v0.26.0
 	github.com/spf13/cobra v1.9.1
 	github.com/swaggo/http-swagger/v2 v2.0.2
