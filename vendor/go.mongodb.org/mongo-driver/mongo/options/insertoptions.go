@@ -17,12 +17,6 @@ type InsertOneOptions struct {
 	// A string or document that will be included in server logs, profiling logs, and currentOp queries to help trace
 	// the operation.  The default value is nil, which means that no comment will be included in the logs.
 	Comment interface{}
-
-	// If true, the server accepts empty Timestamp as a literal rather than replacing it with the current time.
-	//
-	// Deprecated: This option is for internal use only and should not be set. It may be changed or removed in any
-	// release.
-	BypassEmptyTsReplacement *bool
 }
 
 // InsertOne creates a new InsertOneOptions instance.
@@ -44,9 +38,6 @@ func (ioo *InsertOneOptions) SetComment(comment interface{}) *InsertOneOptions {
 
 // MergeInsertOneOptions combines the given InsertOneOptions instances into a single InsertOneOptions in a last-one-wins
 // fashion.
-//
-// Deprecated: Merging options structs will not be supported in Go Driver 2.0. Users should create a
-// single options struct instead.
 func MergeInsertOneOptions(opts ...*InsertOneOptions) *InsertOneOptions {
 	ioOpts := InsertOne()
 	for _, ioo := range opts {
@@ -58,9 +49,6 @@ func MergeInsertOneOptions(opts ...*InsertOneOptions) *InsertOneOptions {
 		}
 		if ioo.Comment != nil {
 			ioOpts.Comment = ioo.Comment
-		}
-		if ioo.BypassEmptyTsReplacement != nil {
-			ioOpts.BypassEmptyTsReplacement = ioo.BypassEmptyTsReplacement
 		}
 	}
 
@@ -81,12 +69,6 @@ type InsertManyOptions struct {
 
 	// If true, no writes will be executed after one fails. The default value is true.
 	Ordered *bool
-
-	// If true, the server accepts empty Timestamp as a literal rather than replacing it with the current time.
-	//
-	// Deprecated: This option is for internal use only and should not be set. It may be changed or removed in any
-	// release.
-	BypassEmptyTsReplacement *bool
 }
 
 // InsertMany creates a new InsertManyOptions instance.
@@ -116,9 +98,6 @@ func (imo *InsertManyOptions) SetOrdered(b bool) *InsertManyOptions {
 
 // MergeInsertManyOptions combines the given InsertManyOptions instances into a single InsertManyOptions in a last one
 // wins fashion.
-//
-// Deprecated: Merging options structs will not be supported in Go Driver 2.0. Users should create a
-// single options struct instead.
 func MergeInsertManyOptions(opts ...*InsertManyOptions) *InsertManyOptions {
 	imOpts := InsertMany()
 	for _, imo := range opts {
@@ -133,9 +112,6 @@ func MergeInsertManyOptions(opts ...*InsertManyOptions) *InsertManyOptions {
 		}
 		if imo.Ordered != nil {
 			imOpts.Ordered = imo.Ordered
-		}
-		if imo.BypassEmptyTsReplacement != nil {
-			imOpts.BypassEmptyTsReplacement = imo.BypassEmptyTsReplacement
 		}
 	}
 
