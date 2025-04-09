@@ -13,8 +13,6 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson/bsontype"
 	"go.mongodb.org/mongo-driver/event"
-	"go.mongodb.org/mongo-driver/internal/driverutil"
-	"go.mongodb.org/mongo-driver/internal/logger"
 	"go.mongodb.org/mongo-driver/mongo/description"
 	"go.mongodb.org/mongo-driver/mongo/readconcern"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -25,7 +23,6 @@ import (
 
 // Find performs a find operation.
 type Find struct {
-	authenticator       driver.Authenticator
 	allowDiskUse        *bool
 	allowPartialResults *bool
 	awaitData           *bool
@@ -37,7 +34,7 @@ type Find struct {
 	let                 bsoncore.Document
 	limit               *int64
 	max                 bsoncore.Document
-	maxTime             *time.Duration
+	maxTimeMS           *int64
 	min                 bsoncore.Document
 	noCursorTimeout     *bool
 	oplogReplay         *bool
@@ -63,8 +60,6 @@ type Find struct {
 	result              driver.CursorResponse
 	serverAPI           *driver.ServerAPIOptions
 	timeout             *time.Duration
-	omitCSOTMaxTimeMS   bool
-	logger              *logger.Logger
 }
 
 // NewFind constructs and returns a new Find.
@@ -103,18 +98,13 @@ func (f *Find) Execute(ctx context.Context) error {
 		Crypt:             f.crypt,
 		Database:          f.database,
 		Deployment:        f.deployment,
-		MaxTime:           f.maxTime,
 		ReadConcern:       f.readConcern,
 		ReadPreference:    f.readPreference,
 		Selector:          f.selector,
 		Legacy:            driver.LegacyFind,
 		ServerAPI:         f.serverAPI,
 		Timeout:           f.timeout,
-		Logger:            f.logger,
-		Name:              driverutil.FindOp,
-		OmitCSOTMaxTimeMS: f.omitCSOTMaxTimeMS,
-		Authenticator:     f.authenticator,
-	}.Execute(ctx)
+	}.Execute(ctx, nil)
 
 }
 
@@ -158,6 +148,10 @@ func (f *Find) command(dst []byte, desc description.SelectedServer) ([]byte, err
 	}
 	if f.max != nil {
 		dst = bsoncore.AppendDocumentElement(dst, "max", f.max)
+	}
+	// Only append specified maxTimeMS if timeout is not also specified.
+	if f.maxTimeMS != nil && f.timeout == nil {
+		dst = bsoncore.AppendInt64Element(dst, "maxTimeMS", *f.maxTimeMS)
 	}
 	if f.min != nil {
 		dst = bsoncore.AppendDocumentElement(dst, "min", f.min)
@@ -305,13 +299,13 @@ func (f *Find) Max(max bsoncore.Document) *Find {
 	return f
 }
 
-// MaxTime specifies the maximum amount of time to allow the query to run on the server.
-func (f *Find) MaxTime(maxTime *time.Duration) *Find {
+// MaxTimeMS specifies the maximum amount of time to allow the query to run.
+func (f *Find) MaxTimeMS(maxTimeMS int64) *Find {
 	if f == nil {
 		f = new(Find)
 	}
 
-	f.maxTime = maxTime
+	f.maxTimeMS = &maxTimeMS
 	return f
 }
 
@@ -553,37 +547,5 @@ func (f *Find) Timeout(timeout *time.Duration) *Find {
 	}
 
 	f.timeout = timeout
-	return f
-}
-
-// OmitCSOTMaxTimeMS omits the automatically-calculated "maxTimeMS" from the
-// command when CSOT is enabled. It does not effect "maxTimeMS" set by
-// [Find.MaxTime].
-func (f *Find) OmitCSOTMaxTimeMS(omit bool) *Find {
-	if f == nil {
-		f = new(Find)
-	}
-
-	f.omitCSOTMaxTimeMS = omit
-	return f
-}
-
-// Logger sets the logger for this operation.
-func (f *Find) Logger(logger *logger.Logger) *Find {
-	if f == nil {
-		f = new(Find)
-	}
-
-	f.logger = logger
-	return f
-}
-
-// Authenticator sets the authenticator to use for this operation.
-func (f *Find) Authenticator(authenticator driver.Authenticator) *Find {
-	if f == nil {
-		f = new(Find)
-	}
-
-	f.authenticator = authenticator
 	return f
 }
