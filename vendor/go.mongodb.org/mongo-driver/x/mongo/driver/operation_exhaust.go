@@ -13,12 +13,13 @@ import (
 
 // ExecuteExhaust reads a response from the provided StreamerConnection. This will error if the connection's
 // CurrentlyStreaming function returns false.
-func (op Operation) ExecuteExhaust(ctx context.Context, conn StreamerConnection) error {
+func (op Operation) ExecuteExhaust(ctx context.Context, conn StreamerConnection, scratch []byte) error {
 	if !conn.CurrentlyStreaming() {
 		return errors.New("exhaust read must be done with a connection that is currently streaming")
 	}
 
-	res, err := op.readWireMessage(ctx, conn)
+	scratch = scratch[:0]
+	res, err := op.readWireMessage(ctx, conn, scratch)
 	if err != nil {
 		return err
 	}
