@@ -95,5 +95,8 @@ func (api *API) Register(r chi.Router, nrApp *newrelic.Application) {
 		r.Post("/admin/vtubers/{id}/parse", api.jwtAuth(api.adminAuth(api.handleParseVtuberByID)))
 		r.Get("/admin/vtubers/{id}/override", api.jwtAuth(api.adminAuth(api.handleGetVtuberOverriddenField)))
 		r.Put("/admin/vtubers/{id}/override", api.jwtAuth(api.adminAuth(api.handleUpdateVtuberOverriddenField)))
+
+		r.Get("/admin/non-vtubers", api.jwtAuth(api.adminAuth(api.handleGetNonVtubers)))
+		r.Delete("/admin/non-vtubers/{id}", api.jwtAuth(api.adminAuth(api.handleDeleteNonVtuberByID)))
 	})
 }

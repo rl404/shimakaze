@@ -80,6 +80,13 @@ definitions:
       name:
         type: string
     type: object
+  service.nonVtuber:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
   service.overriddenAffiliations:
     properties:
       flag:
@@ -508,6 +515,100 @@ info:
   description: Shimakaze API.
   title: Shimakaze API
 paths:
+  /admin/non-vtubers:
+    get:
+      parameters:
+      - description: Bearer jwt.admin_access.token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: name
+        in: query
+        name: name
+        type: string
+      - default: 1
+        description: page
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/service.nonVtuber'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get non-vtuber data.
+      tags:
+      - Admin
+  /admin/non-vtubers/{id}:
+    delete:
+      parameters:
+      - description: Bearer jwt.admin_access.token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: non-vtuber id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Delete non-vtuber data.
+      tags:
+      - Admin
   /admin/vtubers/{id}:
     delete:
       parameters:

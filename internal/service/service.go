@@ -77,6 +77,9 @@ type Service interface {
 	GetVtuberOverriddenFieldByID(ctx context.Context, id int64) (*VtuberOverriddenField, int, error)
 	UpdateVtuberOverriddenFieldByID(ctx context.Context, data VtuberOverriddenField) (int, error)
 
+	GetNonVtubers(ctx context.Context, params GetNonVtubersRequest) ([]nonVtuber, *pagination, int, error)
+	DeleteNonVtuberByID(ctx context.Context, id int64) (int, error)
+
 	ConsumeMessage(ctx context.Context, msg entity.Message) error
 
 	QueueMissingAgency(ctx context.Context, limit int) (int, int, error)
