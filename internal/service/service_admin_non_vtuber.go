@@ -21,7 +21,7 @@ type GetNonVtubersRequest struct {
 	Limit int    `validate:"required,gte=-1" mod:"default=20"`
 }
 
-// GetNonVtubers
+// GetNonVtubers to get non-vtuber list.
 func (s *service) GetNonVtubers(ctx context.Context, data GetNonVtubersRequest) ([]nonVtuber, *pagination, int, error) {
 	if err := utils.Validate(&data); err != nil {
 		return nil, nil, http.StatusBadRequest, stack.Wrap(ctx, err)
@@ -51,7 +51,7 @@ func (s *service) GetNonVtubers(ctx context.Context, data GetNonVtubersRequest) 
 	}, http.StatusOK, nil
 }
 
-// DeleteNonVtuberByID
+// DeleteNonVtuberByID to delete non-vtuber by id.
 func (s *service) DeleteNonVtuberByID(ctx context.Context, id int64) (int, error) {
 	if code, err := s.nonVtuber.DeleteByID(ctx, id); err != nil {
 		return code, stack.Wrap(ctx, err)
