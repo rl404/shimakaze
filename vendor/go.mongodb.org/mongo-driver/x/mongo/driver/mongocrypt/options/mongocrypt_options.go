@@ -7,8 +7,6 @@
 package options
 
 import (
-	"net/http"
-
 	"go.mongodb.org/mongo-driver/x/bsonx/bsoncore"
 )
 
@@ -20,7 +18,6 @@ type MongoCryptOptions struct {
 	EncryptedFieldsMap         map[string]bsoncore.Document
 	CryptSharedLibDisabled     bool
 	CryptSharedLibOverridePath string
-	HTTPClient                 *http.Client
 }
 
 // MongoCrypt creates a new MongoCryptOptions instance.
@@ -62,11 +59,5 @@ func (mo *MongoCryptOptions) SetCryptSharedLibDisabled(disabled bool) *MongoCryp
 // an override path disables the default operating system dynamic library search path.
 func (mo *MongoCryptOptions) SetCryptSharedLibOverridePath(path string) *MongoCryptOptions {
 	mo.CryptSharedLibOverridePath = path
-	return mo
-}
-
-// SetHTTPClient sets the http client.
-func (mo *MongoCryptOptions) SetHTTPClient(httpClient *http.Client) *MongoCryptOptions {
-	mo.HTTPClient = httpClient
 	return mo
 }
