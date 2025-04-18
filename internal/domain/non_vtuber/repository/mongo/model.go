@@ -3,6 +3,7 @@ package mongo
 import (
 	"time"
 
+	"github.com/rl404/shimakaze/internal/domain/non_vtuber/entity"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -20,4 +21,11 @@ func (n *nonVtuber) MarshalBSON() ([]byte, error) {
 
 	type n2 nonVtuber
 	return bson.Marshal((*n2)(n))
+}
+
+func (n *nonVtuber) toEntity() entity.NonVtuber {
+	return entity.NonVtuber{
+		ID:   n.ID,
+		Name: n.Name,
+	}
 }
