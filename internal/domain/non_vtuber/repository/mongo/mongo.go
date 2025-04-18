@@ -83,7 +83,7 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 		nonVtubers = append(nonVtubers, nonVtuber.toEntity())
 	}
 
-	total, err := m.db.CountDocuments(ctx, bson.M{}, options.Count())
+	total, err := m.db.CountDocuments(ctx, query, options.Count())
 	if err != nil {
 		return nil, 0, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
