@@ -74,6 +74,7 @@ type ChangeStreamOptions struct {
 // ChangeStream creates a new ChangeStreamOptions instance.
 func ChangeStream() *ChangeStreamOptions {
 	cso := &ChangeStreamOptions{}
+	cso.SetFullDocument(Default)
 	return cso
 }
 
@@ -156,9 +157,6 @@ func (cso *ChangeStreamOptions) SetCustomPipeline(cp bson.M) *ChangeStreamOption
 
 // MergeChangeStreamOptions combines the given ChangeStreamOptions instances into a single ChangeStreamOptions in a
 // last-one-wins fashion.
-//
-// Deprecated: Merging options structs will not be supported in Go Driver 2.0. Users should create a
-// single options struct instead.
 func MergeChangeStreamOptions(opts ...*ChangeStreamOptions) *ChangeStreamOptions {
 	csOpts := ChangeStream()
 	for _, cso := range opts {
