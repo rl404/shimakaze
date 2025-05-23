@@ -544,7 +544,7 @@ func (m *Mongo) GetBirthdayCount(ctx context.Context) ([]entity.BirthdayCount, i
 
 // GetAverageHeight to get average height.
 func (m *Mongo) GetAverageHeight(ctx context.Context) (float64, int, error) {
-	matchStage := bson.D{{Key: "$match", Value: bson.M{"height": bson.M{"$gte": 0}}}}
+	matchStage := bson.D{{Key: "$match", Value: bson.M{"height": bson.M{"$gte": 0, "$lte": 10000}}}}
 	avgStage := bson.D{{Key: "$group", Value: bson.M{"_id": nil, "avg": bson.M{"$avg": "$height"}}}}
 
 	avgCursor, err := m.db.Aggregate(ctx, m.getPipeline(matchStage, avgStage))
