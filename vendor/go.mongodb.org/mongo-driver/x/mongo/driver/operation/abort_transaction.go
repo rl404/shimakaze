@@ -11,7 +11,6 @@ import (
 	"errors"
 
 	"go.mongodb.org/mongo-driver/event"
-	"go.mongodb.org/mongo-driver/internal/driverutil"
 	"go.mongodb.org/mongo-driver/mongo/description"
 	"go.mongodb.org/mongo-driver/mongo/writeconcern"
 	"go.mongodb.org/mongo-driver/x/bsonx/bsoncore"
@@ -21,7 +20,6 @@ import (
 
 // AbortTransaction performs an abortTransaction operation.
 type AbortTransaction struct {
-	authenticator driver.Authenticator
 	recoveryToken bsoncore.Document
 	session       *session.Client
 	clock         *session.ClusterClock
@@ -66,13 +64,11 @@ func (at *AbortTransaction) Execute(ctx context.Context) error {
 		Selector:          at.selector,
 		WriteConcern:      at.writeConcern,
 		ServerAPI:         at.serverAPI,
-		Name:              driverutil.AbortTransactionOp,
-		Authenticator:     at.authenticator,
-	}.Execute(ctx)
+	}.Execute(ctx, nil)
 
 }
 
-func (at *AbortTransaction) command(dst []byte, _ description.SelectedServer) ([]byte, error) {
+func (at *AbortTransaction) command(dst []byte, desc description.SelectedServer) ([]byte, error) {
 
 	dst = bsoncore.AppendInt32Element(dst, "abortTransaction", 1)
 	if at.recoveryToken != nil {
@@ -199,15 +195,5 @@ func (at *AbortTransaction) ServerAPI(serverAPI *driver.ServerAPIOptions) *Abort
 	}
 
 	at.serverAPI = serverAPI
-	return at
-}
-
-// Authenticator sets the authenticator to use for this operation.
-func (at *AbortTransaction) Authenticator(authenticator driver.Authenticator) *AbortTransaction {
-	if at == nil {
-		at = new(AbortTransaction)
-	}
-
-	at.authenticator = authenticator
 	return at
 }
