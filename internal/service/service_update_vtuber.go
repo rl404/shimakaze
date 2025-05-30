@@ -483,7 +483,7 @@ func (s *service) fillBilibiliChannel(ctx context.Context, channel vtuberEntity.
 	// 	return channel
 	// }
 
-	// channel.ID = user.ID
+	channel.ID = userID
 	// channel.Name = user.Name
 	// channel.Image = user.Image
 
