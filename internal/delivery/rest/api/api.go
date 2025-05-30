@@ -50,6 +50,7 @@ func (api *API) Register(r chi.Router, nrApp *newrelic.Application) {
 
 		r.Get("/vtubers", api.handleGetVtubers)
 		r.Get("/vtubers/{id}", api.handleGetVtuberByID)
+		r.Get("/vtubers/{id}/channel-history", api.handleGetVtuberChannelHistory)
 		r.Get("/vtubers/images", api.handleGetVtuberImages)
 		r.Get("/vtubers/family-trees", api.handleGetVtuberFamilyTrees)
 		r.Get("/vtubers/agency-trees", api.handleGetVtuberAgencyTrees)

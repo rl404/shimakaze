@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/rl404/fairy/errors/stack"
+	historyEntity "github.com/rl404/shimakaze/internal/domain/channel_stats_history/entity"
 	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	"github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/service"
@@ -162,6 +163,39 @@ func (api *API) handleGetVtuberByID(w http.ResponseWriter, r *http.Request) {
 
 	vtuber, code, err := api.service.GetVtuberByID(r.Context(), id)
 	utils.ResponseWithJSON(w, code, vtuber, stack.Wrap(r.Context(), err))
+}
+
+// @summary Get vtuber channel histories.
+// @tags Vtuber
+// @produce json
+// @param id path integer true "wikia id"
+// @param start_date query string false "start date"
+// @param end_date query string false "end date"
+// @param group query string false "group" enums(DAILY,MONTHLY,YEARLY) default(MONTHLY)
+// @success 200 {object} utils.Response{data=service.vtuberChannelHistory}
+// @failure 400 {object} utils.Response
+// @failure 404 {object} utils.Response
+// @failure 500 {object} utils.Response
+// @router /vtubers/{id}/channel-history [get]
+func (api *API) handleGetVtuberChannelHistory(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		utils.ResponseWithJSON(w, http.StatusBadRequest, nil, stack.Wrap(r.Context(), err, errors.ErrInvalidID))
+		return
+	}
+
+	startDate := r.URL.Query().Get("start_date")
+	endDate := r.URL.Query().Get("end_date")
+	group := r.URL.Query().Get("group")
+
+	histories, code, err := api.service.GetVtuberChannelHistoriesByID(r.Context(), service.GetVtuberChannelHistoriesRequest{
+		ID:        id,
+		StartDate: startDate,
+		EndDate:   endDate,
+		Group:     historyEntity.Group(group),
+	})
+
+	utils.ResponseWithJSON(w, code, histories, stack.Wrap(r.Context(), err))
 }
 
 // @summary Get all vtuber images.
