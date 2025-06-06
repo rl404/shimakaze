@@ -10,12 +10,10 @@ import (
 	"context"
 	"crypto/tls"
 	"net"
-	"net/http"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/event"
-	"go.mongodb.org/mongo-driver/internal/httputil"
 	"go.mongodb.org/mongo-driver/x/mongo/driver"
 	"go.mongodb.org/mongo-driver/x/mongo/driver/ocsp"
 )
@@ -56,7 +54,6 @@ type connectionConfig struct {
 	readTimeout              time.Duration
 	writeTimeout             time.Duration
 	tlsConfig                *tls.Config
-	httpClient               *http.Client
 	compressors              []string
 	zlibLevel                *int
 	zstdLevel                *int
@@ -72,7 +69,6 @@ func newConnectionConfig(opts ...ConnectionOption) *connectionConfig {
 		connectTimeout:      30 * time.Second,
 		dialer:              nil,
 		tlsConnectionSource: defaultTLSConnectionSource,
-		httpClient:          httputil.DefaultHTTPClient,
 	}
 
 	for _, opt := range opts {
@@ -83,8 +79,6 @@ func newConnectionConfig(opts ...ConnectionOption) *connectionConfig {
 	}
 
 	if cfg.dialer == nil {
-		// Use a zero value of net.Dialer when nothing is specified, so the Go driver applies default default behaviors
-		// such as Timeout, KeepAlive, DNS resolving, etc. See https://golang.org/pkg/net/#Dialer for more information.
 		cfg.dialer = &net.Dialer{}
 	}
 
@@ -155,13 +149,6 @@ func WithWriteTimeout(fn func(time.Duration) time.Duration) ConnectionOption {
 func WithTLSConfig(fn func(*tls.Config) *tls.Config) ConnectionOption {
 	return func(c *connectionConfig) {
 		c.tlsConfig = fn(c.tlsConfig)
-	}
-}
-
-// WithHTTPClient configures the HTTP client for a connection.
-func WithHTTPClient(fn func(*http.Client) *http.Client) ConnectionOption {
-	return func(c *connectionConfig) {
-		c.httpClient = fn(c.httpClient)
 	}
 }
 
