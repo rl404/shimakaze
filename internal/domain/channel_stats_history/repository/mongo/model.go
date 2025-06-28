@@ -3,6 +3,7 @@ package mongo
 import (
 	"time"
 
+	"github.com/rl404/shimakaze/internal/domain/channel_stats_history/entity"
 	vtuberEntity "github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -23,4 +24,14 @@ func (cs *channelStats) MarshalBSON() ([]byte, error) {
 
 	type cs2 channelStats
 	return bson.Marshal((*cs2)(cs))
+}
+
+func (cs *channelStats) toEntity() entity.ChannelStats {
+	return entity.ChannelStats{
+		VtuberID:    cs.VtuberID,
+		ChannelID:   cs.ChannelID,
+		ChannelType: cs.ChannelType,
+		Subscriber:  cs.Subscriber,
+		CreatedAt:   cs.CreatedAt,
+	}
 }

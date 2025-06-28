@@ -9,4 +9,5 @@ import (
 // Repository contains functions for channel-history domain.
 type Repository interface {
 	Create(ctx context.Context, data entity.ChannelStats) (int, error)
+	Get(ctx context.Context, data entity.GetRequest) ([]entity.ChannelStats, int, error)
 }

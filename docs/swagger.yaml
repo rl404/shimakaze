@@ -326,6 +326,21 @@ definitions:
     required:
     - url
     type: object
+  service.vtuberChannelHistory:
+    properties:
+      channel_id:
+        type: string
+      channel_type:
+        $ref: '#/definitions/entity.ChannelType'
+      day:
+        type: integer
+      month:
+        type: integer
+      subscriber:
+        type: integer
+      year:
+        type: integer
+    type: object
   service.vtuberChannelTypeCount:
     properties:
       channel_type:
@@ -1981,6 +1996,58 @@ paths:
           schema:
             $ref: '#/definitions/utils.Response'
       summary: Get vtuber data.
+      tags:
+      - Vtuber
+  /vtubers/{id}/channel-history:
+    get:
+      parameters:
+      - description: wikia id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: start date
+        in: query
+        name: start_date
+        type: string
+      - description: end date
+        in: query
+        name: end_date
+        type: string
+      - default: MONTHLY
+        description: group
+        enum:
+        - DAILY
+        - MONTHLY
+        - YEARLY
+        in: query
+        name: group
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/service.vtuberChannelHistory'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get vtuber channel histories.
       tags:
       - Vtuber
   /vtubers/2d-modelers:

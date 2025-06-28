@@ -31,6 +31,7 @@ type Service interface {
 
 	GetVtubers(ctx context.Context, params GetVtubersRequest) ([]vtuber, *pagination, int, error)
 	GetVtuberByID(ctx context.Context, id int64) (*vtuber, int, error)
+	GetVtuberChannelHistoriesByID(ctx context.Context, data GetVtuberChannelHistoriesRequest) ([]vtuberChannelHistory, int, error)
 	GetVtuberImages(ctx context.Context, shuffle bool, limit int) ([]vtuberImage, int, error)
 	GetVtuberFamilyTrees(ctx context.Context) (*vtuberFamilyTree, int, error)
 	GetVtuberAgencyTrees(ctx context.Context) (*vtuberAgencyTree, int, error)

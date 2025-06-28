@@ -4,10 +4,12 @@ import (
 	"context"
 	"math/rand"
 	"net/http"
+	"sort"
 	"time"
 
 	"github.com/rl404/fairy/errors/stack"
 	agencyEntity "github.com/rl404/shimakaze/internal/domain/agency/entity"
+	historyEntity "github.com/rl404/shimakaze/internal/domain/channel_stats_history/entity"
 	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	"github.com/rl404/shimakaze/internal/utils"
 )
@@ -558,4 +560,98 @@ func (s *service) GetVtuberCharacter3DModelers(ctx context.Context) ([]string, i
 		return nil, code, stack.Wrap(ctx, err)
 	}
 	return modelers, http.StatusOK, nil
+}
+
+type vtuberChannelHistory struct {
+	Year        int                `json:"year"`
+	Month       int                `json:"month"`
+	Day         int                `json:"day"`
+	ChannelID   string             `json:"channel_id"`
+	ChannelType entity.ChannelType `json:"channel_type"`
+	Subscriber  int                `json:"subscriber"`
+}
+
+// GetVtuberChannelHistoriesRequest is get vtuber channel histories request model.
+type GetVtuberChannelHistoriesRequest struct {
+	ID        int64               `validate:"required,gt=0"`
+	StartDate string              `validate:"omitempty,datetime=2006-01-02" mod:"trim"`
+	EndDate   string              `validate:"omitempty,datetime=2006-01-02" mod:"trim"`
+	Group     historyEntity.Group `validate:"oneof=DAILY MONTHLY YEARLY" mod:"trim,ucase,default=MONTHLY"`
+}
+
+// GetVtuberChannelHistoriesByID to get vtuber channel histories by id.
+func (s *service) GetVtuberChannelHistoriesByID(ctx context.Context, data GetVtuberChannelHistoriesRequest) ([]vtuberChannelHistory, int, error) {
+	if err := utils.Validate(&data); err != nil {
+		return nil, http.StatusBadRequest, stack.Wrap(ctx, err)
+	}
+
+	if data.StartDate == "" {
+		switch data.Group {
+		case historyEntity.Yearly:
+			data.StartDate = time.Now().AddDate(-5, 0, 0).Format("2006-01-02")
+		case historyEntity.Monthly:
+			data.StartDate = time.Now().AddDate(-1, 0, 0).Format("2006-01-02")
+		case historyEntity.Daily:
+			data.StartDate = time.Now().AddDate(0, -3, 0).Format("2006-01-02")
+		}
+	}
+
+	if data.EndDate == "" {
+		data.EndDate = time.Now().Format("2006-01-02")
+	}
+
+	histories, code, err := s.channelStatsHistory.Get(ctx, historyEntity.GetRequest{
+		VtuberID:  data.ID,
+		StartDate: utils.StrToTime("2006-01-02", data.StartDate),
+		EndDate:   utils.StrToTime("2006-01-02", data.EndDate),
+	})
+	if err != nil {
+		return nil, code, stack.Wrap(ctx, err)
+	}
+
+	m := make(map[vtuberChannelHistory]int)
+	for _, history := range histories {
+		year := history.CreatedAt.Year()
+		month := int(history.CreatedAt.Month())
+		day := history.CreatedAt.Day()
+
+		key := vtuberChannelHistory{
+			ChannelID:   history.ChannelID,
+			ChannelType: history.ChannelType,
+		}
+
+		switch data.Group {
+		case historyEntity.Yearly:
+			key.Year = year
+		case historyEntity.Monthly:
+			key.Year = year
+			key.Month = month
+		case historyEntity.Daily:
+			key.Year = year
+			key.Month = month
+			key.Day = day
+		}
+
+		m[key] = max(m[key], history.Subscriber)
+	}
+
+	res := make([]vtuberChannelHistory, 0)
+	for k, v := range m {
+		k.Subscriber = v
+		res = append(res, k)
+	}
+
+	sort.Slice(res, func(i, j int) bool {
+		if res[i].Year != res[j].Year {
+			return res[i].Year < res[j].Year
+		}
+
+		if res[i].Month != res[j].Month {
+			return res[i].Month < res[j].Month
+		}
+
+		return res[i].Day < res[j].Day
+	})
+
+	return res, http.StatusOK, nil
 }

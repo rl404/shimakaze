@@ -260,3 +260,9 @@ func RandomStr(n int) string {
 	}
 	return string(b)
 }
+
+// StrToTime to parse str to time.
+func StrToTime(layout, str string) time.Time {
+	tmp, _ := time.Parse(layout, str)
+	return tmp
+}
