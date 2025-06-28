@@ -14,7 +14,6 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson/bsontype"
 	"go.mongodb.org/mongo-driver/event"
-	"go.mongodb.org/mongo-driver/internal/driverutil"
 	"go.mongodb.org/mongo-driver/mongo/description"
 	"go.mongodb.org/mongo-driver/mongo/readconcern"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -25,8 +24,7 @@ import (
 
 // Count represents a count operation.
 type Count struct {
-	authenticator  driver.Authenticator
-	maxTime        *time.Duration
+	maxTimeMS      *int64
 	query          bsoncore.Document
 	session        *session.Client
 	clock          *session.ClusterClock
@@ -122,15 +120,12 @@ func (c *Count) Execute(ctx context.Context) error {
 		Crypt:             c.crypt,
 		Database:          c.database,
 		Deployment:        c.deployment,
-		MaxTime:           c.maxTime,
 		ReadConcern:       c.readConcern,
 		ReadPreference:    c.readPreference,
 		Selector:          c.selector,
 		ServerAPI:         c.serverAPI,
 		Timeout:           c.timeout,
-		Name:              driverutil.CountOp,
-		Authenticator:     c.authenticator,
-	}.Execute(ctx)
+	}.Execute(ctx, nil)
 
 	// Swallow error if NamespaceNotFound(26) is returned from aggregate on non-existent namespace
 	if err != nil {
@@ -142,10 +137,15 @@ func (c *Count) Execute(ctx context.Context) error {
 	return err
 }
 
-func (c *Count) command(dst []byte, _ description.SelectedServer) ([]byte, error) {
+func (c *Count) command(dst []byte, desc description.SelectedServer) ([]byte, error) {
 	dst = bsoncore.AppendStringElement(dst, "count", c.collection)
 	if c.query != nil {
 		dst = bsoncore.AppendDocumentElement(dst, "query", c.query)
+	}
+
+	// Only append specified maxTimeMS if timeout is not also specified.
+	if c.maxTimeMS != nil && c.timeout == nil {
+		dst = bsoncore.AppendInt64Element(dst, "maxTimeMS", *c.maxTimeMS)
 	}
 	if c.comment.Type != bsontype.Type(0) {
 		dst = bsoncore.AppendValueElement(dst, "comment", c.comment)
@@ -153,13 +153,13 @@ func (c *Count) command(dst []byte, _ description.SelectedServer) ([]byte, error
 	return dst, nil
 }
 
-// MaxTime specifies the maximum amount of time to allow the query to run on the server.
-func (c *Count) MaxTime(maxTime *time.Duration) *Count {
+// MaxTimeMS specifies the maximum amount of time to allow the query to run.
+func (c *Count) MaxTimeMS(maxTimeMS int64) *Count {
 	if c == nil {
 		c = new(Count)
 	}
 
-	c.maxTime = maxTime
+	c.maxTimeMS = &maxTimeMS
 	return c
 }
 
@@ -311,15 +311,5 @@ func (c *Count) Timeout(timeout *time.Duration) *Count {
 	}
 
 	c.timeout = timeout
-	return c
-}
-
-// Authenticator sets the authenticator to use for this operation.
-func (c *Count) Authenticator(authenticator driver.Authenticator) *Count {
-	if c == nil {
-		c = new(Count)
-	}
-
-	c.authenticator = authenticator
 	return c
 }
