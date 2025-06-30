@@ -48,7 +48,7 @@ type getBroadcastsThumbnail struct {
 
 // GetBroadcasts to get live broadcasts.
 func (c *Client) GetBroadcasts(ctx context.Context, id string) ([]entity.Video, int, error) {
-	url, _ := url.Parse("https://live.nicovideo.jp/front/api/v1/user-broadcast-history")
+	url, _ := url.Parse("https://live.nicovideo.jp/front/api/v2/user-broadcast-history")
 
 	q := url.Query()
 	q.Add("providerId", id)
