@@ -18,6 +18,7 @@ require (
 	github.com/swaggo/swag v1.16.5
 	github.com/tmdvs/Go-Emoji-Utils v1.2.1
 	go.mongodb.org/mongo-driver v1.17.4
+	go.mongodb.org/mongo-driver/v2 v2.2.2
 	golang.org/x/oauth2 v0.30.0
 	golang.org/x/text v0.27.0
 )
@@ -49,7 +50,7 @@ require (
 	github.com/go-playground/validator/v10 v10.27.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
-	github.com/golang/snappy v0.0.4 // indirect
+	github.com/golang/snappy v1.0.0 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.6 // indirect
 	github.com/googleapis/gax-go/v2 v2.14.2 // indirect
