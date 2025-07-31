@@ -5,7 +5,7 @@ import (
 
 	"github.com/rl404/shimakaze/internal/domain/channel_stats_history/entity"
 	vtuberEntity "github.com/rl404/shimakaze/internal/domain/vtuber/entity"
-	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 type channelStats struct {

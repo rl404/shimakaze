@@ -8,8 +8,8 @@ import (
 	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/user/entity"
 	"github.com/rl404/shimakaze/internal/errors"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 // Mongo contains function for user mongodb.

@@ -10,10 +10,9 @@ import (
 	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	"github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/utils"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 // Mongo contains functions for vtuber mongodb.
@@ -100,8 +99,8 @@ func (m *Mongo) IsOld(ctx context.Context, id int64) (bool, int, error) {
 	filter := bson.M{
 		"id": id,
 		"$or": bson.A{
-			bson.M{"retirement_date": bson.M{"$eq": nil}, "updated_at": bson.M{"$gte": primitive.NewDateTimeFromTime(time.Now().Add(-m.oldActiveAge))}},
-			bson.M{"retirement_date": bson.M{"$ne": nil}, "updated_at": bson.M{"$gte": primitive.NewDateTimeFromTime(time.Now().Add(-m.oldRetiredAge))}},
+			bson.M{"retirement_date": bson.M{"$eq": nil}, "updated_at": bson.M{"$gte": bson.NewDateTimeFromTime(time.Now().Add(-m.oldActiveAge))}},
+			bson.M{"retirement_date": bson.M{"$ne": nil}, "updated_at": bson.M{"$gte": bson.NewDateTimeFromTime(time.Now().Add(-m.oldRetiredAge))}},
 		},
 	}
 
@@ -119,7 +118,7 @@ func (m *Mongo) IsOld(ctx context.Context, id int64) (bool, int, error) {
 func (m *Mongo) GetOldActiveIDs(ctx context.Context) ([]int64, int, error) {
 	cursor, err := m.db.Find(ctx, bson.M{
 		"retirement_date": bson.M{"$eq": nil},
-		"updated_at":      bson.M{"$lte": primitive.NewDateTimeFromTime(time.Now().Add(-m.oldActiveAge))},
+		"updated_at":      bson.M{"$lte": bson.NewDateTimeFromTime(time.Now().Add(-m.oldActiveAge))},
 	}, options.Find().SetProjection(bson.M{"id": 1}))
 	if err != nil {
 		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
@@ -143,7 +142,7 @@ func (m *Mongo) GetOldActiveIDs(ctx context.Context) ([]int64, int, error) {
 func (m *Mongo) GetOldRetiredIDs(ctx context.Context) ([]int64, int, error) {
 	cursor, err := m.db.Find(ctx, bson.M{
 		"retirement_date": bson.M{"$ne": nil},
-		"updated_at":      bson.M{"$lte": primitive.NewDateTimeFromTime(time.Now().Add(-m.oldActiveAge))},
+		"updated_at":      bson.M{"$lte": bson.NewDateTimeFromTime(time.Now().Add(-m.oldActiveAge))},
 	}, options.Find().SetProjection(bson.M{"id": 1}))
 	if err != nil {
 		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
@@ -496,59 +495,29 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 
 // GetCharacterDesigners to get character designers.
 func (m *Mongo) GetCharacterDesigners(ctx context.Context) ([]string, int, error) {
-	designers, err := m.db.Distinct(ctx, "character_designers", bson.M{"character_designers": bson.M{"$ne": nil}})
-	if err != nil {
+	var designers []string
+	if err := m.db.Distinct(ctx, "character_designers", bson.M{"character_designers": bson.M{"$ne": nil}}).Decode(&designers); err != nil {
 		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
-
-	res := make([]string, len(designers))
-	for i, d := range designers {
-		v, ok := d.(string)
-		if !ok {
-			return nil, http.StatusInternalServerError, stack.Wrap(ctx, _errors.New("invalid value"), errors.ErrInternalDB)
-		}
-		res[i] = v
-	}
-
-	return res, http.StatusOK, nil
+	return designers, http.StatusOK, nil
 }
 
 // GetCharacter2DModelers to get 2d modelers.
 func (m *Mongo) GetCharacter2DModelers(ctx context.Context) ([]string, int, error) {
-	modelers, err := m.db.Distinct(ctx, "character_2d_modelers", bson.M{"character_2d_modelers": bson.M{"$ne": nil}})
-	if err != nil {
+	var modelers []string
+	if err := m.db.Distinct(ctx, "character_2d_modelers", bson.M{"character_2d_modelers": bson.M{"$ne": nil}}).Decode(&modelers); err != nil {
 		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
-
-	res := make([]string, len(modelers))
-	for i, d := range modelers {
-		v, ok := d.(string)
-		if !ok {
-			return nil, http.StatusInternalServerError, stack.Wrap(ctx, _errors.New("invalid value"), errors.ErrInternalDB)
-		}
-		res[i] = v
-	}
-
-	return res, http.StatusOK, nil
+	return modelers, http.StatusOK, nil
 }
 
 // GetCharacter3DModelers to get 3d modelers.
 func (m *Mongo) GetCharacter3DModelers(ctx context.Context) ([]string, int, error) {
-	modelers, err := m.db.Distinct(ctx, "character_3d_modelers", bson.M{"character_3d_modelers": bson.M{"$ne": nil}})
-	if err != nil {
+	var modelers []string
+	if err := m.db.Distinct(ctx, "character_3d_modelers", bson.M{"character_3d_modelers": bson.M{"$ne": nil}}).Decode(&modelers); err != nil {
 		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
 	}
-
-	res := make([]string, len(modelers))
-	for i, d := range modelers {
-		v, ok := d.(string)
-		if !ok {
-			return nil, http.StatusInternalServerError, stack.Wrap(ctx, _errors.New("invalid value"), errors.ErrInternalDB)
-		}
-		res[i] = v
-	}
-
-	return res, http.StatusOK, nil
+	return modelers, http.StatusOK, nil
 }
 
 // GetVideos to get videos.
@@ -578,11 +547,11 @@ func (m *Mongo) GetVideos(ctx context.Context, data entity.GetVideosRequest) ([]
 	countStage := bson.D{{Key: "$count", Value: "count"}}
 
 	if data.StartDate != nil {
-		matchStage = m.addMatch(matchStage, "video_start_date", bson.M{"$gte": primitive.NewDateTimeFromTime(*data.StartDate)})
+		matchStage = m.addMatch(matchStage, "video_start_date", bson.M{"$gte": bson.NewDateTimeFromTime(*data.StartDate)})
 	}
 
 	if data.EndDate != nil {
-		matchStage = m.addMatch(matchStage, "video_start_date", bson.M{"$lte": primitive.NewDateTimeFromTime(*data.EndDate)})
+		matchStage = m.addMatch(matchStage, "video_start_date", bson.M{"$lte": bson.NewDateTimeFromTime(*data.EndDate)})
 	}
 
 	if data.IsFinished != nil {

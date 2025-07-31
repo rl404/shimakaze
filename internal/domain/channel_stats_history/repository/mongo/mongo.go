@@ -7,10 +7,9 @@ import (
 	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/channel_stats_history/entity"
 	"github.com/rl404/shimakaze/internal/errors"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 // Mongo contains functions for channel-stats-history mongodb.
@@ -43,8 +42,8 @@ func (m *Mongo) Get(ctx context.Context, data entity.GetRequest) ([]entity.Chann
 	match := bson.M{
 		"vtuber_id": data.VtuberID,
 		"$and": bson.A{
-			bson.M{"created_at": bson.M{"$gte": primitive.NewDateTimeFromTime(data.StartDate)}},
-			bson.M{"created_at": bson.M{"$lte": primitive.NewDateTimeFromTime(data.EndDate)}},
+			bson.M{"created_at": bson.M{"$gte": bson.NewDateTimeFromTime(data.StartDate)}},
+			bson.M{"created_at": bson.M{"$lte": bson.NewDateTimeFromTime(data.EndDate)}},
 		},
 	}
 

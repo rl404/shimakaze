@@ -9,10 +9,9 @@ import (
 	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/agency/entity"
 	"github.com/rl404/shimakaze/internal/errors"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 // Mongo contains functions for agency mongodb.
@@ -96,7 +95,7 @@ func (m *Mongo) GetAll(ctx context.Context, data entity.GetAllRequest) ([]entity
 func (m *Mongo) IsOld(ctx context.Context, id int64) (bool, int, error) {
 	filter := bson.M{
 		"id":         id,
-		"updated_at": bson.M{"$gte": primitive.NewDateTimeFromTime(time.Now().Add(-m.oldAge))},
+		"updated_at": bson.M{"$gte": bson.NewDateTimeFromTime(time.Now().Add(-m.oldAge))},
 	}
 
 	if err := m.db.FindOne(ctx, filter).Decode(&agency{}); err != nil {
@@ -135,7 +134,7 @@ func (m *Mongo) UpdateByID(ctx context.Context, id int64, data entity.Agency) (i
 // GetOldIDs to get old ids.
 func (m *Mongo) GetOldIDs(ctx context.Context) ([]int64, int, error) {
 	cursor, err := m.db.Find(ctx, bson.M{
-		"updated_at": bson.M{"$lte": primitive.NewDateTimeFromTime(time.Now().Add(-m.oldAge))},
+		"updated_at": bson.M{"$lte": bson.NewDateTimeFromTime(time.Now().Add(-m.oldAge))},
 	}, options.Find().SetProjection(bson.M{"id": 1}))
 	if err != nil {
 		return nil, http.StatusInternalServerError, stack.Wrap(ctx, err, errors.ErrInternalDB)
