@@ -7,9 +7,9 @@ import (
 	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/non_vtuber/entity"
 	"github.com/rl404/shimakaze/internal/errors"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 // Mongo contains functions for non-vtuber mongodb.

@@ -8,8 +8,7 @@ import (
 	"github.com/rl404/fairy/errors/stack"
 	"github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	"github.com/rl404/shimakaze/internal/errors"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 // GetCount to get count.
@@ -23,7 +22,7 @@ func (m *Mongo) GetCount(ctx context.Context) (int, int, error) {
 
 // GetAverageActiveTime to get average active time.
 func (m *Mongo) GetAverageActiveTime(ctx context.Context) (float64, int, error) {
-	replaceFieldStage := bson.D{{Key: "$addFields", Value: bson.M{"new_retirement_date": bson.M{"$ifNull": bson.A{"$retirement_date", primitive.NewDateTimeFromTime(time.Now())}}}}}
+	replaceFieldStage := bson.D{{Key: "$addFields", Value: bson.M{"new_retirement_date": bson.M{"$ifNull": bson.A{"$retirement_date", bson.NewDateTimeFromTime(time.Now())}}}}}
 	matchStage := bson.D{{Key: "$match", Value: bson.M{"debut_date": bson.M{"$ne": nil}}}}
 	avgStage := bson.D{{Key: "$group", Value: bson.M{"_id": nil, "avg": bson.M{"$avg": bson.M{"$dateDiff": bson.M{"startDate": "$debut_date", "endDate": "$new_retirement_date", "unit": "day"}}}}}}
 

@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/rl404/shimakaze/internal/domain/non_vtuber/entity"
-	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 type nonVtuber struct {
