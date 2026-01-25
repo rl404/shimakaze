@@ -330,7 +330,7 @@ func (s *service) fillChannelData(ctx context.Context, debutDate, retirementDate
 }
 
 func (s *service) fillYoutubeChannel(ctx context.Context, channel vtuberEntity.Channel) vtuberEntity.Channel {
-	if channel.ID != "" && false {
+	if channel.ID != "" {
 		ch, _, err := s.youtube.GetChannelByID(ctx, channel.ID)
 		if err != nil {
 			stack.Wrap(ctx, err)
