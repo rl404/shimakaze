@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	_errors "errors"
 	"fmt"
 	"math"
 	"net/http"
@@ -15,7 +14,6 @@ import (
 	channelStatsEntity "github.com/rl404/shimakaze/internal/domain/channel_stats_history/entity"
 	vtuberEntity "github.com/rl404/shimakaze/internal/domain/vtuber/entity"
 	wikiaEntity "github.com/rl404/shimakaze/internal/domain/wikia/entity"
-	"github.com/rl404/shimakaze/internal/errors"
 	"github.com/rl404/shimakaze/internal/utils"
 )
 
@@ -332,32 +330,28 @@ func (s *service) fillChannelData(ctx context.Context, debutDate, retirementDate
 }
 
 func (s *service) fillYoutubeChannel(ctx context.Context, channel vtuberEntity.Channel) vtuberEntity.Channel {
-	channelID := utils.GetLastPathFromURL(channel.URL)
-	if channelID == "" {
-		return channel
-	}
+	if channel.ID != "" && false {
+		ch, _, err := s.youtube.GetChannelByID(ctx, channel.ID)
+		if err != nil {
+			stack.Wrap(ctx, err)
+			return channel
+		}
 
-	ch, _, err := s.youtube.GetChannelByID(ctx, channelID)
-	if err == nil {
 		channel.ID = ch.ID
 		channel.Name = ch.Name
 		channel.Image = ch.Image
 		channel.Subscriber = ch.Subscriber
+
 		return channel
 	}
 
-	// URL not contain channel id.
-	if !_errors.Is(err, errors.ErrChannelNotFound) {
-		stack.Wrap(ctx, err)
-	}
-
-	channelID, _, err = s.youtube.GetChannelIDByURL(ctx, channel.URL)
+	channelID, _, err := s.youtube.GetChannelIDByURL(ctx, channel.URL)
 	if err != nil {
 		stack.Wrap(ctx, err)
 		return channel
 	}
 
-	ch, _, err = s.youtube.GetChannelByID(ctx, channelID)
+	ch, _, err := s.youtube.GetChannelByID(ctx, channelID)
 	if err != nil {
 		stack.Wrap(ctx, err)
 		return channel
