@@ -83,8 +83,7 @@ func (c *Client) GetChannelByID(ctx context.Context, id string) (*entity.Channel
 		}, http.StatusOK, nil
 	}
 
-	// No need to wrap the error to prevent useless error log.
-	return nil, http.StatusNotFound, errors.ErrChannelNotFound
+	return nil, http.StatusNotFound, stack.Wrap(ctx, errors.ErrChannelNotFound)
 }
 
 func (c *Client) getChannelImage(thumbnails channelThumbnails) string {
