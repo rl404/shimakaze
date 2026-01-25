@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"html"
 	"math"
 	"math/rand"
@@ -265,4 +266,9 @@ func RandomStr(n int) string {
 func StrToTime(layout, str string) time.Time {
 	tmp, _ := time.Parse(layout, str)
 	return tmp
+}
+
+// GenerateYoutubeChannelURL to generate youtube channel url.
+func GenerateYoutubeChannelURL(id string) string {
+	return fmt.Sprintf("https://www.youtube.com/channel/%s", id)
 }

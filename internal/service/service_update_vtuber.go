@@ -340,6 +340,7 @@ func (s *service) fillYoutubeChannel(ctx context.Context, channel vtuberEntity.C
 		channel.ID = ch.ID
 		channel.Name = ch.Name
 		channel.Image = ch.Image
+		channel.URL = utils.GenerateYoutubeChannelURL(ch.ID)
 		channel.Subscriber = ch.Subscriber
 
 		return channel
@@ -360,6 +361,7 @@ func (s *service) fillYoutubeChannel(ctx context.Context, channel vtuberEntity.C
 	channel.ID = ch.ID
 	channel.Name = ch.Name
 	channel.Image = ch.Image
+	channel.URL = utils.GenerateYoutubeChannelURL(ch.ID)
 	channel.Subscriber = ch.Subscriber
 
 	return channel
