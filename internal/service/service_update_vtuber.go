@@ -84,7 +84,7 @@ func (s *service) updateVtuber(ctx context.Context, id int64) (int, error) {
 	vtuber = s.overrideVtuberData(vtuber, existingVtuber)
 
 	// Fill channel data.
-	vtuber.Channels, vtuber.Subscriber, vtuber.MonthlySubscriber, vtuber.VideoCount, vtuber.AverageVideoLength, vtuber.TotalVideoLength = s.fillChannelData(ctx, vtuber.DebutDate, vtuber.RetirementDate, vtuber.Channels)
+	vtuber.Channels, vtuber.Subscriber, vtuber.MonthlySubscriber, vtuber.VideoCount, vtuber.AverageVideoLength, vtuber.TotalVideoLength = s.fillChannelData(ctx, vtuber.DebutDate, vtuber.RetirementDate, vtuber.Channels, existingVtuber.Channels)
 
 	// Update data.
 	if code, err := s.vtuber.UpdateByID(ctx, id, vtuber); err != nil {
@@ -281,12 +281,12 @@ func (s *service) mergeAgencies(a1, a2 []vtuberEntity.Agency) []vtuberEntity.Age
 	return a3
 }
 
-func (s *service) fillChannelData(ctx context.Context, debutDate, retirementDate *time.Time, channels []vtuberEntity.Channel) ([]vtuberEntity.Channel, int, int, int, int, int) {
+func (s *service) fillChannelData(ctx context.Context, debutDate, retirementDate *time.Time, channels []vtuberEntity.Channel, existingChannels []vtuberEntity.Channel) ([]vtuberEntity.Channel, int, int, int, int, int) {
 	subscriber, monthlySubs, allVideoCount, avgVideoCount, totalVideoLength := 0, 0, 0, 0, 0
 	for i, channel := range channels {
 		switch channel.Type {
 		case vtuberEntity.ChannelYoutube:
-			channels[i] = s.fillYoutubeChannel(ctx, channels[i])
+			channels[i] = s.fillYoutubeChannel(ctx, channels[i], existingChannels)
 			channels[i] = s.fillYoutubeVideos(ctx, channels[i], retirementDate)
 		case vtuberEntity.ChannelTwitch:
 			channels[i] = s.fillTwitchChannel(ctx, channels[i])
@@ -329,7 +329,15 @@ func (s *service) fillChannelData(ctx context.Context, debutDate, retirementDate
 	return channels, subscriber, monthlySubs, allVideoCount, avgVideoLength, totalVideoLength
 }
 
-func (s *service) fillYoutubeChannel(ctx context.Context, channel vtuberEntity.Channel) vtuberEntity.Channel {
+func (s *service) fillYoutubeChannel(ctx context.Context, channel vtuberEntity.Channel, existingChannels []vtuberEntity.Channel) vtuberEntity.Channel {
+	// Find existing channel.
+	for _, existingChannel := range existingChannels {
+		if existingChannel.Type == channel.Type && existingChannel.URL == channel.URL {
+			channel.ID = existingChannel.ID
+		}
+	}
+
+	// Use existing id.
 	if channel.ID != "" {
 		ch, _, err := s.youtube.GetChannelByID(ctx, channel.ID)
 		if err != nil {
@@ -340,7 +348,6 @@ func (s *service) fillYoutubeChannel(ctx context.Context, channel vtuberEntity.C
 		channel.ID = ch.ID
 		channel.Name = ch.Name
 		channel.Image = ch.Image
-		channel.URL = utils.GenerateYoutubeChannelURL(ch.ID)
 		channel.Subscriber = ch.Subscriber
 
 		return channel
@@ -361,7 +368,6 @@ func (s *service) fillYoutubeChannel(ctx context.Context, channel vtuberEntity.C
 	channel.ID = ch.ID
 	channel.Name = ch.Name
 	channel.Image = ch.Image
-	channel.URL = utils.GenerateYoutubeChannelURL(ch.ID)
 	channel.Subscriber = ch.Subscriber
 
 	return channel
