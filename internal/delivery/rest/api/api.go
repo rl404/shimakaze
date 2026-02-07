@@ -38,7 +38,7 @@ func (api *API) Register(r chi.Router, nrApp *newrelic.Application) {
 			RawPath:        true,
 			Error:          true,
 		}))
-		r.Use(utils.Recoverer)
+		r.Use(utils.HttpRecoverer)
 
 		r.Get("/wikia/image/*", api.maxConcurrent(api.handleGetWikiaImage, 5))
 
