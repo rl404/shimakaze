@@ -27,6 +27,7 @@ func New(service service.Service, ps pubsub.PubSub, topic string) *Consumer {
 		Payload: true,
 		Error:   true,
 	}))
+	ps.Use(utils.PubsubRecoverer)
 
 	return &Consumer{
 		service: service,

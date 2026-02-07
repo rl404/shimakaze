@@ -1008,7 +1008,8 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "number"
+                                            "type": "number",
+                                            "format": "float64"
                                         }
                                     }
                                 }
@@ -1045,7 +1046,8 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "number"
+                                            "type": "number",
+                                            "format": "float64"
                                         }
                                     }
                                 }
@@ -1082,7 +1084,8 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "number"
+                                            "type": "number",
+                                            "format": "float64"
                                         }
                                     }
                                 }
@@ -1119,7 +1122,8 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "number"
+                                            "type": "number",
+                                            "format": "float64"
                                         }
                                     }
                                 }
@@ -1156,7 +1160,8 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "number"
+                                            "type": "number",
+                                            "format": "float64"
                                         }
                                     }
                                 }

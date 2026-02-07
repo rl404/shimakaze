@@ -1,9 +1,7 @@
-version: "2.4"
-
 services:
   shimakaze-lint:
     container_name: shimakaze-lint
-    image: golangci/golangci-lint:latest
+    image: golangci/golangci-lint:v2.8.0
     working_dir: /shimakaze
     volumes:
       - ../:/shimakaze

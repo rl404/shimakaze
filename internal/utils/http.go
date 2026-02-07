@@ -61,9 +61,9 @@ func ResponseWithPNG(w http.ResponseWriter, code int, data []byte, err error) {
 	_, _ = w.Write(data)
 }
 
-// Recoverer is custom recoverer middleware.
+// HttpRecoverer is custom http recoverer middleware.
 // Will return 500.
-func Recoverer(next http.Handler) http.Handler {
+func HttpRecoverer(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if rvr := recover(); rvr != nil {

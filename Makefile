@@ -16,9 +16,6 @@ SWAG_GEN := $(SWAG) init
 GCL_CMD := golangci-lint
 GCL_RUN := $(GCL_CMD) run
 
-# Base protoc commands.
-PROTOC := protoc
-
 # Project executable file, and its binary.
 CMD_PATH    := ./cmd/shimakaze
 BINARY_NAME := shimakaze
@@ -34,6 +31,7 @@ fmt:
 # Lint go source code.
 .PHONY: lint
 lint: fmt
+	@$(GO_INSTALL) github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.8.0
 	@$(GCL_RUN) -D errcheck --timeout 5m
 
 # Clean project binary, test, and coverage file.
@@ -44,15 +42,8 @@ clean:
 # Generate swagger docs.
 .PHONY: swagger
 swagger:
+	@$(GO_INSTALL) github.com/swaggo/swag/cmd/swag@v1.16.6
 	@$(SWAG_GEN) -g cmd/shimakaze/main.go -o ./docs
-
-# Install library.
-.PHONY: install
-install:
-	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $$(go env GOPATH)/bin v1.46.2
-	@$(GCL_CMD) version
-	@$(GO_INSTALL) github.com/swaggo/swag/cmd/swag@v1.8.3
-	@$(SWAG) -v
 
 # Build the project executable binary.
 .PHONY: build
@@ -89,7 +80,7 @@ DOCKER_CMD   := docker
 DOCKER_IMAGE := $(DOCKER_CMD) image
 
 # Docker-compose base command and docker-compose.yml path.
-COMPOSE_CMD         := docker-compose
+COMPOSE_CMD         := $(DOCKER_CMD) compose
 COMPOSE_BUILD       := deployment/build.yml
 COMPOSE_API         := deployment/api.yml
 COMPOSE_CONSUMER    := deployment/consumer.yml

@@ -179,7 +179,7 @@ func server() error {
 
 	r := httpServer.Router()
 	r.Use(middleware.RealIP)
-	r.Use(utils.Recoverer)
+	r.Use(utils.HttpRecoverer)
 	utils.Info("http server middleware initialized")
 
 	// Register ping route.

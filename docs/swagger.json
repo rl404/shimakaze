@@ -1004,7 +1004,8 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "number"
+                                            "type": "number",
+                                            "format": "float64"
                                         }
                                     }
                                 }
@@ -1041,7 +1042,8 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "number"
+                                            "type": "number",
+                                            "format": "float64"
                                         }
                                     }
                                 }
@@ -1078,7 +1080,8 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "number"
+                                            "type": "number",
+                                            "format": "float64"
                                         }
                                     }
                                 }
@@ -1115,7 +1118,8 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "number"
+                                            "type": "number",
+                                            "format": "float64"
                                         }
                                     }
                                 }
@@ -1152,7 +1156,8 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "number"
+                                            "type": "number",
+                                            "format": "float64"
                                         }
                                     }
                                 }

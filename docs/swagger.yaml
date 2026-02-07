@@ -1151,6 +1151,7 @@ paths:
             - $ref: '#/definitions/utils.Response'
             - properties:
                 data:
+                  format: float64
                   type: number
               type: object
         "500":
@@ -1172,6 +1173,7 @@ paths:
             - $ref: '#/definitions/utils.Response'
             - properties:
                 data:
+                  format: float64
                   type: number
               type: object
         "500":
@@ -1193,6 +1195,7 @@ paths:
             - $ref: '#/definitions/utils.Response'
             - properties:
                 data:
+                  format: float64
                   type: number
               type: object
         "500":
@@ -1214,6 +1217,7 @@ paths:
             - $ref: '#/definitions/utils.Response'
             - properties:
                 data:
+                  format: float64
                   type: number
               type: object
         "500":
@@ -1235,6 +1239,7 @@ paths:
             - $ref: '#/definitions/utils.Response'
             - properties:
                 data:
+                  format: float64
                   type: number
               type: object
         "500":
