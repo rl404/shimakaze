@@ -160,7 +160,8 @@ func ParseDuration(durationStr string, startFromTime ...bool) (time.Duration, er
 
 			num = ""
 		case 'M', 'm':
-			if state == parsingPeriod {
+			switch state {
+			case parsingPeriod:
 				m, err := strconv.ParseFloat(num, 64)
 				if err != nil {
 					return 0, err
@@ -169,7 +170,7 @@ func ParseDuration(durationStr string, startFromTime ...bool) (time.Duration, er
 				duration += time.Duration(math.Round(m)) * 30 * 24 * time.Hour
 
 				num = ""
-			} else if state == parsingTime {
+			case parsingTime:
 				m, err := strconv.ParseFloat(num, 64)
 				if err != nil {
 					return 0, err
@@ -246,7 +247,7 @@ func ParseDuration(durationStr string, startFromTime ...bool) (time.Duration, er
 
 // GenerateUUID to generate random uuid.
 func GenerateUUID() string {
-	return strings.Replace(uuid.New().String(), "-", "", -1)
+	return strings.ReplaceAll(uuid.New().String(), "-", "")
 }
 
 var strs = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
