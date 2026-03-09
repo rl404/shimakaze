@@ -1,6 +1,6 @@
 module github.com/rl404/shimakaze
 
-go 1.25
+go 1.25.0
 
 require (
 	github.com/PuerkitoBio/goquery v1.11.0
@@ -18,7 +18,7 @@ require (
 	github.com/swaggo/swag v1.16.6
 	github.com/tmdvs/Go-Emoji-Utils v1.2.1
 	go.mongodb.org/mongo-driver/v2 v2.5.0
-	golang.org/x/oauth2 v0.35.0
+	golang.org/x/oauth2 v0.36.0
 	golang.org/x/text v0.34.0
 )
 
