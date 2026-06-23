@@ -206,7 +206,7 @@ github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.20
 ## explicit; go 1.15
 github.com/mattn/go-isatty
-# github.com/newrelic/go-agent/v3 v3.43.3
+# github.com/newrelic/go-agent/v3 v3.44.1
 ## explicit; go 1.25
 github.com/newrelic/go-agent/v3/internal
 github.com/newrelic/go-agent/v3/internal/cat
@@ -220,8 +220,8 @@ github.com/newrelic/go-agent/v3/newrelic
 # github.com/newrelic/go-agent/v3/integrations/nrgrpc v1.4.6
 ## explicit; go 1.22
 github.com/newrelic/go-agent/v3/integrations/nrgrpc
-# github.com/newrelic/go-agent/v3/integrations/nrmongo-v2 v1.0.1
-## explicit; go 1.22
+# github.com/newrelic/go-agent/v3/integrations/nrmongo-v2 v1.0.2
+## explicit; go 1.25
 github.com/newrelic/go-agent/v3/integrations/nrmongo-v2
 # github.com/nicklaw5/helix/v2 v2.34.0
 ## explicit; go 1.25
