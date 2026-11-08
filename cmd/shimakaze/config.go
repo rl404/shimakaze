@@ -114,7 +114,7 @@ type ssoConfig struct {
 	RedirectURL  string `envconfig:"REDIRECT_URL"`
 }
 
-const envPath = "../../.env"
+const envPath = ".env"
 const envPrefix = "SHIMAKAZE"
 const pubsubTopic = "shimakaze-pubsub"
 
