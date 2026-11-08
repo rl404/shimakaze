@@ -1,10 +1,9 @@
 # Shimakaze
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/rl404/shimakaze)](https://goreportcard.com/report/github.com/rl404/shimakaze)
 ![License: MIT](https://img.shields.io/github/license/rl404/shimakaze)
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/rl404/shimakaze)
 [![Docker Image Size (latest semver)](https://img.shields.io/docker/image-size/rl404/shimakaze)](https://hub.docker.com/r/rl404/shimakaze)
-[![publish & deploy](https://github.com/rl404/shimakaze/actions/workflows/publish-deploy.yml/badge.svg)](https://github.com/rl404/shimakaze/actions/workflows/publish-deploy.yml)
+[![CI](https://github.com/rl404/shimakaze/actions/workflows/ci.yml/badge.svg?event=push)](https://github.com/rl404/shimakaze/actions/workflows/ci.yml)
 
 Shimakaze is [Vtuber Wikia](https://virtualyoutuber.fandom.com/wiki/Virtual_YouTuber_Wiki) scraper and REST API.
 
@@ -56,24 +55,24 @@ _More will be coming soon..._
 
 1. Clone the repository.
 
-```sh
-git clone github.com/rl404/shimakaze
-```
+   ```sh
+   git clone github.com/rl404/shimakaze
+   ```
 
 2. Rename `.env.sample` to `.env` and modify the values according to your setup.
 3. Run. You need at least 2 consoles/terminals.
 
-```sh
-# Run the API.
-make
+   ```sh
+   # Run the API.
+   make api
 
-# Run the consumer.
-make consumer
-```
+   # Run the consumer.
+   make consumer
+   ```
 
-6. [localhost:45001](http://localhost:45001) is ready (port may varies depend on your `.env`).
+4. [localhost:45001](http://localhost:45001) is ready (port may varies depend on your `.env`).
 
-#### Other commands
+#### Other Commands
 
 ```sh
 # Update old vtuber data.
@@ -81,40 +80,43 @@ make cron-update
 
 # Fill missing vtuber data.
 make cron-fill
+
+# Show help.
+make help
 ```
 
 ### With [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/)
 
 1. Clone the repository.
 
-```sh
-git clone github.com/rl404/shimakaze
-```
+   ```sh
+   git clone github.com/rl404/shimakaze
+   ```
 
 2. Rename `.env.sample` to `.env` and modify the values according to your setup.
 3. Get docker image.
 
-```sh
-# Pull existing image.
-docker pull rl404/shimakaze
+   ```sh
+   # Pull existing image.
+   docker pull rl404/shimakaze
 
-# Or build your own.
-make docker-build
-```
+   # Or build your own.
+   make docker-build
+   ```
 
 4. Run the container. You need at least 2 consoles/terminals.
 
-```sh
-# Run the API.
-make docker-api
+   ```sh
+   # Run the API.
+   make docker-api
 
-# Run the consumer.
-make docker-consumer
-```
+   # Run the consumer.
+   make docker-consumer
+   ```
 
 5. [localhost:45001](http://localhost:45001) is ready (port may varies depend on your `.env`).
 
-#### Other commands
+#### Other Docker Commands
 
 ```sh
 # Update old vtuber data.
@@ -125,6 +127,9 @@ make docker-cron-fill
 
 # Stop running containers.
 make docker-stop
+
+# Show help.
+make help
 ```
 
 ## Environment Variables
@@ -161,6 +166,9 @@ make docker-stop
 | `SHIMAKAZE_TWITCH_MAX_AGE`        |            `60`             | Age limit of twitch videos (in days).                                                                      |
 | `SHIMAKAZE_BILIBILI_MAX_AGE`      |            `60`             | Age limit of bilibili videos (in days).                                                                    |
 | `SHIMAKAZE_NICONICO_MAX_AGE`      |            `60`             | Age limit of niconico videos (in days).                                                                    |
+| `SHIMAKAZE_LOG_LEVEL`             |            `-1`             | Log level                                                                                                  |
+| `SHIMAKAZE_LOG_JSON`              |           `false`           | Log JSON format                                                                                            |
+| `SHIMAKAZE_LOG_COLOR`             |           `true`            | Log color                                                                                                  |
 
 ## Trivia
 
