@@ -4,3 +4,5 @@ services:
     build:
       context: ./..
       dockerfile: ./build/package/Dockerfile
+    profiles:
+      - build

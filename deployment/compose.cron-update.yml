@@ -2,6 +2,6 @@ services:
   shimakaze-cron-update:
     container_name: shimakaze-cron-update
     image: rl404/shimakaze:latest
-    command: ./shimakaze cron update
-    env_file: ./../.env
+    command: cron update
+    env_file: ../.env
     network_mode: host
