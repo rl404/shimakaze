@@ -3,7 +3,7 @@ module github.com/rl404/shimakaze
 go 1.27.3
 
 require (
-	github.com/PuerkitoBio/goquery v1.13.0
+	github.com/PuerkitoBio/goquery v1.14.0
 	github.com/go-chi/chi/v5 v5.5.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/google/uuid v1.6.0
@@ -17,7 +17,7 @@ require (
 	github.com/swaggo/http-swagger/v2 v2.0.2
 	github.com/swaggo/swag v1.16.6
 	github.com/tmdvs/Go-Emoji-Utils v1.2.1
-	go.mongodb.org/mongo-driver/v2 v2.10.0
+	go.mongodb.org/mongo-driver/v2 v2.10.1
 	golang.org/x/oauth2 v0.38.0
 	golang.org/x/text v0.44.0
 )
@@ -31,7 +31,7 @@ require (
 	cloud.google.com/go/pubsub/v2 v2.7.0 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/allegro/bigcache/v3 v3.2.0 // indirect
-	github.com/andybalholm/cascadia v1.3.4 // indirect
+	github.com/andybalholm/cascadia v1.3.5 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/dlclark/regexp2 v1.10.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
@@ -86,7 +86,7 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	golang.org/x/crypto v0.58.0 // indirect
 	golang.org/x/mod v0.42.0 // indirect
-	golang.org/x/net v0.61.0 // indirect
+	golang.org/x/net v0.62.0 // indirect
 	golang.org/x/sync v0.25.0 // indirect
 	golang.org/x/sys v0.49.0 // indirect
 	golang.org/x/time v0.16.0 // indirect
